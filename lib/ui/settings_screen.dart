@@ -10,6 +10,7 @@ import 'widgets/common.dart';
 import 'settings/currencies_screen.dart';
 import 'settings/security_screen.dart';
 import 'settings/fiscal_close_screen.dart';
+import 'settings/import_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -222,6 +223,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     context,
                     MaterialPageRoute(
                         builder: (_) => const FiscalCloseScreen()),
+                  ),
+                ),
+                const Divider(height: 1),
+                ListTile(
+                  leading:
+                      const Icon(Icons.upload_file, color: AppColors.teal),
+                  title: const Text('استيراد البيانات (Excel / CSV)'),
+                  subtitle: const Text('استيراد الأصناف والعملاء والموردين'),
+                  trailing: const Icon(Icons.chevron_left),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => const ImportScreen()),
                   ),
                 ),
               ],
