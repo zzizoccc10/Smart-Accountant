@@ -82,7 +82,7 @@ class DashboardScreen extends StatelessWidget {
 
           // بطاقات الإحصاءات
           GridView.count(
-            crossAxisCount: 2,
+            crossAxisCount: MediaQuery.sizeOf(context).width >= 900 ? 4 : 2,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             mainAxisSpacing: 12,
@@ -167,7 +167,7 @@ class DashboardScreen extends StatelessWidget {
           // إجراءات سريعة
           const SectionTitle('إجراءات سريعة', icon: Icons.flash_on),
           GridView.count(
-            crossAxisCount: 3,
+            crossAxisCount: MediaQuery.sizeOf(context).width >= 900 ? 6 : 3,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             mainAxisSpacing: 12,

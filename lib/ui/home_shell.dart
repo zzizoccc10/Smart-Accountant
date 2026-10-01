@@ -37,74 +37,71 @@ class _HomeShellState extends State<HomeShell> {
   @override
   Widget build(BuildContext context) {
     final prov = context.watch<ERPProvider>();
-    return Scaffold(
-      appBar: AppBar(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(prov.companyName),
-            Text(
-              'المحاسب السهل',
-              style: TextStyle(
-                fontSize: 11,
-                color: Colors.white.withValues(alpha: 0.8),
-                fontWeight: FontWeight.normal,
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          Builder(
-            builder: (ctx) {
-              final count = prov.lowStockItems.length +
-                  prov.overdueInvoices.length;
-              return Stack(
-                children: [
-                  IconButton(
-                    tooltip: 'التنبيهات',
-                    icon: const Icon(Icons.notifications_none),
-                    onPressed: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const AlertsScreen()),
-                    ),
-                  ),
-                  if (count > 0)
-                    Positioned(
-                      right: 6,
-                      top: 6,
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: const BoxDecoration(
-                          color: AppColors.danger,
-                          shape: BoxShape.circle,
-                        ),
-                        constraints: const BoxConstraints(
-                            minWidth: 16, minHeight: 16),
-                        child: Text(
-                          '$count',
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 9,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                ],
-              );
-            },
-          ),
-          IconButton(
-            tooltip: 'الإعدادات',
-            icon: const Icon(Icons.settings),
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const SettingsScreen()),
+    // تصميم متجاوب: الشاشات العريضة (تابلت) تستخدم NavigationRail جانبي
+    final isWide = MediaQuery.sizeOf(context).width >= 900;
+
+    final appBar = AppBar(
+      title: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(prov.companyName),
+          Text(
+            'المحاسب السهل',
+            style: TextStyle(
+              fontSize: 11,
+              color: Colors.white.withValues(alpha: 0.8),
+              fontWeight: FontWeight.normal,
             ),
           ),
         ],
       ),
+      actions: _appActions(context, prov),
+    );
+
+    if (isWide) {
+      return Scaffold(
+        appBar: appBar,
+        body: Row(
+          children: [
+            NavigationRail(
+              selectedIndex: _idx,
+              onDestinationSelected: (i) => setState(() => _idx = i),
+              labelType: NavigationRailLabelType.all,
+              leading: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child: CircleAvatar(
+                  backgroundColor: AppColors.primary.withValues(alpha: 0.12),
+                  child: const Icon(Icons.account_balance_wallet_rounded,
+                      color: AppColors.primary),
+                ),
+              ),
+              destinations: const [
+                NavigationRailDestination(
+                    icon: Icon(Icons.dashboard_rounded), label: Text('الرئيسية')),
+                NavigationRailDestination(
+                    icon: Icon(Icons.point_of_sale_rounded),
+                    label: Text('البيع والشراء')),
+                NavigationRailDestination(
+                    icon: Icon(Icons.inventory_2_rounded),
+                    label: Text('المخزون')),
+                NavigationRailDestination(
+                    icon: Icon(Icons.account_balance_rounded),
+                    label: Text('الحسابات')),
+                NavigationRailDestination(
+                    icon: Icon(Icons.bar_chart_rounded), label: Text('التقارير')),
+              ],
+            ),
+            const VerticalDivider(width: 1),
+            Expanded(
+              child: IndexedStack(index: _idx, children: _pages),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Scaffold(
+      appBar: appBar,
       drawer: _buildDrawer(context),
       body: IndexedStack(index: _idx, children: _pages),
       bottomNavigationBar: BottomNavigationBar(
@@ -134,6 +131,61 @@ class _HomeShellState extends State<HomeShell> {
         ],
       ),
     );
+  }
+
+
+  List<Widget> _appActions(BuildContext context, ERPProvider prov) {
+    return [
+            Builder(
+              builder: (ctx) {
+                final count = prov.lowStockItems.length +
+                    prov.overdueInvoices.length;
+                return Stack(
+                  children: [
+                    IconButton(
+                      tooltip: 'التنبيهات',
+                      icon: const Icon(Icons.notifications_none),
+                      onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const AlertsScreen()),
+                      ),
+                    ),
+                    if (count > 0)
+                      Positioned(
+                        right: 6,
+                        top: 6,
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: const BoxDecoration(
+                            color: AppColors.danger,
+                            shape: BoxShape.circle,
+                          ),
+                          constraints: const BoxConstraints(
+                              minWidth: 16, minHeight: 16),
+                          child: Text(
+                            '$count',
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 9,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                );
+              },
+            ),
+            IconButton(
+              tooltip: 'الإعدادات',
+              icon: const Icon(Icons.settings),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const SettingsScreen()),
+              ),
+            ),
+    ];
   }
 
   Widget _buildDrawer(BuildContext context) {
