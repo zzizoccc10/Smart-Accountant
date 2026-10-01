@@ -1,0 +1,47 @@
+name: easy_accountant
+description: "المحاسب السهل — نظام محاسبي ERP متكامل يعمل دون اتصال."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.9.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+
+  # State Management
+  provider: 6.1.5+1
+
+  # Local Storage (Web + Android compatible)
+  hive: 2.2.3
+  hive_flutter: 1.1.0
+  shared_preferences: 2.5.3
+
+  # Utilities
+  intl: ^0.20.2
+  uuid: ^4.5.1
+
+  # Charts
+  fl_chart: ^0.69.0
+
+  # Reports & Printing
+  pdf: ^3.11.1
+  printing: ^5.13.2
+  barcode: ^2.2.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/fonts/
+  fonts:
+    - family: Cairo
+      fonts:
+        - asset: assets/fonts/Cairo-Regular.ttf
