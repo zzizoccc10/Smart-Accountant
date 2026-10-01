@@ -1489,3 +1489,108 @@ class AuditLog {
     _ => entity,
   };
 }
+
+/// مستند تجاري (عرض سعر / أمر بيع / أمر شراء) — orders
+/// يتحوّل لاحقاً إلى فاتورة بضغطة واحدة
+class OrderDoc {
+  final String id;
+  String docNumber;
+  String docType; // quotation | sales_order | purchase_order
+  String date;
+  String validUntil; // صلاحية عرض السعر / تاريخ التسليم المتوقع
+  String? contactId;
+  String contactName;
+  String warehouseId;
+  List<InvoiceLine> lines;
+  double discountAmount;
+  double taxAmount;
+  double shipping;
+  double total;
+  String status; // draft | confirmed | converted | cancelled
+  String notes;
+  String? convertedInvoiceId; // الفاتورة الناتجة بعد التحويل
+  String createdAt;
+  bool isDeleted;
+
+  OrderDoc({
+    required this.id,
+    required this.docNumber,
+    required this.docType,
+    required this.date,
+    this.validUntil = '',
+    this.contactId,
+    this.contactName = '',
+    this.warehouseId = '',
+    List<InvoiceLine>? lines,
+    this.discountAmount = 0.0,
+    this.taxAmount = 0.0,
+    this.shipping = 0.0,
+    this.total = 0.0,
+    this.status = 'draft',
+    this.notes = '',
+    this.convertedInvoiceId,
+    this.isDeleted = false,
+    String? createdAt,
+  }) : lines = lines ?? [],
+       createdAt = createdAt ?? DateTime.now().toIso8601String();
+
+  double get subtotal => lines.fold(0.0, (s, l) => s + l.lineSubtotal);
+
+  String get typeLabel => switch (docType) {
+    'quotation' => 'عرض سعر',
+    'sales_order' => 'أمر بيع',
+    _ => 'أمر شراء',
+  };
+
+  String get statusLabel => switch (status) {
+    'draft' => 'مسودة',
+    'confirmed' => 'مؤكّد',
+    'converted' => 'مُحوّل لفاتورة',
+    _ => 'ملغى',
+  };
+
+  Map<String, dynamic> toMap() => {
+    'id': id,
+    'docNumber': docNumber,
+    'docType': docType,
+    'date': date,
+    'validUntil': validUntil,
+    'contactId': contactId,
+    'contactName': contactName,
+    'warehouseId': warehouseId,
+    'lines': lines.map((l) => l.toMap()).toList(),
+    'discountAmount': discountAmount,
+    'taxAmount': taxAmount,
+    'shipping': shipping,
+    'total': total,
+    'status': status,
+    'notes': notes,
+    'convertedInvoiceId': convertedInvoiceId,
+    'createdAt': createdAt,
+    'isDeleted': isDeleted,
+  };
+
+  factory OrderDoc.fromMap(Map<String, dynamic> m) => OrderDoc(
+    id: m['id'] as String,
+    docNumber: m['docNumber'] as String? ?? '',
+    docType: m['docType'] as String? ?? 'quotation',
+    date: m['date'] as String? ?? '',
+    validUntil: m['validUntil'] as String? ?? '',
+    contactId: m['contactId'] as String?,
+    contactName: m['contactName'] as String? ?? '',
+    warehouseId: m['warehouseId'] as String? ?? '',
+    lines: (m['lines'] as List?)
+            ?.map((e) => InvoiceLine.fromMap(Map<String, dynamic>.from(e)))
+            .toList() ??
+        [],
+    discountAmount: (m['discountAmount'] as num?)?.toDouble() ?? 0.0,
+    taxAmount: (m['taxAmount'] as num?)?.toDouble() ?? 0.0,
+    shipping: (m['shipping'] as num?)?.toDouble() ?? 0.0,
+    total: (m['total'] as num?)?.toDouble() ?? 0.0,
+    status: m['status'] as String? ?? 'draft',
+    notes: m['notes'] as String? ?? '',
+    convertedInvoiceId: m['convertedInvoiceId'] as String?,
+    isDeleted: m['isDeleted'] as bool? ?? false,
+    createdAt: m['createdAt'] as String?,
+  );
+}

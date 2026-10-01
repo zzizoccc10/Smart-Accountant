@@ -36,6 +36,7 @@ class AppDatabase {
   static const boxCostCenters = 'cost_centers';
   static const boxExchangeRates = 'exchange_rates';
   static const boxAuditLog = 'audit_log';
+  static const boxOrders = 'orders';
 
   static late Box _bAccounts;
   static late Box _bContacts;
@@ -63,6 +64,7 @@ class AppDatabase {
   static late Box _bCostCenters;
   static late Box _bExchangeRates;
   static late Box _bAuditLog;
+  static late Box _bOrders;
 
   static String newId() => _uuid.v4();
 
@@ -96,6 +98,7 @@ class AppDatabase {
     _bCostCenters = await Hive.openBox(boxCostCenters);
     _bExchangeRates = await Hive.openBox(boxExchangeRates);
     _bAuditLog = await Hive.openBox(boxAuditLog);
+    _bOrders = await Hive.openBox(boxOrders);
 
     if (_bSettings.get('seeded') != true) {
       await _seed();
@@ -407,6 +410,24 @@ class AppDatabase {
   static List<ExchangeRate> exchangeRatesOfCurrency(String currencyId) =>
       exchangeRates.where((r) => r.currencyId == currencyId).toList();
 
+  // ---------------------------- المستندات التجارية (عروض/أوامر) ----------------------------
+  static List<OrderDoc> get orders => _bOrders.values
+      .map((e) => OrderDoc.fromMap(Map<String, dynamic>.from(e)))
+      .where((o) => !o.isDeleted)
+      .toList();
+
+  static Future<void> saveOrder(OrderDoc o) => _bOrders.put(o.id, o.toMap());
+  static Future<void> deleteOrder(String id) => _bOrders.delete(id);
+
+  static OrderDoc? orderById(String? id) {
+    if (id == null) return null;
+    final v = _bOrders.get(id);
+    return v == null ? null : OrderDoc.fromMap(Map<String, dynamic>.from(v));
+  }
+
+  static List<OrderDoc> ordersOfType(String docType) =>
+      orders.where((o) => o.docType == docType).toList();
+
   // ---------------------------- سجل المراجعة ----------------------------
   static const int _maxAuditLog = 2000;
 
@@ -479,6 +500,7 @@ class AppDatabase {
       _bCostCenters,
       _bExchangeRates,
       _bAuditLog,
+      _bOrders,
     ]) {
       await b.clear();
     }

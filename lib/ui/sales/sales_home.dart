@@ -8,6 +8,7 @@ import '../../theme/app_theme.dart';
 import '../widgets/common.dart';
 import 'invoice_form.dart';
 import 'invoice_details_screen.dart';
+import 'orders_list_screen.dart';
 
 class SalesHome extends StatefulWidget {
   const SalesHome({super.key});
@@ -73,15 +74,32 @@ class _SalesHomeState extends State<SalesHome> {
               ),
             ),
           ),
-          // بحث
+          // بحث + المستندات التجارية
           Padding(
             padding: const EdgeInsets.all(12),
-            child: TextField(
-              decoration: const InputDecoration(
-                hintText: 'بحث بالاسم أو رقم الفاتورة...',
-                prefixIcon: Icon(Icons.search),
-              ),
-              onChanged: (v) => setState(() => _search = v),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    decoration: const InputDecoration(
+                      hintText: 'بحث بالاسم أو رقم الفاتورة...',
+                      prefixIcon: Icon(Icons.search),
+                    ),
+                    onChanged: (v) => setState(() => _search = v),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                IconButton.filledTonal(
+                  tooltip: 'عروض الأسعار والأوامر',
+                  icon: const Icon(Icons.description_outlined),
+                  onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const OrdersListScreen(),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
           // قائمة

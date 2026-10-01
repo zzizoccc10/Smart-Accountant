@@ -8,6 +8,7 @@ import '../providers/erp_provider.dart';
 import '../theme/app_theme.dart';
 import 'dashboard_screen.dart';
 import 'sales/sales_home.dart';
+import 'sales/orders_list_screen.dart';
 import 'inventory/inventory_home.dart';
 import 'reports/reports_home.dart';
 import 'accounts/accounts_home.dart';
@@ -232,6 +233,19 @@ class _HomeShellState extends State<HomeShell> {
           ),
           _tile(context, Icons.dashboard_rounded, 'الرئيسية', 0),
           _tile(context, Icons.point_of_sale_rounded, 'البيع والشراء', 1),
+          ListTile(
+            leading: const Icon(Icons.description_outlined,
+                color: AppColors.info),
+            title: const Text('عروض الأسعار والأوامر'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (_) => const OrdersListScreen()),
+              );
+            },
+          ),
           _tile(context, Icons.inventory_2_rounded, 'المخزون', 2),
           _tile(context, Icons.account_balance_rounded, 'الحسابات', 3),
           _tile(context, Icons.bar_chart_rounded, 'التقارير', 4),

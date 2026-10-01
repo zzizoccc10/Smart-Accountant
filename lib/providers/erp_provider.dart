@@ -32,6 +32,7 @@ class ERPProvider extends ChangeNotifier {
   List<CostCenter> costCenters = [];
   List<ExchangeRate> exchangeRates = [];
   List<AuditLog> auditLogs = [];
+  List<OrderDoc> orders = [];
 
   bool initialized = false;
 
@@ -63,6 +64,7 @@ class ERPProvider extends ChangeNotifier {
     costCenters = AppDatabase.costCenters;
     exchangeRates = AppDatabase.exchangeRates;
     auditLogs = AppDatabase.auditLogs;
+    orders = AppDatabase.orders;
     fixedAssets = AppDatabase.fixedAssets;
     initialized = true;
     notifyListeners();
@@ -1170,4 +1172,104 @@ class ERPProvider extends ChangeNotifier {
 
   List<AuditLog> auditLogsByEntity(String entity) =>
       auditLogs.where((l) => l.entity == entity).toList();
+
+  // ============================ المستندات التجارية (عروض/أوامر) ============================
+  List<OrderDoc> ordersOfType(String docType) =>
+      orders.where((o) => o.docType == docType).toList();
+
+  Future<OrderDoc> createOrder({
+    required String docType, // quotation | sales_order | purchase_order
+    required String date,
+    String? contactId,
+    required String warehouseId,
+    required List<InvoiceLine> lines,
+    double discountAmount = 0.0,
+    double taxAmount = 0.0,
+    double shipping = 0.0,
+    String validUntil = '',
+    String notes = '',
+  }) async {
+    final contact = AppDatabase.contactById(contactId);
+    final prefix = switch (docType) {
+      'quotation' => 'QT-',
+      'sales_order' => 'SO-',
+      _ => 'PO-',
+    };
+    final subtotal = lines.fold<double>(0.0, (s, l) => s + l.lineSubtotal);
+    final total = subtotal - discountAmount + taxAmount + shipping;
+    final o = OrderDoc(
+      id: AppDatabase.newId(),
+      docNumber: await AppDatabase.nextNumber('order_$docType', prefix: prefix),
+      docType: docType,
+      date: date,
+      validUntil: validUntil,
+      contactId: contactId,
+      contactName: contact?.name ?? '',
+      warehouseId: warehouseId,
+      lines: lines,
+      discountAmount: discountAmount,
+      taxAmount: taxAmount,
+      shipping: shipping,
+      total: total,
+      status: 'draft',
+      notes: notes,
+    );
+    await AppDatabase.saveOrder(o);
+    reload();
+    await logAction('create', 'order',
+        entityId: o.id, description: 'إنشاء ${o.typeLabel} ${o.docNumber} بمبلغ ${o.total}');
+    return o;
+  }
+
+  Future<void> updateOrderStatus(String id, String status) async {
+    final o = AppDatabase.orderById(id);
+    if (o != null) {
+      o.status = status;
+      await AppDatabase.saveOrder(o);
+      reload();
+    }
+  }
+
+  Future<void> deleteOrder(String id) async {
+    final o = AppDatabase.orderById(id);
+    if (o != null) {
+      o.isDeleted = true;
+      await AppDatabase.saveOrder(o);
+      await logAction('delete', 'order',
+          entityId: o.id, description: 'حذف ${o.typeLabel} ${o.docNumber}');
+    }
+    reload();
+  }
+
+  /// تحويل مستند (عرض سعر/أمر بيع/أمر شراء) إلى فاتورة
+  Future<Invoice?> convertOrderToInvoice(
+    String orderId, {
+    required String paymentType, // cash/credit
+    String? cashboxId,
+    String? date,
+  }) async {
+    final o = AppDatabase.orderById(orderId);
+    if (o == null) return null;
+    final invoiceType = o.docType == 'purchase_order' ? 'purchase' : 'sale';
+    final inv = await createInvoice(
+      invoiceType: invoiceType,
+      paymentType: paymentType,
+      date: date ?? DateTime.now().toIso8601String().substring(0, 10),
+      contactId: o.contactId,
+      warehouseId: o.warehouseId,
+      cashboxId: cashboxId,
+      lines: o.lines,
+      discountAmount: o.discountAmount,
+      taxAmount: o.taxAmount,
+      shipping: o.shipping,
+      notes: 'محوّل من ${o.typeLabel} ${o.docNumber}',
+    );
+    o.status = 'converted';
+    o.convertedInvoiceId = inv.id;
+    await AppDatabase.saveOrder(o);
+    reload();
+    await logAction('post', 'order',
+        entityId: o.id, description: 'تحويل ${o.typeLabel} ${o.docNumber} إلى فاتورة ${inv.invoiceNumber}');
+    return inv;
+  }
 }
