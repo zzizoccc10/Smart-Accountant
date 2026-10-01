@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../../providers/erp_provider.dart';
 import '../../models/models.dart';
 import '../../services/print_service.dart';
+import '../../services/share_service.dart';
 import '../../theme/app_theme.dart';
 import '../widgets/common.dart';
 
@@ -45,6 +46,45 @@ class InvoiceDetailsScreen extends StatelessWidget {
             icon: const Icon(Icons.share),
             tooltip: 'مشاركة PDF',
             onPressed: () => _print(context, prov, inv, true),
+          ),
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert),
+            tooltip: 'إرسال',
+            onSelected: (v) => _send(context, prov, inv, v),
+            itemBuilder: (_) => const [
+              PopupMenuItem(
+                value: 'whatsapp',
+                child: ListTile(
+                  leading: Icon(Icons.chat, color: Color(0xFF25D366)),
+                  title: Text('واتساب'),
+                  dense: true,
+                ),
+              ),
+              PopupMenuItem(
+                value: 'sms',
+                child: ListTile(
+                  leading: Icon(Icons.sms),
+                  title: Text('رسالة SMS'),
+                  dense: true,
+                ),
+              ),
+              PopupMenuItem(
+                value: 'email',
+                child: ListTile(
+                  leading: Icon(Icons.email),
+                  title: Text('بريد إلكتروني'),
+                  dense: true,
+                ),
+              ),
+              PopupMenuItem(
+                value: 'call',
+                child: ListTile(
+                  leading: Icon(Icons.call),
+                  title: Text('اتصال بالعميل'),
+                  dense: true,
+                ),
+              ),
+            ],
           ),
           IconButton(
             icon: const Icon(Icons.delete_outline),
@@ -195,6 +235,69 @@ class InvoiceDetailsScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+/// إرسال ملخّص الفاتورة عبر واتساب/SMS/بريد/اتصال
+Future<void> _send(
+  BuildContext context,
+  ERPProvider prov,
+  Invoice inv,
+  String channel,
+) async {
+  final phone = _contactPhone(prov, inv.contactId);
+  final text = _invoiceText(prov, inv);
+  bool ok = false;
+  switch (channel) {
+    case 'whatsapp':
+      ok = await ShareService.whatsapp(text, phone: phone);
+      break;
+    case 'sms':
+      ok = await ShareService.sms(text, phone: phone);
+      break;
+    case 'email':
+      ok = await ShareService.email('فاتورة ${inv.invoiceNumber}', text);
+      break;
+    case 'call':
+      if (phone == null || phone.isEmpty) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('لا يوجد رقم هاتف لهذه الجهة')),
+          );
+        }
+        return;
+      }
+      ok = await ShareService.call(phone);
+      break;
+  }
+  if (context.mounted && !ok && channel != 'call') {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('تعذّر فتح التطبيق المطلوب')),
+    );
+  }
+}
+
+String? _contactPhone(ERPProvider prov, String? contactId) {
+  if (contactId == null) return null;
+  final c = prov.contacts.where((x) => x.id == contactId).firstOrNull;
+  return c?.phone;
+}
+
+String _invoiceText(ERPProvider prov, Invoice inv) {
+  final b = StringBuffer();
+  b.writeln(prov.companyName);
+  b.writeln('فاتورة رقم: ${inv.invoiceNumber}');
+  b.writeln('التاريخ: ${inv.date}');
+  b.writeln('الجهة: ${inv.contactName.isEmpty ? "عميل نقدي" : inv.contactName}');
+  b.writeln('----------------------');
+  for (final l in inv.lines) {
+    b.writeln('${l.itemName} × ${l.quantity} = ${l.lineTotal.toStringAsFixed(2)}');
+  }
+  b.writeln('----------------------');
+  b.writeln('الإجمالي: ${Fmt.money(inv.total, prov.currency)}');
+  if (inv.remaining > 0) {
+    b.writeln('المتبقي: ${Fmt.money(inv.remaining, prov.currency)}');
+  }
+  return b.toString();
 }
 
 /// طباعة أو مشاركة الفاتورة كـ PDF
