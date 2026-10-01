@@ -13,6 +13,7 @@ import 'settings/fiscal_close_screen.dart';
 import 'settings/import_screen.dart';
 import 'settings/basic_tables_screen.dart';
 import 'settings/audit_log_screen.dart';
+import '../services/backup_service.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -274,6 +275,52 @@ class _SettingsScreenState extends State<SettingsScreen> {
           Card(
             child: Column(
               children: [
+                ListTile(
+                  leading: const Icon(Icons.backup, color: AppColors.success),
+                  title: const Text('نسخة احتياطية (تصدير)'),
+                  subtitle: const Text('حفظ كل البيانات في ملف JSON'),
+                  onTap: () async {
+                    final path = await BackupService.exportBackup();
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(path == null
+                              ? 'تم تصدير النسخة الاحتياطية'
+                              : 'حُفظت في: $path'),
+                          backgroundColor: AppColors.success,
+                        ),
+                      );
+                    }
+                  },
+                ),
+                const Divider(height: 1),
+                ListTile(
+                  leading: const Icon(Icons.restore, color: AppColors.info),
+                  title: const Text('استعادة من نسخة احتياطية'),
+                  subtitle: const Text('استرجاع البيانات من ملف JSON'),
+                  onTap: () async {
+                    final ok = await confirmDialog(
+                      context,
+                      title: 'استعادة نسخة احتياطية',
+                      message:
+                          'سيتم استبدال كل البيانات الحالية بالبيانات من الملف. هل أنت متأكد؟',
+                    );
+                    if (!ok) return;
+                    final res = await BackupService.restoreBackup();
+                    if (context.mounted) {
+                      context.read<ERPProvider>().reload();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(res.message),
+                          backgroundColor: res.success
+                              ? AppColors.success
+                              : AppColors.danger,
+                        ),
+                      );
+                    }
+                  },
+                ),
+                const Divider(height: 1),
                 ListTile(
                   leading: const Icon(Icons.delete_forever, color: AppColors.danger),
                   title: const Text('إعادة تعيين البيانات'),

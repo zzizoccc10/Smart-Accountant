@@ -472,6 +472,74 @@ class AppDatabase {
     final year = DateTime.now().year;
     return '$prefix$current/$year';
   }
+  // ============================ النسخ الاحتياطي ============================
+  /// أسماء الصناديق مع مراجعها (للنسخ الاحتياطي والاستعادة)
+  static Map<String, Box> get _allBoxes => {
+    boxAccounts: _bAccounts,
+    boxContacts: _bContacts,
+    boxItems: _bItems,
+    boxCategories: _bCategories,
+    boxInvoices: _bInvoices,
+    boxPayments: _bPayments,
+    boxExpenses: _bExpenses,
+    boxExpenseCats: _bExpenseCats,
+    boxMovements: _bMovements,
+    boxBalances: _bBalances,
+    boxCashboxes: _bCashboxes,
+    boxWarehouses: _bWarehouses,
+    boxJournals: _bJournals,
+    boxSettings: _bSettings,
+    boxSequences: _bSequences,
+    boxEmployees: _bEmployees,
+    boxAttendance: _bAttendance,
+    boxPayroll: _bPayroll,
+    boxCurrencies: _bCurrencies,
+    boxFixedAssets: _bFixedAssets,
+    boxAllocations: _bAllocations,
+    boxBranches: _bBranches,
+    boxUnits: _bUnits,
+    boxCostCenters: _bCostCenters,
+    boxExchangeRates: _bExchangeRates,
+    boxAuditLog: _bAuditLog,
+    boxOrders: _bOrders,
+  };
+
+  /// تصدير كل البيانات كخريطة JSON قابلة للتحويل إلى نص
+  static Map<String, dynamic> exportAll() {
+    final data = <String, dynamic>{};
+    _allBoxes.forEach((name, box) {
+      final entries = <String, dynamic>{};
+      for (final key in box.keys) {
+        entries[key.toString()] = box.get(key);
+      }
+      data[name] = entries;
+    });
+    data['_meta'] = {
+      'app': 'easy_accountant',
+      'version': 1,
+      'exportedAt': DateTime.now().toIso8601String(),
+    };
+    return data;
+  }
+
+  /// استعادة البيانات من خريطة (تستبدل الحالي بالكامل)
+  static Future<void> importAll(Map<String, dynamic> data) async {
+    for (final entry in _allBoxes.entries) {
+      final box = entry.value;
+      await box.clear();
+      final content = data[entry.key];
+      if (content is Map) {
+        content.forEach((k, v) {
+          box.put(k.toString(), v);
+        });
+      }
+    }
+    // ضمان وجود بيانات البذر إن كان الملف ناقصاً
+    if (_bSettings.get('seeded') != true) {
+      await _seed();
+    }
+  }
+
   // ============================ حذف كل البيانات ============================
   static Future<void> clearAll() async {
     for (final b in [
