@@ -7,6 +7,7 @@ import 'data/app_database.dart';
 import 'providers/erp_provider.dart';
 import 'theme/app_theme.dart';
 import 'ui/splash_screen.dart';
+import 'ui/lock_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,7 +36,7 @@ class EasyAccountantApp extends StatelessWidget {
       builder: (context, child) {
         return Directionality(
           textDirection: TextDirection.rtl,
-          child: child!,
+          child: LockScreen(child: child!),
         );
       },
       home: const SplashScreen(),

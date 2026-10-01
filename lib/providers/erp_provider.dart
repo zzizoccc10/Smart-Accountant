@@ -4,6 +4,7 @@
 // ============================================================================
 import 'package:flutter/material.dart';
 import '../data/app_database.dart';
+import '../data/chart_of_accounts.dart';
 import '../models/models.dart';
 import '../services/journal_engine.dart';
 
@@ -22,6 +23,10 @@ class ERPProvider extends ChangeNotifier {
   List<Cashbox> cashboxes = [];
   List<Warehouse> warehouses = [];
   List<JournalEntry> journals = [];
+  List<Employee> employees = [];
+  List<Attendance> attendance = [];
+  List<PayrollRecord> payrolls = [];
+  List<Currency> currencies = [];
 
   bool initialized = false;
 
@@ -44,6 +49,10 @@ class ERPProvider extends ChangeNotifier {
     cashboxes = AppDatabase.cashboxes;
     warehouses = AppDatabase.warehouses;
     journals = AppDatabase.journals;
+    employees = AppDatabase.employees;
+    attendance = AppDatabase.attendance;
+    payrolls = AppDatabase.payrolls;
+    currencies = AppDatabase.currencies;
     initialized = true;
     notifyListeners();
   }
@@ -654,5 +663,213 @@ class ERPProvider extends ChangeNotifier {
       result.add({'day': d, 'total': total});
     }
     return result;
+  }
+
+  // ---------------------------- مبيعات الشهر (رسم بياني) ----------------------------
+  List<Map<String, dynamic>> monthlySalesByDay(int days) {
+    final result = <Map<String, dynamic>>[];
+    final now = DateTime.now();
+    for (int i = days - 1; i >= 0; i--) {
+      final d = now.subtract(Duration(days: i));
+      final key =
+          '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+      final total = invoices
+          .where((inv) => inv.invoiceType == 'sale' && inv.date == key)
+          .fold(0.0, (s, inv) => s + inv.total);
+      result.add({'day': d, 'total': total});
+    }
+    return result;
+  }
+
+  // ============================ الموارد البشرية ============================
+  Future<void> addEmployee(Employee e) async {
+    await AppDatabase.saveEmployee(e);
+    reload();
+  }
+
+  Future<void> updateEmployee(Employee e) async {
+    await AppDatabase.saveEmployee(e);
+    reload();
+  }
+
+  Future<void> deleteEmployee(String id) async {
+    await AppDatabase.deleteEmployee(id);
+    reload();
+  }
+
+  Future<void> saveAttendance(Attendance a) async {
+    await AppDatabase.saveAttendance(a);
+    reload();
+  }
+
+  /// إنشاء مسير راتب لموظف
+  Future<PayrollRecord> createPayroll({
+    required Employee employee,
+    required String period, // 2025-06
+    required String date,
+    double overtimeAmount = 0.0,
+    double advanceDeduction = 0.0,
+    String? cashboxId,
+  }) async {
+    final netPay = employee.basicSalary +
+        employee.allowances +
+        overtimeAmount -
+        employee.deductions -
+        advanceDeduction;
+
+    final rec = PayrollRecord(
+      id: AppDatabase.newId(),
+      payrollNumber: await AppDatabase.nextNumber('payroll', prefix: 'PRL-'),
+      employeeId: employee.id,
+      employeeName: employee.name,
+      period: period,
+      date: date,
+      basicSalary: employee.basicSalary,
+      allowances: employee.allowances,
+      overtimeAmount: overtimeAmount,
+      deductions: employee.deductions,
+      advanceDeduction: advanceDeduction,
+      netPay: netPay,
+      cashboxId: cashboxId,
+    );
+    await AppDatabase.savePayroll(rec);
+
+    final cashbox = AppDatabase.cashboxById(cashboxId);
+    final entry = await JournalEngine.payroll(rec: rec, cashbox: cashbox);
+    if (cashbox != null && entry.id.isNotEmpty) {
+      final cb = AppDatabase.cashboxById(cashbox.id)!;
+      cb.currentBalance -= netPay;
+      await AppDatabase.saveCashbox(cb);
+    }
+    reload();
+    return rec;
+  }
+
+  double get monthlyPayrollTotal {
+    final period = _today().substring(0, 7);
+    return payrolls
+        .where((p) => p.period == period)
+        .fold(0.0, (s, p) => s + p.netPay);
+  }
+
+  // ============================ العملات ============================
+  Future<void> addCurrency(Currency c) async {
+    await AppDatabase.saveCurrency(c);
+    reload();
+  }
+
+  Future<void> updateCurrency(Currency c) async {
+    await AppDatabase.saveCurrency(c);
+    reload();
+  }
+
+  Future<void> deleteCurrency(String id) async {
+    await AppDatabase.deleteCurrency(id);
+    reload();
+  }
+
+  Currency? get baseCurrency {
+    if (currencies.isEmpty) return null;
+    try {
+      return currencies.firstWhere((c) => c.isBase);
+    } catch (_) {
+      return currencies.first;
+    }
+  }
+
+  // ============================ الأمان (PIN) ============================
+  bool get pinEnabled => AppDatabase.getSettingBool('pinEnabled', false);
+  String get pin => AppDatabase.getSetting('pin', '');
+
+  Future<void> setPin(bool enabled, String value) async {
+    await AppDatabase.setSetting('pinEnabled', enabled ? 'true' : 'false');
+    await AppDatabase.setSetting('pin', value);
+    reload();
+  }
+
+  // ============================ الإقفال السنوي ============================
+  String get fiscalYearClosed =>
+      AppDatabase.getSetting('fiscalYearClosed', '');
+
+  /// إقفال السنة المالية: ترحيل صافي الربح إلى الأرباح المحتجزة
+  Future<JournalEntry?> closeFiscalYear(String year) async {
+    // حساب صافي الربح من الإيرادات والمصروفات
+    final bals = accountBalances();
+    double revenue = 0, expense = 0;
+    for (final a in accounts) {
+      if (!a.isLeaf) continue;
+      final b = bals[a.id];
+      if (b == null) continue;
+      final bal = (b['debit'] ?? 0) - (b['credit'] ?? 0);
+      if (a.accountType == 'revenue') {
+        revenue += -bal; // الإيراد طبيعته دائن
+      } else if (a.accountType == 'expense') {
+        expense += bal; // المصروف طبيعته مدين
+      }
+    }
+    final netProfit = revenue - expense;
+    final date = '$year-12-31';
+    final retained = AppDatabase.accountByCode(CoA.retainedEarnings);
+    final netProfitAcc = AppDatabase.accountByCode(CoA.inventoryGain);
+    final lines = <JournalLine>[];
+    if (netProfit >= 0) {
+      lines.add(JournalLine(
+          accountId: netProfitAcc?.id ?? '',
+          accountName: netProfitAcc?.name ?? 'صافي الربح',
+          debit: netProfit,
+          description: 'صافي ربح السنة'));
+      lines.add(JournalLine(
+          accountId: retained?.id ?? '',
+          accountName: retained?.name ?? 'أرباح محتجزة',
+          credit: netProfit,
+          description: 'ترحيل للأرباح المحتجزة'));
+    } else {
+      lines.add(JournalLine(
+          accountId: retained?.id ?? '',
+          accountName: retained?.name ?? 'أرباح محتجزة',
+          debit: netProfit.abs(),
+          description: 'تغطية خسارة'));
+      lines.add(JournalLine(
+          accountId: netProfitAcc?.id ?? '',
+          accountName: netProfitAcc?.name ?? 'صافي الخسارة',
+          credit: netProfit.abs(),
+          description: 'صافي خسارة السنة'));
+    }
+    final closed = await JournalEngine.post(
+      date: date,
+      description: 'ترحيل صافي الربح/الخسارة للسنة $year',
+      sourceType: 'fiscal_close',
+      lines: lines,
+    );
+    await AppDatabase.setSetting('fiscalYearClosed', year);
+    reload();
+    return closed;
+  }
+
+  // ============================ التنبيهات ============================
+  /// أصناف وصلت لحد الطلب
+  List<Item> get lowStockItems {
+    final result = <Item>[];
+    for (final it in items) {
+      final qty = stockQty(it.id);
+      if (it.reorderLevel > 0 && qty <= it.reorderLevel) {
+        result.add(it);
+      }
+    }
+    return result;
+  }
+
+  /// عملاء لهم مستحقات متأخرة (فواتير آجلة غير مسددة)
+  List<Invoice> get overdueInvoices {
+    final today = _today();
+    return invoices.where((inv) {
+      if (inv.invoiceType != 'sale' && inv.invoiceType != 'purchase') {
+        return false;
+      }
+      if (inv.paymentType != 'credit') return false;
+      if (inv.remaining <= 0.001) return false;
+      if (inv.dueDate.isEmpty) return false;
+      return inv.dueDate.compareTo(today) < 0;
+    }).toList();
   }
 }

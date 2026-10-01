@@ -4,6 +4,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/erp_provider.dart';
+import '../../models/models.dart';
+import '../../services/print_service.dart';
 import '../../theme/app_theme.dart';
 import '../widgets/common.dart';
 
@@ -34,6 +36,16 @@ class InvoiceDetailsScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(inv.invoiceNumber),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.print),
+            tooltip: 'طباعة',
+            onPressed: () => _print(context, prov, inv, false),
+          ),
+          IconButton(
+            icon: const Icon(Icons.share),
+            tooltip: 'مشاركة PDF',
+            onPressed: () => _print(context, prov, inv, true),
+          ),
           IconButton(
             icon: const Icon(Icons.delete_outline),
             onPressed: () async {
@@ -182,5 +194,47 @@ class InvoiceDetailsScreen extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+/// طباعة أو مشاركة الفاتورة كـ PDF
+Future<void> _print(
+  BuildContext context,
+  ERPProvider prov,
+  Invoice inv,
+  bool share,
+) async {
+  try {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('جارٍ تجهيز PDF...')),
+    );
+    if (share) {
+      await PrintService.shareInvoice(
+        inv: inv,
+        companyName: prov.companyName,
+        currency: prov.currency,
+        companyPhone: prov.companyPhone,
+        companyAddress: prov.companyAddress,
+        footer: prov.invoiceFooter,
+      );
+    } else {
+      await PrintService.printInvoice(
+        inv: inv,
+        companyName: prov.companyName,
+        currency: prov.currency,
+        companyPhone: prov.companyPhone,
+        companyAddress: prov.companyAddress,
+        footer: prov.invoiceFooter,
+      );
+    }
+  } catch (e) {
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('تعذّر إنشاء PDF: $e'),
+          backgroundColor: AppColors.danger,
+        ),
+      );
+    }
   }
 }

@@ -4,11 +4,36 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/erp_provider.dart';
+import '../../models/models.dart';
+import '../../services/print_service.dart';
 import '../../theme/app_theme.dart';
 import '../widgets/common.dart';
 
 class SalesReportScreen extends StatelessWidget {
   const SalesReportScreen({super.key});
+
+  Future<void> _exportPdf(BuildContext context, ERPProvider prov,
+      List<Invoice> sales, String curr) async {
+    final headers = ['الرقم', 'التاريخ', 'الجهة', 'النوع', 'الإجمالي'];
+    final rows = <List<String>>[];
+    for (final inv in sales) {
+      rows.add([
+        inv.invoiceNumber,
+        inv.date,
+        inv.contactName.isEmpty ? 'عميل نقدي' : inv.contactName,
+        inv.paymentType == 'cash' ? 'نقدي' : 'آجل',
+        Fmt.num(inv.total),
+      ]);
+    }
+    final total = sales.fold<double>(0.0, (s, i) => s + i.total);
+    await PrintService.printTable(
+      title: 'تقرير المبيعات',
+      companyName: prov.companyName,
+      headers: headers,
+      rows: rows,
+      totals: ['إجمالي المبيعات: ${Fmt.money(total, curr)}'],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +62,16 @@ class SalesReportScreen extends StatelessWidget {
       ..sort((a, b) => b.value.compareTo(a.value));
 
     return Scaffold(
-      appBar: AppBar(title: const Text('تقرير المبيعات')),
+      appBar: AppBar(
+        title: const Text('تقرير المبيعات'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.picture_as_pdf),
+            tooltip: 'تصدير PDF',
+            onPressed: () => _exportPdf(context, prov, sales, curr),
+          ),
+        ],
+      ),
       body: ListView(
         padding: const EdgeInsets.all(12),
         children: [

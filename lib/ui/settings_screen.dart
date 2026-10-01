@@ -7,6 +7,9 @@ import '../providers/erp_provider.dart';
 import '../data/app_database.dart';
 import '../theme/app_theme.dart';
 import 'widgets/common.dart';
+import 'settings/currencies_screen.dart';
+import 'settings/security_screen.dart';
+import 'settings/fiscal_close_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -70,6 +73,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final prov = context.watch<ERPProvider>();
     return Scaffold(
       appBar: AppBar(
         title: const Text('الإعدادات'),
@@ -172,6 +176,55 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   prefixIcon: Icon(Icons.notes),
                 ),
               ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          const SectionTitle('الأدوات المتقدمة', icon: Icons.tune),
+          Card(
+            child: Column(
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.currency_exchange,
+                      color: AppColors.info),
+                  title: const Text('العملات وأسعار الصرف'),
+                  subtitle: Text('${prov.currencies.length} عملة'),
+                  trailing: const Icon(Icons.chevron_left),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => const CurrenciesScreen()),
+                  ),
+                ),
+                const Divider(height: 1),
+                ListTile(
+                  leading: const Icon(Icons.lock, color: AppColors.purple),
+                  title: const Text('الأمان وقفل التطبيق'),
+                  subtitle: Text(prov.pinEnabled ? 'مفعّل' : 'معطّل'),
+                  trailing: const Icon(Icons.chevron_left),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => const SecurityScreen()),
+                  ),
+                ),
+                const Divider(height: 1),
+                ListTile(
+                  leading: const Icon(Icons.event_busy,
+                      color: AppColors.warning),
+                  title: const Text('إقفال السنة المالية'),
+                  subtitle: Text(
+                    prov.fiscalYearClosed.isEmpty
+                        ? 'لم يتم الإقفال'
+                        : 'آخر سنة مقفلة: ${prov.fiscalYearClosed}',
+                  ),
+                  trailing: const Icon(Icons.chevron_left),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => const FiscalCloseScreen()),
+                  ),
+                ),
+              ],
             ),
           ),
           const SizedBox(height: 16),

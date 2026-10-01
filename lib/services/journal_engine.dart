@@ -337,4 +337,25 @@ class JournalEngine {
       lines: lines,
     );
   }
+
+  // ============================ راتب موظف ============================
+  /// تدفق 4.10 — مدين: مصروف الرواتب، دائن: الصندوق
+  static Future<JournalEntry> payroll({
+    required PayrollRecord rec,
+    required Cashbox? cashbox,
+  }) async {
+    final cash = AppDatabase.accountByCode(CoA.cash);
+    final salary = AppDatabase.accountByCode(CoA.salariesExpense);
+    final lines = [
+      dr(salary, rec.netPay, 'راتب ${rec.employeeName} — ${rec.period}'),
+      cr(cash, rec.netPay, 'صرف راتب'),
+    ];
+    return post(
+      date: rec.date,
+      description: 'راتب ${rec.employeeName} (${rec.period})',
+      sourceType: 'payroll',
+      sourceId: rec.id,
+      lines: lines,
+    );
+  }
 }

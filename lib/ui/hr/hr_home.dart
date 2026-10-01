@@ -1,39 +1,38 @@
 // ============================================================================
-// وحدة المخزون — الأصناف، الجرد، التحويل
+// وحدة الموارد البشرية — الموظفون، الحضور، الرواتب
 // ============================================================================
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/erp_provider.dart';
 import '../../theme/app_theme.dart';
 import '../widgets/common.dart';
-import 'item_form.dart';
-import 'stock_count_screen.dart';
-import 'stock_transfer_screen.dart';
-import 'movements_screen.dart';
-import 'barcode_screen.dart';
+import 'employee_form.dart';
+import 'attendance_screen.dart';
+import 'payroll_screen.dart';
 
-class InventoryHome extends StatefulWidget {
-  const InventoryHome({super.key});
+class HrHome extends StatefulWidget {
+  const HrHome({super.key});
 
   @override
-  State<InventoryHome> createState() => _InventoryHomeState();
+  State<HrHome> createState() => _HrHomeState();
 }
 
-class _InventoryHomeState extends State<InventoryHome> {
+class _HrHomeState extends State<HrHome> {
   String _search = '';
 
   @override
   Widget build(BuildContext context) {
     final prov = context.watch<ERPProvider>();
     final curr = prov.currency;
-    final items = prov.items
-        .where((i) =>
+    final employees = prov.employees
+        .where((e) =>
             _search.isEmpty ||
-            i.name.contains(_search) ||
-            i.barcode.contains(_search))
+            e.name.contains(_search) ||
+            e.jobTitle.contains(_search))
         .toList();
 
     return Scaffold(
+      appBar: AppBar(title: const Text('الموارد البشرية')),
       body: Column(
         children: [
           // إجراءات
@@ -44,48 +43,29 @@ class _InventoryHomeState extends State<InventoryHome> {
               children: [
                 _actionBtn(
                   context,
-                  Icons.add_box,
-                  'صنف جديد',
+                  Icons.person_add,
+                  'موظف جديد',
                   () => Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => const ItemForm()),
+                    MaterialPageRoute(builder: (_) => const EmployeeForm()),
                   ),
                 ),
                 _actionBtn(
                   context,
-                  Icons.fact_check,
-                  'الجرد',
+                  Icons.event_available,
+                  'الحضور',
                   () => Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => const StockCountScreen()),
+                    MaterialPageRoute(builder: (_) => const AttendanceScreen()),
                   ),
                 ),
                 _actionBtn(
                   context,
-                  Icons.swap_horiz,
-                  'تحويل',
+                  Icons.request_page,
+                  'الرواتب',
                   () => Navigator.push(
                     context,
-                    MaterialPageRoute(
-                        builder: (_) => const StockTransferScreen()),
-                  ),
-                ),
-                _actionBtn(
-                  context,
-                  Icons.history,
-                  'الحركات',
-                  () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const MovementsScreen()),
-                  ),
-                ),
-                _actionBtn(
-                  context,
-                  Icons.qr_code_2,
-                  'الباركود',
-                  () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const BarcodeScreen()),
+                    MaterialPageRoute(builder: (_) => const PayrollScreen()),
                   ),
                 ),
               ],
@@ -98,19 +78,19 @@ class _InventoryHomeState extends State<InventoryHome> {
               children: [
                 Expanded(
                   child: StatCard(
-                    title: 'قيمة المخزون',
-                    value: Fmt.money(prov.inventoryValue, curr),
-                    icon: Icons.inventory,
-                    color: AppColors.purple,
+                    title: 'عدد الموظفين',
+                    value: '${prov.employees.where((e) => e.isActive).length}',
+                    icon: Icons.groups,
+                    color: AppColors.info,
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: StatCard(
-                    title: 'عدد الأصناف',
-                    value: '${prov.items.length}',
-                    icon: Icons.category,
-                    color: AppColors.teal,
+                    title: 'رواتب هذا الشهر',
+                    value: Fmt.money(prov.monthlyPayrollTotal, curr),
+                    icon: Icons.account_balance_wallet,
+                    color: AppColors.success,
                   ),
                 ),
               ],
@@ -120,7 +100,7 @@ class _InventoryHomeState extends State<InventoryHome> {
             padding: const EdgeInsets.symmetric(horizontal: 12),
             child: TextField(
               decoration: const InputDecoration(
-                hintText: 'بحث بالاسم أو الباركود...',
+                hintText: 'بحث عن موظف...',
                 prefixIcon: Icon(Icons.search),
               ),
               onChanged: (v) => setState(() => _search = v),
@@ -128,45 +108,44 @@ class _InventoryHomeState extends State<InventoryHome> {
           ),
           const SizedBox(height: 8),
           Expanded(
-            child: items.isEmpty
+            child: employees.isEmpty
                 ? EmptyState(
-                    message: 'لا توجد أصناف — أضف صنفاً للبدء',
-                    icon: Icons.inventory_2_outlined,
-                    actionLabel: 'إضافة صنف',
+                    message: 'لا يوجد موظفون — أضف موظفاً للبدء',
+                    icon: Icons.groups_outlined,
+                    actionLabel: 'إضافة موظف',
                     onAction: () => Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (_) => const ItemForm()),
+                      MaterialPageRoute(builder: (_) => const EmployeeForm()),
                     ),
                   )
                 : ListView.builder(
                     padding: const EdgeInsets.fromLTRB(12, 0, 12, 20),
-                    itemCount: items.length,
+                    itemCount: employees.length,
                     itemBuilder: (_, i) {
-                      final it = items[i];
-                      final qty = prov.stockQty(it.id);
-                      final low = it.reorderLevel > 0 && qty <= it.reorderLevel;
+                      final e = employees[i];
                       return Card(
                         margin: const EdgeInsets.only(bottom: 8),
                         child: ListTile(
                           onTap: () => Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (_) => ItemForm(item: it)),
+                                builder: (_) => EmployeeForm(employee: e)),
                           ),
                           leading: CircleAvatar(
-                            backgroundColor: (low
-                                    ? AppColors.danger
-                                    : AppColors.primary)
-                                .withValues(alpha: 0.12),
-                            child: Icon(
-                              Icons.inventory_2,
-                              color: low ? AppColors.danger : AppColors.primary,
+                            backgroundColor:
+                                AppColors.primary.withValues(alpha: 0.12),
+                            child: Text(
+                              e.name.isNotEmpty ? e.name.characters.first : '؟',
+                              style: const TextStyle(
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
-                          title: Text(it.name,
+                          title: Text(e.name,
                               style: const TextStyle(fontSize: 14)),
                           subtitle: Text(
-                            'بيع: ${Fmt.money(it.salePrice, curr)} • شراء: ${Fmt.money(it.purchasePrice, curr)}',
+                            e.jobTitle.isEmpty ? 'بدون مسمى' : e.jobTitle,
                             style: const TextStyle(fontSize: 12),
                           ),
                           trailing: Column(
@@ -174,21 +153,17 @@ class _InventoryHomeState extends State<InventoryHome> {
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               Text(
-                                'متاح: ${Fmt.num(qty)}',
-                                style: TextStyle(
+                                Fmt.money(e.netSalary, curr),
+                                style: const TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 13,
-                                  color: low
-                                      ? AppColors.danger
-                                      : AppColors.success,
+                                  fontSize: 12,
+                                  color: AppColors.success,
                                 ),
                               ),
-                              if (low)
-                                const Text(
-                                  '⚠ أقل من حد الطلب',
-                                  style: TextStyle(
-                                      fontSize: 10, color: AppColors.danger),
-                                ),
+                              if (!e.isActive)
+                                const Text('غير نشط',
+                                    style: TextStyle(
+                                        fontSize: 10, color: AppColors.danger)),
                             ],
                           ),
                         ),
@@ -217,10 +192,8 @@ class _InventoryHomeState extends State<InventoryHome> {
               child: Icon(icon, color: Colors.white, size: 22),
             ),
             const SizedBox(height: 4),
-            Text(
-              label,
-              style: const TextStyle(color: Colors.white, fontSize: 11),
-            ),
+            Text(label,
+                style: const TextStyle(color: Colors.white, fontSize: 11)),
           ],
         ),
       ),

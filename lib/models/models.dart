@@ -855,3 +855,249 @@ class InventoryBalance {
     avgCost: (m['avgCost'] as num?)?.toDouble() ?? 0.0,
   );
 }
+
+// ============================================================================
+// وحدة الموارد البشرية (HR)
+// ============================================================================
+
+/// الموظف — employees
+class Employee {
+  final String id;
+  String code;
+  String name;
+  String jobTitle;
+  String department;
+  String phone;
+  String email;
+  String nationalId;
+  String hireDate;
+  double basicSalary;
+  double allowances; // بدلات
+  double deductions; // خصومات ثابتة
+  String salaryAccountId;
+  bool isActive;
+  String notes;
+
+  Employee({
+    required this.id,
+    this.code = '',
+    required this.name,
+    this.jobTitle = '',
+    this.department = '',
+    this.phone = '',
+    this.email = '',
+    this.nationalId = '',
+    this.hireDate = '',
+    this.basicSalary = 0.0,
+    this.allowances = 0.0,
+    this.deductions = 0.0,
+    this.salaryAccountId = '',
+    this.isActive = true,
+    this.notes = '',
+  });
+
+  double get netSalary => basicSalary + allowances - deductions;
+
+  Map<String, dynamic> toMap() => {
+    'id': id,
+    'code': code,
+    'name': name,
+    'jobTitle': jobTitle,
+    'department': department,
+    'phone': phone,
+    'email': email,
+    'nationalId': nationalId,
+    'hireDate': hireDate,
+    'basicSalary': basicSalary,
+    'allowances': allowances,
+    'deductions': deductions,
+    'salaryAccountId': salaryAccountId,
+    'isActive': isActive,
+    'notes': notes,
+  };
+
+  factory Employee.fromMap(Map<String, dynamic> m) => Employee(
+    id: m['id'] as String,
+    code: m['code'] as String? ?? '',
+    name: m['name'] as String? ?? '',
+    jobTitle: m['jobTitle'] as String? ?? '',
+    department: m['department'] as String? ?? '',
+    phone: m['phone'] as String? ?? '',
+    email: m['email'] as String? ?? '',
+    nationalId: m['nationalId'] as String? ?? '',
+    hireDate: m['hireDate'] as String? ?? '',
+    basicSalary: (m['basicSalary'] as num?)?.toDouble() ?? 0.0,
+    allowances: (m['allowances'] as num?)?.toDouble() ?? 0.0,
+    deductions: (m['deductions'] as num?)?.toDouble() ?? 0.0,
+    salaryAccountId: m['salaryAccountId'] as String? ?? '',
+    isActive: m['isActive'] as bool? ?? true,
+    notes: m['notes'] as String? ?? '',
+  );
+}
+
+/// سجل الحضور — attendance
+class Attendance {
+  final String id;
+  String employeeId;
+  String employeeName;
+  String date;
+  String status; // present/absent/late/leave/holiday
+  double overtimeHours;
+  String notes;
+
+  Attendance({
+    required this.id,
+    required this.employeeId,
+    this.employeeName = '',
+    required this.date,
+    this.status = 'present',
+    this.overtimeHours = 0.0,
+    this.notes = '',
+  });
+
+  Map<String, dynamic> toMap() => {
+    'id': id,
+    'employeeId': employeeId,
+    'employeeName': employeeName,
+    'date': date,
+    'status': status,
+    'overtimeHours': overtimeHours,
+    'notes': notes,
+  };
+
+  factory Attendance.fromMap(Map<String, dynamic> m) => Attendance(
+    id: m['id'] as String,
+    employeeId: m['employeeId'] as String? ?? '',
+    employeeName: m['employeeName'] as String? ?? '',
+    date: m['date'] as String? ?? '',
+    status: m['status'] as String? ?? 'present',
+    overtimeHours: (m['overtimeHours'] as num?)?.toDouble() ?? 0.0,
+    notes: m['notes'] as String? ?? '',
+  );
+}
+
+/// مسير راتب — payroll
+class PayrollRecord {
+  final String id;
+  String payrollNumber;
+  String employeeId;
+  String employeeName;
+  String period; // 2025-06
+  String date;
+  double basicSalary;
+  double allowances;
+  double overtimeAmount;
+  double deductions;
+  double advanceDeduction; // خصم سلفة
+  double netPay;
+  String paymentMethod; // cash
+  String? cashboxId;
+  String? journalEntryId;
+  String notes;
+  String createdAt;
+
+  PayrollRecord({
+    required this.id,
+    this.payrollNumber = '',
+    required this.employeeId,
+    this.employeeName = '',
+    required this.period,
+    required this.date,
+    this.basicSalary = 0.0,
+    this.allowances = 0.0,
+    this.overtimeAmount = 0.0,
+    this.deductions = 0.0,
+    this.advanceDeduction = 0.0,
+    this.netPay = 0.0,
+    this.paymentMethod = 'cash',
+    this.cashboxId,
+    this.journalEntryId,
+    this.notes = '',
+    String? createdAt,
+  }) : createdAt = createdAt ?? DateTime.now().toIso8601String();
+
+  Map<String, dynamic> toMap() => {
+    'id': id,
+    'payrollNumber': payrollNumber,
+    'employeeId': employeeId,
+    'employeeName': employeeName,
+    'period': period,
+    'date': date,
+    'basicSalary': basicSalary,
+    'allowances': allowances,
+    'overtimeAmount': overtimeAmount,
+    'deductions': deductions,
+    'advanceDeduction': advanceDeduction,
+    'netPay': netPay,
+    'paymentMethod': paymentMethod,
+    'cashboxId': cashboxId,
+    'journalEntryId': journalEntryId,
+    'notes': notes,
+    'createdAt': createdAt,
+  };
+
+  factory PayrollRecord.fromMap(Map<String, dynamic> m) => PayrollRecord(
+    id: m['id'] as String,
+    payrollNumber: m['payrollNumber'] as String? ?? '',
+    employeeId: m['employeeId'] as String? ?? '',
+    employeeName: m['employeeName'] as String? ?? '',
+    period: m['period'] as String? ?? '',
+    date: m['date'] as String? ?? '',
+    basicSalary: (m['basicSalary'] as num?)?.toDouble() ?? 0.0,
+    allowances: (m['allowances'] as num?)?.toDouble() ?? 0.0,
+    overtimeAmount: (m['overtimeAmount'] as num?)?.toDouble() ?? 0.0,
+    deductions: (m['deductions'] as num?)?.toDouble() ?? 0.0,
+    advanceDeduction: (m['advanceDeduction'] as num?)?.toDouble() ?? 0.0,
+    netPay: (m['netPay'] as num?)?.toDouble() ?? 0.0,
+    paymentMethod: m['paymentMethod'] as String? ?? 'cash',
+    cashboxId: m['cashboxId'] as String?,
+    journalEntryId: m['journalEntryId'] as String?,
+    notes: m['notes'] as String? ?? '',
+    createdAt: m['createdAt'] as String?,
+  );
+}
+
+// ============================================================================
+// تعدد العملات
+// ============================================================================
+
+/// عملة — currencies
+class Currency {
+  final String id;
+  String code; // USD, SAR, EGP
+  String name;
+  String symbol;
+  double rate; // سعر الصرف مقابل العملة الأساسية
+  bool isBase;
+  bool isActive;
+
+  Currency({
+    required this.id,
+    required this.code,
+    required this.name,
+    this.symbol = '',
+    this.rate = 1.0,
+    this.isBase = false,
+    this.isActive = true,
+  });
+
+  Map<String, dynamic> toMap() => {
+    'id': id,
+    'code': code,
+    'name': name,
+    'symbol': symbol,
+    'rate': rate,
+    'isBase': isBase,
+    'isActive': isActive,
+  };
+
+  factory Currency.fromMap(Map<String, dynamic> m) => Currency(
+    id: m['id'] as String,
+    code: m['code'] as String? ?? '',
+    name: m['name'] as String? ?? '',
+    symbol: m['symbol'] as String? ?? '',
+    rate: (m['rate'] as num?)?.toDouble() ?? 1.0,
+    isBase: m['isBase'] as bool? ?? false,
+    isActive: m['isActive'] as bool? ?? true,
+  );
+}

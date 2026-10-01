@@ -25,6 +25,10 @@ class AppDatabase {
   static const boxJournals = 'journals';
   static const boxSettings = 'settings';
   static const boxSequences = 'sequences';
+  static const boxEmployees = 'employees';
+  static const boxAttendance = 'attendance';
+  static const boxPayroll = 'payroll';
+  static const boxCurrencies = 'currencies';
 
   static late Box _bAccounts;
   static late Box _bContacts;
@@ -41,6 +45,10 @@ class AppDatabase {
   static late Box _bJournals;
   static late Box _bSettings;
   static late Box _bSequences;
+  static late Box _bEmployees;
+  static late Box _bAttendance;
+  static late Box _bPayroll;
+  static late Box _bCurrencies;
 
   static String newId() => _uuid.v4();
 
@@ -63,6 +71,10 @@ class AppDatabase {
     _bJournals = await Hive.openBox(boxJournals);
     _bSettings = await Hive.openBox(boxSettings);
     _bSequences = await Hive.openBox(boxSequences);
+    _bEmployees = await Hive.openBox(boxEmployees);
+    _bAttendance = await Hive.openBox(boxAttendance);
+    _bPayroll = await Hive.openBox(boxPayroll);
+    _bCurrencies = await Hive.openBox(boxCurrencies);
 
     if (_bSettings.get('seeded') != true) {
       await _seed();
@@ -225,6 +237,56 @@ class AppDatabase {
       _bJournals.put(j.id, j.toMap());
   static Future<void> deleteJournal(String id) => _bJournals.delete(id);
 
+  // ---------------------------- الموظفون ----------------------------
+  static List<Employee> get employees => _bEmployees.values
+      .map((e) => Employee.fromMap(Map<String, dynamic>.from(e)))
+      .toList();
+
+  static Future<void> saveEmployee(Employee e) =>
+      _bEmployees.put(e.id, e.toMap());
+  static Future<void> deleteEmployee(String id) => _bEmployees.delete(id);
+
+  static Employee? employeeById(String? id) {
+    if (id == null) return null;
+    final v = _bEmployees.get(id);
+    return v == null ? null : Employee.fromMap(Map<String, dynamic>.from(v));
+  }
+
+  // ---------------------------- الحضور ----------------------------
+  static List<Attendance> get attendance => _bAttendance.values
+      .map((e) => Attendance.fromMap(Map<String, dynamic>.from(e)))
+      .toList();
+
+  static Future<void> saveAttendance(Attendance a) =>
+      _bAttendance.put(a.id, a.toMap());
+
+  static List<Attendance> attendanceOf(String employeeId, String period) =>
+      attendance
+          .where((a) =>
+              a.employeeId == employeeId && a.date.startsWith(period))
+          .toList();
+
+  // ---------------------------- الرواتب ----------------------------
+  static List<PayrollRecord> get payrolls => _bPayroll.values
+      .map((e) => PayrollRecord.fromMap(Map<String, dynamic>.from(e)))
+      .toList();
+
+  static Future<void> savePayroll(PayrollRecord p) =>
+      _bPayroll.put(p.id, p.toMap());
+  static Future<void> deletePayroll(String id) => _bPayroll.delete(id);
+
+  static bool payrollExists(String employeeId, String period) => payrolls
+      .any((p) => p.employeeId == employeeId && p.period == period);
+
+  // ---------------------------- العملات ----------------------------
+  static List<Currency> get currencies => _bCurrencies.values
+      .map((e) => Currency.fromMap(Map<String, dynamic>.from(e)))
+      .toList();
+
+  static Future<void> saveCurrency(Currency c) =>
+      _bCurrencies.put(c.id, c.toMap());
+  static Future<void> deleteCurrency(String id) => _bCurrencies.delete(id);
+
   // ---------------------------- الإعدادات ----------------------------
   static String getSetting(String key, [String def = '']) =>
       _bSettings.get(key, defaultValue: def).toString();
@@ -263,6 +325,10 @@ class AppDatabase {
       _bWarehouses,
       _bJournals,
       _bSequences,
+      _bEmployees,
+      _bAttendance,
+      _bPayroll,
+      _bCurrencies,
     ]) {
       await b.clear();
     }
@@ -334,6 +400,23 @@ class AppDatabase {
     await _bSettings.put('invoiceFooter', 'شكراً لتعاملكم معنا');
     await _bSettings.put('allowNegativeStock', 'false');
     await _bSettings.put('isInit', 'false');
+    await _bSettings.put('pinEnabled', 'false');
+    await _bSettings.put('pin', '');
+    await _bSettings.put('fiscalYearClosed', '');
+
+    // 7. العملات الافتراضية
+    await _bCurrencies.put('cur_base', Currency(
+      id: 'cur_base', code: 'SAR', name: 'ريال سعودي', symbol: 'ر.س',
+      rate: 1.0, isBase: true,
+    ).toMap());
+    await _bCurrencies.put('cur_usd', Currency(
+      id: 'cur_usd', code: 'USD', name: 'دولار أمريكي', symbol: '\$',
+      rate: 3.75, isBase: false,
+    ).toMap());
+    await _bCurrencies.put('cur_egp', Currency(
+      id: 'cur_egp', code: 'EGP', name: 'جنيه مصري', symbol: 'ج.م',
+      rate: 0.077, isBase: false,
+    ).toMap());
 
     await _bSettings.put('seeded', true);
   }

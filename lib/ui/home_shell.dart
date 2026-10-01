@@ -11,6 +11,7 @@ import 'sales/sales_home.dart';
 import 'inventory/inventory_home.dart';
 import 'reports/reports_home.dart';
 import 'accounts/accounts_home.dart';
+import 'hr/hr_home.dart';
 import 'settings_screen.dart';
 
 class HomeShell extends StatefulWidget {
@@ -140,6 +141,17 @@ class _HomeShellState extends State<HomeShell> {
           _tile(context, Icons.account_balance_rounded, 'الحسابات', 3),
           _tile(context, Icons.bar_chart_rounded, 'التقارير', 4),
           const Divider(),
+          ListTile(
+            leading: const Icon(Icons.groups, color: AppColors.teal),
+            title: const Text('الموارد البشرية'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const HrHome()),
+              );
+            },
+          ),
           ListTile(
             leading: const Icon(Icons.settings, color: AppColors.primary),
             title: const Text('الإعدادات'),
