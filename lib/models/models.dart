@@ -1427,3 +1427,65 @@ class ExchangeRate {
     sellRate: (m['sellRate'] as num?)?.toDouble() ?? 1.0,
   );
 }
+
+/// سجل المراجعة — audit_log
+/// يتتبّع كل العمليات الحساسة (إنشاء/تعديل/حذف/ترحيل)
+class AuditLog {
+  final String id;
+  String action; // create | update | delete | post | login
+  String entity; // invoice | payment | contact | item | journal ...
+  String entityId;
+  String description;
+  String userName;
+  String date; // ISO timestamp
+
+  AuditLog({
+    required this.id,
+    required this.action,
+    required this.entity,
+    this.entityId = '',
+    this.description = '',
+    this.userName = '',
+    required this.date,
+  });
+
+  Map<String, dynamic> toMap() => {
+    'id': id,
+    'action': action,
+    'entity': entity,
+    'entityId': entityId,
+    'description': description,
+    'userName': userName,
+    'date': date,
+  };
+
+  factory AuditLog.fromMap(Map<String, dynamic> m) => AuditLog(
+    id: m['id'] as String,
+    action: m['action'] as String? ?? '',
+    entity: m['entity'] as String? ?? '',
+    entityId: m['entityId'] as String? ?? '',
+    description: m['description'] as String? ?? '',
+    userName: m['userName'] as String? ?? '',
+    date: m['date'] as String? ?? '',
+  );
+
+  String get actionLabel => switch (action) {
+    'create' => 'إنشاء',
+    'update' => 'تعديل',
+    'delete' => 'حذف',
+    'post' => 'ترحيل',
+    'login' => 'دخول',
+    _ => action,
+  };
+
+  String get entityLabel => switch (entity) {
+    'invoice' => 'فاتورة',
+    'payment' => 'سند',
+    'contact' => 'جهة',
+    'item' => 'صنف',
+    'journal' => 'قيد',
+    'expense' => 'مصروف',
+    'asset' => 'أصل ثابت',
+    _ => entity,
+  };
+}
