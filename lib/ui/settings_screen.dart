@@ -11,6 +11,7 @@ import 'settings/currencies_screen.dart';
 import 'settings/security_screen.dart';
 import 'settings/fiscal_close_screen.dart';
 import 'settings/import_screen.dart';
+import 'settings/basic_tables_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -223,6 +224,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     context,
                     MaterialPageRoute(
                         builder: (_) => const FiscalCloseScreen()),
+                  ),
+                ),
+                const Divider(height: 1),
+                ListTile(
+                  leading:
+                      const Icon(Icons.table_chart, color: AppColors.success),
+                  title: const Text('الجداول الأساسية'),
+                  subtitle: Text(
+                      '${prov.branches.length} فرع • ${prov.units.length} وحدة • ${prov.costCenters.length} مركز تكلفة • ${prov.exchangeRates.length} سعر صرف'),
+                  trailing: const Icon(Icons.chevron_left),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => const BasicTablesScreen()),
                   ),
                 ),
                 const Divider(height: 1),

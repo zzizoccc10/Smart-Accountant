@@ -4,9 +4,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/erp_provider.dart';
-import '../../services/print_service.dart';
 import '../../theme/app_theme.dart';
 import '../widgets/common.dart';
+import '../widgets/export_button.dart';
 
 class TrialBalanceScreen extends StatelessWidget {
   const TrialBalanceScreen({super.key});
@@ -41,31 +41,28 @@ class TrialBalanceScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('ميزان المراجعة'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.picture_as_pdf),
-            tooltip: 'تصدير PDF',
-            onPressed: () => PrintService.printTable(
-              title: 'ميزان المراجعة',
-              companyName: prov.companyName,
-              headers: ['الرمز', 'الحساب', 'مدين', 'دائن'],
-              rows: [
-                for (final r in rows)
-                  [
-                    r['code'] as String,
-                    r['name'] as String,
-                    (r['debit'] as double) > 0
-                        ? Fmt.num(r['debit'] as double)
-                        : '-',
-                    (r['credit'] as double) > 0
-                        ? Fmt.num(r['credit'] as double)
-                        : '-',
-                  ],
-              ],
-              totals: [
-                'إجمالي المدين: ${Fmt.num(totalDebit)}',
-                'إجمالي الدائن: ${Fmt.num(totalCredit)}',
-              ],
-            ),
+          ExportButton(
+            title: 'ميزان المراجعة',
+            companyName: prov.companyName,
+            filename: 'trial_balance',
+            headers: const ['الرمز', 'الحساب', 'مدين', 'دائن'],
+            rows: [
+              for (final r in rows)
+                [
+                  r['code'] as String,
+                  r['name'] as String,
+                  (r['debit'] as double) > 0
+                      ? Fmt.num(r['debit'] as double)
+                      : '0',
+                  (r['credit'] as double) > 0
+                      ? Fmt.num(r['credit'] as double)
+                      : '0',
+                ],
+            ],
+            totals: [
+              'إجمالي المدين: ${Fmt.num(totalDebit)}',
+              'إجمالي الدائن: ${Fmt.num(totalCredit)}',
+            ],
           ),
         ],
       ),

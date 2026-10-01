@@ -31,6 +31,10 @@ class AppDatabase {
   static const boxCurrencies = 'currencies';
   static const boxFixedAssets = 'fixed_assets';
   static const boxAllocations = 'payment_allocations';
+  static const boxBranches = 'branches';
+  static const boxUnits = 'units';
+  static const boxCostCenters = 'cost_centers';
+  static const boxExchangeRates = 'exchange_rates';
 
   static late Box _bAccounts;
   static late Box _bContacts;
@@ -53,6 +57,10 @@ class AppDatabase {
   static late Box _bCurrencies;
   static late Box _bFixedAssets;
   static late Box _bAllocations;
+  static late Box _bBranches;
+  static late Box _bUnits;
+  static late Box _bCostCenters;
+  static late Box _bExchangeRates;
 
   static String newId() => _uuid.v4();
 
@@ -81,6 +89,10 @@ class AppDatabase {
     _bCurrencies = await Hive.openBox(boxCurrencies);
     _bFixedAssets = await Hive.openBox(boxFixedAssets);
     _bAllocations = await Hive.openBox(boxAllocations);
+    _bBranches = await Hive.openBox(boxBranches);
+    _bUnits = await Hive.openBox(boxUnits);
+    _bCostCenters = await Hive.openBox(boxCostCenters);
+    _bExchangeRates = await Hive.openBox(boxExchangeRates);
 
     if (_bSettings.get('seeded') != true) {
       await _seed();
@@ -329,6 +341,69 @@ class AppDatabase {
     return v == null ? null : FixedAsset.fromMap(Map<String, dynamic>.from(v));
   }
 
+  // ---------------------------- الفروع ----------------------------
+  static List<Branch> get branches => _bBranches.values
+      .map((e) => Branch.fromMap(Map<String, dynamic>.from(e)))
+      .where((b) => !b.isDeleted)
+      .toList();
+
+  static Future<void> saveBranch(Branch b) =>
+      _bBranches.put(b.id, b.toMap());
+  static Future<void> deleteBranch(String id) => _bBranches.delete(id);
+
+  static Branch? branchById(String? id) {
+    if (id == null) return null;
+    final v = _bBranches.get(id);
+    return v == null ? null : Branch.fromMap(Map<String, dynamic>.from(v));
+  }
+
+  // ---------------------------- وحدات القياس ----------------------------
+  static List<Unit> get units => _bUnits.values
+      .map((e) => Unit.fromMap(Map<String, dynamic>.from(e)))
+      .where((u) => !u.isDeleted)
+      .toList();
+
+  static Future<void> saveUnit(Unit u) => _bUnits.put(u.id, u.toMap());
+  static Future<void> deleteUnit(String id) => _bUnits.delete(id);
+
+  static Unit? unitById(String? id) {
+    if (id == null) return null;
+    final v = _bUnits.get(id);
+    return v == null ? null : Unit.fromMap(Map<String, dynamic>.from(v));
+  }
+
+  // ---------------------------- مراكز التكلفة ----------------------------
+  static List<CostCenter> get costCenters => _bCostCenters.values
+      .map((e) => CostCenter.fromMap(Map<String, dynamic>.from(e)))
+      .where((c) => !c.isDeleted)
+      .toList();
+
+  static Future<void> saveCostCenter(CostCenter c) =>
+      _bCostCenters.put(c.id, c.toMap());
+  static Future<void> deleteCostCenter(String id) =>
+      _bCostCenters.delete(id);
+
+  static CostCenter? costCenterById(String? id) {
+    if (id == null) return null;
+    final v = _bCostCenters.get(id);
+    return v == null
+        ? null
+        : CostCenter.fromMap(Map<String, dynamic>.from(v));
+  }
+
+  // ---------------------------- أسعار الصرف ----------------------------
+  static List<ExchangeRate> get exchangeRates => _bExchangeRates.values
+      .map((e) => ExchangeRate.fromMap(Map<String, dynamic>.from(e)))
+      .toList();
+
+  static Future<void> saveExchangeRate(ExchangeRate r) =>
+      _bExchangeRates.put(r.id, r.toMap());
+  static Future<void> deleteExchangeRate(String id) =>
+      _bExchangeRates.delete(id);
+
+  static List<ExchangeRate> exchangeRatesOfCurrency(String currencyId) =>
+      exchangeRates.where((r) => r.currencyId == currencyId).toList();
+
   // ---------------------------- الإعدادات ----------------------------
   static String getSetting(String key, [String def = '']) =>
       _bSettings.get(key, defaultValue: def).toString();
@@ -372,6 +447,10 @@ class AppDatabase {
       _bCurrencies,
       _bFixedAssets,
       _bAllocations,
+      _bBranches,
+      _bUnits,
+      _bCostCenters,
+      _bExchangeRates,
     ]) {
       await b.clear();
     }
@@ -458,6 +537,49 @@ class AppDatabase {
     await _bCurrencies.put('cur_egp', Currency(
       id: 'cur_egp', code: 'EGP', name: 'جنيه مصري', symbol: 'ج.م',
       rate: 0.077, isBase: false,
+    ).toMap());
+
+    // 8. الفروع
+    await _bBranches.put('br_main', Branch(
+      id: 'br_main', code: 'BR-01', name: 'الفرع الرئيسي',
+      address: '', phone: '', email: '',
+    ).toMap());
+
+    // 9. وحدات القياس
+    final unitsSeed = <List<String>>[
+      ['unt_pc', 'PCS', 'قطعة', 'ق'],
+      ['unt_box', 'BOX', 'كرتون', 'ك'],
+      ['unt_kg', 'KG', 'كيلوجرام', 'كج'],
+      ['unt_ltr', 'LTR', 'لتر', 'ل'],
+      ['unt_mtr', 'MTR', 'متر', 'م'],
+      ['unt_pack', 'PKG', 'علبة', 'ع'],
+    ];
+    for (final u in unitsSeed) {
+      await _bUnits.put(u[0], Unit(
+        id: u[0], code: u[1], name: u[2], symbol: u[3],
+      ).toMap());
+    }
+
+    // 10. مراكز التكلفة
+    await _bCostCenters.put('cc_admin', CostCenter(
+      id: 'cc_admin', code: 'CC-01', name: 'الإدارة العامة',
+    ).toMap());
+    await _bCostCenters.put('cc_sales', CostCenter(
+      id: 'cc_sales', code: 'CC-02', name: 'المبيعات',
+    ).toMap());
+    await _bCostCenters.put('cc_wh', CostCenter(
+      id: 'cc_wh', code: 'CC-03', name: 'المخازن',
+    ).toMap());
+
+    // 11. أسعار الصرف الافتراضية (مقابل العملة الأساسية SAR)
+    final today = DateTime.now().toIso8601String().split('T').first;
+    await _bExchangeRates.put('xr_usd', ExchangeRate(
+      id: 'xr_usd', currencyId: 'cur_usd', currencyCode: 'USD',
+      rateDate: today, buyRate: 3.74, sellRate: 3.76,
+    ).toMap());
+    await _bExchangeRates.put('xr_egp', ExchangeRate(
+      id: 'xr_egp', currencyId: 'cur_egp', currencyCode: 'EGP',
+      rateDate: today, buyRate: 0.076, sellRate: 0.078,
     ).toMap());
 
     await _bSettings.put('seeded', true);

@@ -5,16 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/erp_provider.dart';
 import '../../models/models.dart';
-import '../../services/print_service.dart';
+import '../widgets/export_button.dart';
 import '../../theme/app_theme.dart';
 import '../widgets/common.dart';
 
 class SalesReportScreen extends StatelessWidget {
   const SalesReportScreen({super.key});
 
-  Future<void> _exportPdf(BuildContext context, ERPProvider prov,
-      List<Invoice> sales, String curr) async {
-    final headers = ['الرقم', 'التاريخ', 'الجهة', 'النوع', 'الإجمالي'];
+  List<List<String>> _rows(List<Invoice> sales) {
     final rows = <List<String>>[];
     for (final inv in sales) {
       rows.add([
@@ -25,14 +23,7 @@ class SalesReportScreen extends StatelessWidget {
         Fmt.num(inv.total),
       ]);
     }
-    final total = sales.fold<double>(0.0, (s, i) => s + i.total);
-    await PrintService.printTable(
-      title: 'تقرير المبيعات',
-      companyName: prov.companyName,
-      headers: headers,
-      rows: rows,
-      totals: ['إجمالي المبيعات: ${Fmt.money(total, curr)}'],
-    );
+    return rows;
   }
 
   @override
@@ -65,10 +56,17 @@ class SalesReportScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('تقرير المبيعات'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.picture_as_pdf),
-            tooltip: 'تصدير PDF',
-            onPressed: () => _exportPdf(context, prov, sales, curr),
+          ExportButton(
+            title: 'تقرير المبيعات',
+            companyName: prov.companyName,
+            filename: 'sales_report',
+            headers: const ['الرقم', 'التاريخ', 'الجهة', 'النوع', 'الإجمالي'],
+            rows: _rows(sales),
+            totals: [
+              'إجمالي المبيعات: ${Fmt.money(grossSales, curr)}',
+              'المرتجعات: ${Fmt.money(totalReturns, curr)}',
+              'صافي المبيعات: ${Fmt.money(netSales, curr)}',
+            ],
           ),
         ],
       ),

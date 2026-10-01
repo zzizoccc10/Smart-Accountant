@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/erp_provider.dart';
 import '../../theme/app_theme.dart';
+import '../widgets/export_button.dart';
 import '../widgets/common.dart';
 
 class AgingReportScreen extends StatelessWidget {
@@ -59,8 +60,45 @@ class AgingReportScreen extends StatelessWidget {
     ];
     final keys = buckets.keys.toList();
 
+    final totalBalance =
+        customerRows.fold<double>(0.0, (s, r) => s + (r['balance'] as double));
+
     return Scaffold(
-      appBar: AppBar(title: const Text('أعمار الديون')),
+      appBar: AppBar(
+        title: const Text('أعمار الديون'),
+        actions: [
+          ExportButton(
+            title: 'تقرير أعمار الديون',
+            companyName: prov.companyName,
+            filename: 'aging_report',
+            headers: const [
+              'العميل',
+              'الرصيد',
+              'المتأخر',
+              '0-30',
+              '31-60',
+              '61-90',
+              '+90'
+            ],
+            rows: [
+              for (final r in customerRows)
+                [
+                  r['name'] as String,
+                  Fmt.num(r['balance'] as double),
+                  Fmt.num(r['overdue'] as double),
+                  '',
+                  '',
+                  '',
+                  '',
+                ],
+              ['— إجمالي الأعمار —', '', '', for (final k in keys) Fmt.num(buckets[k]!)],
+            ],
+            totals: [
+              'إجمالي الذمم: ${Fmt.money(totalBalance, curr)}',
+            ],
+          ),
+        ],
+      ),
       body: ListView(
         padding: const EdgeInsets.all(12),
         children: [

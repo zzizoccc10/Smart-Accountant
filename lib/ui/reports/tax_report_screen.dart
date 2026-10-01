@@ -4,26 +4,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/erp_provider.dart';
-import '../../services/print_service.dart';
 import '../../theme/app_theme.dart';
 import '../widgets/common.dart';
+import '../widgets/export_button.dart';
 
 class TaxReportScreen extends StatelessWidget {
   const TaxReportScreen({super.key});
-
-  Future<void> _exportPdf(BuildContext context, ERPProvider prov,
-      List<List<String>> rows, String curr, double net, double salesVat) async {
-    await PrintService.printTable(
-      title: 'تقرير ضريبة القيمة المضافة',
-      companyName: prov.companyName,
-      headers: const ['البيان', 'المبلغ'],
-      rows: rows,
-      totals: [
-        'ض.ق.م على المبيعات: ${Fmt.money(salesVat, curr)}',
-        'الصافي المستحق: ${Fmt.money(net, curr)}',
-      ],
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -77,11 +63,16 @@ class TaxReportScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('تقرير الضرائب'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.picture_as_pdf),
-            tooltip: 'تصدير PDF',
-            onPressed: () =>
-                _exportPdf(context, prov, rows, curr, netVat, outputVat),
+          ExportButton(
+            title: 'تقرير ضريبة القيمة المضافة',
+            companyName: prov.companyName,
+            filename: 'vat_report',
+            headers: const ['البيان', 'المبلغ'],
+            rows: rows,
+            totals: [
+              'ض.ق.م على المبيعات: ${Fmt.money(outputVat, curr)}',
+              'الصافي المستحق: ${Fmt.money(netVat, curr)}',
+            ],
           ),
         ],
       ),

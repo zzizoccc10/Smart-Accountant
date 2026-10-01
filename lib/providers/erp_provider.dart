@@ -27,6 +27,10 @@ class ERPProvider extends ChangeNotifier {
   List<Attendance> attendance = [];
   List<PayrollRecord> payrolls = [];
   List<Currency> currencies = [];
+  List<Branch> branches = [];
+  List<Unit> units = [];
+  List<CostCenter> costCenters = [];
+  List<ExchangeRate> exchangeRates = [];
 
   bool initialized = false;
 
@@ -53,6 +57,10 @@ class ERPProvider extends ChangeNotifier {
     attendance = AppDatabase.attendance;
     payrolls = AppDatabase.payrolls;
     currencies = AppDatabase.currencies;
+    branches = AppDatabase.branches;
+    units = AppDatabase.units;
+    costCenters = AppDatabase.costCenters;
+    exchangeRates = AppDatabase.exchangeRates;
     fixedAssets = AppDatabase.fixedAssets;
     initialized = true;
     notifyListeners();
@@ -1045,4 +1053,85 @@ class ERPProvider extends ChangeNotifier {
   /// صافي القيمة الدفترية
   double get totalAssetBookValue =>
       fixedAssets.where((a) => a.status == 'active').fold(0.0, (s, a) => s + a.bookValue);
+
+  // ============================ الفروع ============================
+  Future<void> addBranch(Branch b) async {
+    await AppDatabase.saveBranch(b);
+    reload();
+  }
+
+  Future<void> updateBranch(Branch b) async {
+    await AppDatabase.saveBranch(b);
+    reload();
+  }
+
+  Future<void> deleteBranch(String id) async {
+    final b = AppDatabase.branchById(id);
+    if (b != null) {
+      b.isDeleted = true;
+      await AppDatabase.saveBranch(b);
+    }
+    reload();
+  }
+
+  // ============================ وحدات القياس ============================
+  Future<void> addUnit(Unit u) async {
+    await AppDatabase.saveUnit(u);
+    reload();
+  }
+
+  Future<void> updateUnit(Unit u) async {
+    await AppDatabase.saveUnit(u);
+    reload();
+  }
+
+  Future<void> deleteUnit(String id) async {
+    final u = AppDatabase.unitById(id);
+    if (u != null) {
+      u.isDeleted = true;
+      await AppDatabase.saveUnit(u);
+    }
+    reload();
+  }
+
+  Unit? unitOf(String? id) => id == null ? null : AppDatabase.unitById(id);
+
+  // ============================ مراكز التكلفة ============================
+  Future<void> addCostCenter(CostCenter c) async {
+    await AppDatabase.saveCostCenter(c);
+    reload();
+  }
+
+  Future<void> updateCostCenter(CostCenter c) async {
+    await AppDatabase.saveCostCenter(c);
+    reload();
+  }
+
+  Future<void> deleteCostCenter(String id) async {
+    final c = AppDatabase.costCenterById(id);
+    if (c != null) {
+      c.isDeleted = true;
+      await AppDatabase.saveCostCenter(c);
+    }
+    reload();
+  }
+
+  // ============================ أسعار الصرف ============================
+  Future<void> addExchangeRate(ExchangeRate r) async {
+    await AppDatabase.saveExchangeRate(r);
+    reload();
+  }
+
+  Future<void> updateExchangeRate(ExchangeRate r) async {
+    await AppDatabase.saveExchangeRate(r);
+    reload();
+  }
+
+  Future<void> deleteExchangeRate(String id) async {
+    await AppDatabase.deleteExchangeRate(id);
+    reload();
+  }
+
+  List<ExchangeRate> ratesOfCurrency(String currencyId) =>
+      exchangeRates.where((r) => r.currencyId == currencyId).toList();
 }

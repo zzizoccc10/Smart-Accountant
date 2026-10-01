@@ -1263,3 +1263,167 @@ class FixedAsset {
     notes: m['notes'] as String? ?? '',
   );
 }
+
+/// الفرع — branches
+class Branch {
+  final String id;
+  String code;
+  String name;
+  String address;
+  String phone;
+  String email;
+  bool isActive;
+  bool isDeleted;
+
+  Branch({
+    required this.id,
+    this.code = '',
+    required this.name,
+    this.address = '',
+    this.phone = '',
+    this.email = '',
+    this.isActive = true,
+    this.isDeleted = false,
+  });
+
+  Map<String, dynamic> toMap() => {
+    'id': id,
+    'code': code,
+    'name': name,
+    'address': address,
+    'phone': phone,
+    'email': email,
+    'isActive': isActive,
+    'isDeleted': isDeleted,
+  };
+
+  factory Branch.fromMap(Map<String, dynamic> m) => Branch(
+    id: m['id'] as String,
+    code: m['code'] as String? ?? '',
+    name: m['name'] as String? ?? '',
+    address: m['address'] as String? ?? '',
+    phone: m['phone'] as String? ?? '',
+    email: m['email'] as String? ?? '',
+    isActive: m['isActive'] as bool? ?? true,
+    isDeleted: m['isDeleted'] as bool? ?? false,
+  );
+}
+
+/// وحدة القياس — units
+class Unit {
+  final String id;
+  String code;
+  String name;
+  String symbol;
+  String? baseUnitId;
+  double conversionFactor; // معامل التحويل للوحدة الأساسية
+  bool isActive;
+  bool isDeleted;
+
+  Unit({
+    required this.id,
+    this.code = '',
+    required this.name,
+    this.symbol = '',
+    this.baseUnitId,
+    this.conversionFactor = 1.0,
+    this.isActive = true,
+    this.isDeleted = false,
+  });
+
+  Map<String, dynamic> toMap() => {
+    'id': id,
+    'code': code,
+    'name': name,
+    'symbol': symbol,
+    'baseUnitId': baseUnitId,
+    'conversionFactor': conversionFactor,
+    'isActive': isActive,
+    'isDeleted': isDeleted,
+  };
+
+  factory Unit.fromMap(Map<String, dynamic> m) => Unit(
+    id: m['id'] as String,
+    code: m['code'] as String? ?? '',
+    name: m['name'] as String? ?? '',
+    symbol: m['symbol'] as String? ?? '',
+    baseUnitId: m['baseUnitId'] as String?,
+    conversionFactor: (m['conversionFactor'] as num?)?.toDouble() ?? 1.0,
+    isActive: m['isActive'] as bool? ?? true,
+    isDeleted: m['isDeleted'] as bool? ?? false,
+  );
+}
+
+/// مركز التكلفة — cost_centers
+class CostCenter {
+  final String id;
+  String code;
+  String name;
+  String? parentId;
+  bool isActive;
+  bool isDeleted;
+
+  CostCenter({
+    required this.id,
+    this.code = '',
+    required this.name,
+    this.parentId,
+    this.isActive = true,
+    this.isDeleted = false,
+  });
+
+  Map<String, dynamic> toMap() => {
+    'id': id,
+    'code': code,
+    'name': name,
+    'parentId': parentId,
+    'isActive': isActive,
+    'isDeleted': isDeleted,
+  };
+
+  factory CostCenter.fromMap(Map<String, dynamic> m) => CostCenter(
+    id: m['id'] as String,
+    code: m['code'] as String? ?? '',
+    name: m['name'] as String? ?? '',
+    parentId: m['parentId'] as String?,
+    isActive: m['isActive'] as bool? ?? true,
+    isDeleted: m['isDeleted'] as bool? ?? false,
+  );
+}
+
+/// سعر صرف — exchange_rates
+class ExchangeRate {
+  final String id;
+  String currencyId;
+  String currencyCode;
+  String rateDate;
+  double buyRate;
+  double sellRate;
+
+  ExchangeRate({
+    required this.id,
+    required this.currencyId,
+    this.currencyCode = '',
+    required this.rateDate,
+    this.buyRate = 1.0,
+    this.sellRate = 1.0,
+  });
+
+  Map<String, dynamic> toMap() => {
+    'id': id,
+    'currencyId': currencyId,
+    'currencyCode': currencyCode,
+    'rateDate': rateDate,
+    'buyRate': buyRate,
+    'sellRate': sellRate,
+  };
+
+  factory ExchangeRate.fromMap(Map<String, dynamic> m) => ExchangeRate(
+    id: m['id'] as String,
+    currencyId: m['currencyId'] as String? ?? '',
+    currencyCode: m['currencyCode'] as String? ?? '',
+    rateDate: m['rateDate'] as String? ?? '',
+    buyRate: (m['buyRate'] as num?)?.toDouble() ?? 1.0,
+    sellRate: (m['sellRate'] as num?)?.toDouble() ?? 1.0,
+  );
+}
