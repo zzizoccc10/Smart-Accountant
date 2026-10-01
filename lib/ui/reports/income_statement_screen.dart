@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/erp_provider.dart';
+import '../../services/print_service.dart';
 import '../../theme/app_theme.dart';
 
 class IncomeStatementScreen extends StatelessWidget {
@@ -47,7 +48,38 @@ class IncomeStatementScreen extends StatelessWidget {
     final netProfit = revenueTotal - expenseTotal;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('الأرباح والخسائر')),
+      appBar: AppBar(
+        title: const Text('الأرباح والخسائر'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.picture_as_pdf),
+            tooltip: 'تصدير PDF',
+            onPressed: () {
+              final pdfRows = <List<String>>[
+                for (final r in revenues)
+                  [r['name'] as String, Fmt.num(r['amount'] as double)],
+                ['إجمالي الإيرادات', Fmt.num(revenueTotal)],
+                ['تكلفة المبيعات (COGS)', Fmt.num(cogsTotal)],
+                ['إجمالي الربح', Fmt.num(grossProfit)],
+                for (final e in expenses)
+                  [e['name'] as String, Fmt.num(e['amount'] as double)],
+                ['إجمالي المصروفات', Fmt.num(expenseTotal)],
+              ];
+              PrintService.printTable(
+                title: 'قائمة الأرباح والخسائر',
+                companyName: prov.companyName,
+                headers: ['البند', 'المبلغ ($curr)'],
+                rows: pdfRows,
+                totals: [
+                  netProfit >= 0
+                      ? 'صافي الربح: ${Fmt.money(netProfit, curr)}'
+                      : 'صافي الخسارة: ${Fmt.money(netProfit.abs(), curr)}',
+                ],
+              );
+            },
+          ),
+        ],
+      ),
       body: ListView(
         padding: const EdgeInsets.all(12),
         children: [

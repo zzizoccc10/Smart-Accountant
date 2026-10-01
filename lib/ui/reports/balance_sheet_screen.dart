@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/erp_provider.dart';
+import '../../services/print_service.dart';
 import '../../theme/app_theme.dart';
 
 class BalanceSheetScreen extends StatelessWidget {
@@ -54,7 +55,41 @@ class BalanceSheetScreen extends StatelessWidget {
     totalEquity += netProfit;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('المركز المالي')),
+      appBar: AppBar(
+        title: const Text('المركز المالي'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.picture_as_pdf),
+            tooltip: 'تصدير PDF',
+            onPressed: () {
+              final pdfRows = <List<String>>[
+                ['— الأصول —', ''],
+                for (final a in assets)
+                  [a['name'] as String, Fmt.num(a['amount'] as double)],
+                ['إجمالي الأصول', Fmt.num(totalAssets)],
+                ['— الخصوم —', ''],
+                for (final l in liabilities)
+                  [l['name'] as String, Fmt.num(l['amount'] as double)],
+                ['إجمالي الخصوم', Fmt.num(totalLiab)],
+                ['— حقوق الملكية —', ''],
+                for (final e in equity)
+                  [e['name'] as String, Fmt.num(e['amount'] as double)],
+                ['إجمالي حقوق الملكية', Fmt.num(totalEquity)],
+              ];
+              PrintService.printTable(
+                title: 'المركز المالي',
+                companyName: prov.companyName,
+                headers: ['البند', 'المبلغ ($curr)'],
+                rows: pdfRows,
+                totals: [
+                  'إجمالي الأصول: ${Fmt.money(totalAssets, curr)}',
+                  'إجمالي الخصوم + حقوق الملكية: ${Fmt.money(totalLiab + totalEquity, curr)}',
+                ],
+              );
+            },
+          ),
+        ],
+      ),
       body: ListView(
         padding: const EdgeInsets.all(12),
         children: [

@@ -12,6 +12,7 @@ import 'sales/invoice_form.dart';
 import 'inventory/inventory_home.dart';
 import 'accounts/accounts_home.dart';
 import 'reports/reports_home.dart';
+import 'alerts_screen.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
@@ -143,6 +144,12 @@ class DashboardScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 20),
+
+          // التنبيهات
+          if (prov.lowStockItems.isNotEmpty || prov.overdueInvoices.isNotEmpty)
+            _AlertsCard(prov: prov),
+          if (prov.lowStockItems.isNotEmpty || prov.overdueInvoices.isNotEmpty)
+            const SizedBox(height: 20),
 
           // رسم بياني للمبيعات
           const SectionTitle('مبيعات آخر 7 أيام', icon: Icons.show_chart),
@@ -329,11 +336,96 @@ class DashboardScreen extends StatelessWidget {
   }
 }
 
+/// بطاقة التنبيهات على اللوحة
+class _AlertsCard extends StatelessWidget {
+  final ERPProvider prov;
+  const _AlertsCard({required this.prov});
+
+  @override
+  Widget build(BuildContext context) {
+    final curr = prov.currency;
+    final low = prov.lowStockItems;
+    final overdue = prov.overdueInvoices;
+    final overdueAmount =
+        overdue.fold<double>(0.0, (s, i) => s + i.remaining);
+
+    return InkWell(
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const AlertsScreen()),
+      ),
+      borderRadius: BorderRadius.circular(16),
+      child: Card(
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            border: Border(
+              right: BorderSide(color: AppColors.warning, width: 4),
+            ),
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const Icon(Icons.notifications_active,
+                      color: AppColors.warning, size: 20),
+                  const SizedBox(width: 8),
+                  const Text('التنبيهات',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 15)),
+                  const Spacer(),
+                  const Icon(Icons.chevron_left, color: Colors.grey),
+                ],
+              ),
+              const SizedBox(height: 8),
+              if (low.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 3),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.inventory_2,
+                          size: 16, color: AppColors.danger),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          '${low.length} صنف وصل حد الطلب',
+                          style: const TextStyle(fontSize: 13),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              if (overdue.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 3),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.schedule,
+                          size: 16, color: AppColors.warning),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          '${overdue.length} فاتورة متأخرة بقيمة ${Fmt.money(overdueAmount, curr)}',
+                          style: const TextStyle(fontSize: 13),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _SalesChart extends StatelessWidget {
   final List<Map<String, dynamic>> data;
 
   const _SalesChart({required this.data});
-
   @override
   Widget build(BuildContext context) {
     final maxVal = data.fold<double>(

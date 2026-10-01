@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/erp_provider.dart';
+import '../../services/print_service.dart';
 import '../../theme/app_theme.dart';
 import '../widgets/common.dart';
 
@@ -37,7 +38,37 @@ class TrialBalanceScreen extends StatelessWidget {
     rows.sort((a, b) => (a['code'] as String).compareTo(b['code'] as String));
 
     return Scaffold(
-      appBar: AppBar(title: const Text('ميزان المراجعة')),
+      appBar: AppBar(
+        title: const Text('ميزان المراجعة'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.picture_as_pdf),
+            tooltip: 'تصدير PDF',
+            onPressed: () => PrintService.printTable(
+              title: 'ميزان المراجعة',
+              companyName: prov.companyName,
+              headers: ['الرمز', 'الحساب', 'مدين', 'دائن'],
+              rows: [
+                for (final r in rows)
+                  [
+                    r['code'] as String,
+                    r['name'] as String,
+                    (r['debit'] as double) > 0
+                        ? Fmt.num(r['debit'] as double)
+                        : '-',
+                    (r['credit'] as double) > 0
+                        ? Fmt.num(r['credit'] as double)
+                        : '-',
+                  ],
+              ],
+              totals: [
+                'إجمالي المدين: ${Fmt.num(totalDebit)}',
+                'إجمالي الدائن: ${Fmt.num(totalCredit)}',
+              ],
+            ),
+          ),
+        ],
+      ),
       body: rows.isEmpty
           ? const EmptyState(
               message: 'لا توجد حركات لعرض الميزان',

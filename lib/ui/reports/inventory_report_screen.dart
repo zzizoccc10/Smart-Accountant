@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/erp_provider.dart';
+import '../../services/print_service.dart';
 import '../../theme/app_theme.dart';
 import '../widgets/common.dart';
 
@@ -33,7 +34,30 @@ class InventoryReportScreen extends StatelessWidget {
     rows.sort((a, b) => (b['value'] as double).compareTo(a['value'] as double));
 
     return Scaffold(
-      appBar: AppBar(title: const Text('تقرير المخزون')),
+      appBar: AppBar(
+        title: const Text('تقرير المخزون'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.picture_as_pdf),
+            tooltip: 'تصدير PDF',
+            onPressed: () => PrintService.printTable(
+              title: 'تقرير المخزون',
+              companyName: prov.companyName,
+              headers: ['الصنف', 'الكمية', 'متوسط التكلفة', 'القيمة'],
+              rows: [
+                for (final r in rows)
+                  [
+                    r['name'] as String,
+                    Fmt.num(r['qty'] as double),
+                    Fmt.num(r['cost'] as double),
+                    Fmt.num(r['value'] as double),
+                  ],
+              ],
+              totals: ['إجمالي قيمة المخزون: ${Fmt.money(totalValue, curr)}'],
+            ),
+          ),
+        ],
+      ),
       body: ListView(
         padding: const EdgeInsets.all(12),
         children: [

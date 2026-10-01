@@ -12,6 +12,7 @@ import 'inventory/inventory_home.dart';
 import 'reports/reports_home.dart';
 import 'accounts/accounts_home.dart';
 import 'hr/hr_home.dart';
+import 'alerts_screen.dart';
 import 'settings_screen.dart';
 
 class HomeShell extends StatefulWidget {
@@ -52,6 +53,47 @@ class _HomeShellState extends State<HomeShell> {
           ],
         ),
         actions: [
+          Builder(
+            builder: (ctx) {
+              final count = prov.lowStockItems.length +
+                  prov.overdueInvoices.length;
+              return Stack(
+                children: [
+                  IconButton(
+                    tooltip: 'التنبيهات',
+                    icon: const Icon(Icons.notifications_none),
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const AlertsScreen()),
+                    ),
+                  ),
+                  if (count > 0)
+                    Positioned(
+                      right: 6,
+                      top: 6,
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: const BoxDecoration(
+                          color: AppColors.danger,
+                          shape: BoxShape.circle,
+                        ),
+                        constraints: const BoxConstraints(
+                            minWidth: 16, minHeight: 16),
+                        child: Text(
+                          '$count',
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 9,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              );
+            },
+          ),
           IconButton(
             tooltip: 'الإعدادات',
             icon: const Icon(Icons.settings),
