@@ -12,6 +12,7 @@ import 'settings/security_screen.dart';
 import 'settings/fiscal_close_screen.dart';
 import 'settings/import_screen.dart';
 import 'settings/basic_tables_screen.dart';
+import 'settings/audit_log_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -195,6 +196,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     context,
                     MaterialPageRoute(
                         builder: (_) => const CurrenciesScreen()),
+                  ),
+                ),
+                const Divider(height: 1),
+                ListTile(
+                  leading: const Icon(Icons.history, color: AppColors.info),
+                  title: const Text('سجل المراجعة'),
+                  subtitle: Text('${prov.auditLogs.length} عملية مسجّلة'),
+                  trailing: const Icon(Icons.chevron_left),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => const AuditLogScreen()),
                   ),
                 ),
                 const Divider(height: 1),

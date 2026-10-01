@@ -35,6 +35,7 @@ class AppDatabase {
   static const boxUnits = 'units';
   static const boxCostCenters = 'cost_centers';
   static const boxExchangeRates = 'exchange_rates';
+  static const boxAuditLog = 'audit_log';
 
   static late Box _bAccounts;
   static late Box _bContacts;
@@ -61,6 +62,7 @@ class AppDatabase {
   static late Box _bUnits;
   static late Box _bCostCenters;
   static late Box _bExchangeRates;
+  static late Box _bAuditLog;
 
   static String newId() => _uuid.v4();
 
@@ -93,6 +95,7 @@ class AppDatabase {
     _bUnits = await Hive.openBox(boxUnits);
     _bCostCenters = await Hive.openBox(boxCostCenters);
     _bExchangeRates = await Hive.openBox(boxExchangeRates);
+    _bAuditLog = await Hive.openBox(boxAuditLog);
 
     if (_bSettings.get('seeded') != true) {
       await _seed();
@@ -404,6 +407,30 @@ class AppDatabase {
   static List<ExchangeRate> exchangeRatesOfCurrency(String currencyId) =>
       exchangeRates.where((r) => r.currencyId == currencyId).toList();
 
+  // ---------------------------- سجل المراجعة ----------------------------
+  static const int _maxAuditLog = 2000;
+
+  static List<AuditLog> get auditLogs {
+    final list = _bAuditLog.values
+        .map((e) => AuditLog.fromMap(Map<String, dynamic>.from(e)))
+        .toList();
+    list.sort((a, b) => b.date.compareTo(a.date)); // الأحدث أولاً
+    return list;
+  }
+
+  static Future<void> saveAuditLog(AuditLog log) async {
+    await _bAuditLog.put(log.id, log.toMap());
+    // حدّ أقصى لتجنّب تضخّم التخزين
+    if (_bAuditLog.length > _maxAuditLog) {
+      final all = auditLogs;
+      for (final old in all.sublist(_maxAuditLog)) {
+        await _bAuditLog.delete(old.id);
+      }
+    }
+  }
+
+  static Future<void> clearAuditLog() => _bAuditLog.clear();
+
   // ---------------------------- الإعدادات ----------------------------
   static String getSetting(String key, [String def = '']) =>
       _bSettings.get(key, defaultValue: def).toString();
@@ -451,6 +478,7 @@ class AppDatabase {
       _bUnits,
       _bCostCenters,
       _bExchangeRates,
+      _bAuditLog,
     ]) {
       await b.clear();
     }

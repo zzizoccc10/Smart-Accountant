@@ -31,6 +31,7 @@ class ERPProvider extends ChangeNotifier {
   List<Unit> units = [];
   List<CostCenter> costCenters = [];
   List<ExchangeRate> exchangeRates = [];
+  List<AuditLog> auditLogs = [];
 
   bool initialized = false;
 
@@ -61,6 +62,7 @@ class ERPProvider extends ChangeNotifier {
     units = AppDatabase.units;
     costCenters = AppDatabase.costCenters;
     exchangeRates = AppDatabase.exchangeRates;
+    auditLogs = AppDatabase.auditLogs;
     fixedAssets = AppDatabase.fixedAssets;
     initialized = true;
     notifyListeners();
@@ -339,6 +341,9 @@ class ERPProvider extends ChangeNotifier {
     }
 
     reload();
+    await logAction('create', 'invoice',
+        entityId: inv.id,
+        description: 'إنشاء فاتورة ${inv.invoiceNumber} بمبلغ ${inv.total}');
     return inv;
   }
 
@@ -397,6 +402,8 @@ class ERPProvider extends ChangeNotifier {
       final i = inv.first;
       i.isDeleted = true;
       await AppDatabase.saveInvoice(i);
+      await logAction('delete', 'invoice',
+          entityId: i.id, description: 'حذف فاتورة ${i.invoiceNumber}');
     }
     reload();
   }
@@ -467,6 +474,9 @@ class ERPProvider extends ChangeNotifier {
       await AppDatabase.saveInvoice(inv);
     }
     reload();
+    await logAction('create', 'payment',
+        entityId: p.id,
+        description: 'إنشاء ${p.paymentType == 'receipt' ? 'سند قبض' : 'سند صرف'} ${p.paymentNumber} بمبلغ ${p.amount}');
     return p;
   }
 
@@ -517,6 +527,8 @@ class ERPProvider extends ChangeNotifier {
       await AppDatabase.saveCashbox(cb);
     }
     reload();
+    await logAction('create', 'expense',
+        entityId: e.id, description: 'إنشاء مصروف ${e.expenseNumber} بمبلغ ${e.total}');
     return e;
   }
 
@@ -1134,4 +1146,28 @@ class ERPProvider extends ChangeNotifier {
 
   List<ExchangeRate> ratesOfCurrency(String currencyId) =>
       exchangeRates.where((r) => r.currencyId == currencyId).toList();
+
+  // ============================ سجل المراجعة ============================
+  /// تسجيل عملية في سجل المراجعة
+  Future<void> logAction(String action, String entity,
+      {String entityId = '', String description = ''}) async {
+    final log = AuditLog(
+      id: AppDatabase.newId(),
+      action: action,
+      entity: entity,
+      entityId: entityId,
+      description: description,
+      userName: AppDatabase.getSetting('companyName', 'مستخدم'),
+      date: DateTime.now().toIso8601String(),
+    );
+    await AppDatabase.saveAuditLog(log);
+  }
+
+  Future<void> clearAuditLog() async {
+    await AppDatabase.clearAuditLog();
+    reload();
+  }
+
+  List<AuditLog> auditLogsByEntity(String entity) =>
+      auditLogs.where((l) => l.entity == entity).toList();
 }
