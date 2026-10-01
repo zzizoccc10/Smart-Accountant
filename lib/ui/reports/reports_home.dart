@@ -10,6 +10,8 @@ import 'sales_report_screen.dart';
 import 'inventory_report_screen.dart';
 import 'aging_report_screen.dart';
 import 'tax_report_screen.dart';
+import 'item_ledger_screen.dart';
+import 'cashbox_statement_screen.dart';
 
 class ReportsHome extends StatelessWidget {
   const ReportsHome({super.key});
@@ -31,6 +33,10 @@ class ReportsHome extends StatelessWidget {
           'الذمم حسب العمر', () => const AgingReportScreen()),
       _Report(Icons.receipt_long, 'تقرير الضرائب', AppColors.danger,
           'ضريبة القيمة المضافة', () => const TaxReportScreen()),
+      _Report(Icons.menu_book, 'حركة الصنف (كارت الصنف)', AppColors.primary,
+          'حركات وأرصدة صنف محدد', () => const ItemLedgerScreen()),
+      _Report(Icons.savings, 'حركة الصندوق', AppColors.success,
+          'المقبوضات والمدفوعات النقدية', () => const CashboxStatementScreen()),
     ];
 
     return ListView(
