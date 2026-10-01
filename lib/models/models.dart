@@ -172,6 +172,7 @@ class Contact {
   double openingBalance;
   bool isActive;
   String notes;
+  bool isDeleted;
 
   Contact({
     required this.id,
@@ -188,6 +189,7 @@ class Contact {
     this.openingBalance = 0.0,
     this.isActive = true,
     this.notes = '',
+    this.isDeleted = false,
   });
 
   Map<String, dynamic> toMap() => {
@@ -205,6 +207,7 @@ class Contact {
     'openingBalance': openingBalance,
     'isActive': isActive,
     'notes': notes,
+    'isDeleted': isDeleted,
   };
 
   factory Contact.fromMap(Map<String, dynamic> m) => Contact(
@@ -222,6 +225,7 @@ class Contact {
     openingBalance: (m['openingBalance'] as num?)?.toDouble() ?? 0.0,
     isActive: m['isActive'] as bool? ?? true,
     notes: m['notes'] as String? ?? '',
+    isDeleted: m['isDeleted'] as bool? ?? false,
   );
 }
 
@@ -247,6 +251,7 @@ class Item {
   bool isTracked;
   bool hasExpiry;
   String imagePath;
+  bool isDeleted;
 
   Item({
     required this.id,
@@ -269,6 +274,7 @@ class Item {
     this.isTracked = true,
     this.hasExpiry = false,
     this.imagePath = '',
+    this.isDeleted = false,
   });
 
   Map<String, dynamic> toMap() => {
@@ -292,6 +298,7 @@ class Item {
     'isTracked': isTracked,
     'hasExpiry': hasExpiry,
     'imagePath': imagePath,
+    'isDeleted': isDeleted,
   };
 
   factory Item.fromMap(Map<String, dynamic> m) => Item(
@@ -315,6 +322,7 @@ class Item {
     isTracked: m['isTracked'] as bool? ?? true,
     hasExpiry: m['hasExpiry'] as bool? ?? false,
     imagePath: m['imagePath'] as String? ?? '',
+    isDeleted: m['isDeleted'] as bool? ?? false,
   );
 }
 
@@ -394,6 +402,8 @@ class Invoice {
   String status; // draft/posted/cancelled
   String notes;
   String createdAt;
+  String? originalInvoiceId; // للفواتير المرتجعة: الفاتورة الأصلية
+  bool isDeleted;
 
   Invoice({
     required this.id,
@@ -419,6 +429,8 @@ class Invoice {
     this.journalEntryId,
     this.status = 'posted',
     this.notes = '',
+    this.originalInvoiceId,
+    this.isDeleted = false,
     String? createdAt,
   }) : lines = lines ?? [],
        createdAt = createdAt ?? DateTime.now().toIso8601String();
@@ -456,6 +468,8 @@ class Invoice {
     'status': status,
     'notes': notes,
     'createdAt': createdAt,
+    'originalInvoiceId': originalInvoiceId,
+    'isDeleted': isDeleted,
   };
 
   factory Invoice.fromMap(Map<String, dynamic> m) => Invoice(
@@ -484,6 +498,8 @@ class Invoice {
     journalEntryId: m['journalEntryId'] as String?,
     status: m['status'] as String? ?? 'posted',
     notes: m['notes'] as String? ?? '',
+    originalInvoiceId: m['originalInvoiceId'] as String?,
+    isDeleted: m['isDeleted'] as bool? ?? false,
     createdAt: m['createdAt'] as String?,
   );
 }
@@ -502,6 +518,7 @@ class Payment {
   String description;
   String? journalEntryId;
   String createdAt;
+  bool isDeleted;
 
   Payment({
     required this.id,
@@ -515,6 +532,7 @@ class Payment {
     this.paymentMethod = 'cash',
     this.description = '',
     this.journalEntryId,
+    this.isDeleted = false,
     String? createdAt,
   }) : createdAt = createdAt ?? DateTime.now().toIso8601String();
 
@@ -530,6 +548,7 @@ class Payment {
     'paymentMethod': paymentMethod,
     'description': description,
     'journalEntryId': journalEntryId,
+    'isDeleted': isDeleted,
     'createdAt': createdAt,
   };
 
@@ -545,7 +564,49 @@ class Payment {
     paymentMethod: m['paymentMethod'] as String? ?? 'cash',
     description: m['description'] as String? ?? '',
     journalEntryId: m['journalEntryId'] as String?,
+    isDeleted: m['isDeleted'] as bool? ?? false,
     createdAt: m['createdAt'] as String?,
+  );
+}
+
+/// تخصيص دفعة على فاتورة — payment_allocations
+class PaymentAllocation {
+  final String id;
+  String paymentId;
+  String invoiceType; // sale/purchase/sale_return/purchase_return
+  String invoiceId;
+  String invoiceNumber;
+  double amount;
+  String date;
+
+  PaymentAllocation({
+    required this.id,
+    required this.paymentId,
+    required this.invoiceType,
+    required this.invoiceId,
+    this.invoiceNumber = '',
+    required this.amount,
+    required this.date,
+  });
+
+  Map<String, dynamic> toMap() => {
+    'id': id,
+    'paymentId': paymentId,
+    'invoiceType': invoiceType,
+    'invoiceId': invoiceId,
+    'invoiceNumber': invoiceNumber,
+    'amount': amount,
+    'date': date,
+  };
+
+  factory PaymentAllocation.fromMap(Map<String, dynamic> m) => PaymentAllocation(
+    id: m['id'] as String,
+    paymentId: m['paymentId'] as String? ?? '',
+    invoiceType: m['invoiceType'] as String? ?? 'sale',
+    invoiceId: m['invoiceId'] as String? ?? '',
+    invoiceNumber: m['invoiceNumber'] as String? ?? '',
+    amount: (m['amount'] as num?)?.toDouble() ?? 0.0,
+    date: m['date'] as String? ?? '',
   );
 }
 
@@ -566,6 +627,7 @@ class Expense {
   String description;
   String? journalEntryId;
   String createdAt;
+  bool isDeleted;
 
   Expense({
     required this.id,
@@ -582,6 +644,7 @@ class Expense {
     this.contactId,
     this.description = '',
     this.journalEntryId,
+    this.isDeleted = false,
     String? createdAt,
   }) : createdAt = createdAt ?? DateTime.now().toIso8601String();
 
@@ -600,6 +663,7 @@ class Expense {
     'contactId': contactId,
     'description': description,
     'journalEntryId': journalEntryId,
+    'isDeleted': isDeleted,
     'createdAt': createdAt,
   };
 
@@ -618,6 +682,7 @@ class Expense {
     contactId: m['contactId'] as String?,
     description: m['description'] as String? ?? '',
     journalEntryId: m['journalEntryId'] as String?,
+    isDeleted: m['isDeleted'] as bool? ?? false,
     createdAt: m['createdAt'] as String?,
   );
 }

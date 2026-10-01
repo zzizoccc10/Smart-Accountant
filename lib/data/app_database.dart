@@ -30,6 +30,7 @@ class AppDatabase {
   static const boxPayroll = 'payroll';
   static const boxCurrencies = 'currencies';
   static const boxFixedAssets = 'fixed_assets';
+  static const boxAllocations = 'payment_allocations';
 
   static late Box _bAccounts;
   static late Box _bContacts;
@@ -51,6 +52,7 @@ class AppDatabase {
   static late Box _bPayroll;
   static late Box _bCurrencies;
   static late Box _bFixedAssets;
+  static late Box _bAllocations;
 
   static String newId() => _uuid.v4();
 
@@ -78,6 +80,7 @@ class AppDatabase {
     _bPayroll = await Hive.openBox(boxPayroll);
     _bCurrencies = await Hive.openBox(boxCurrencies);
     _bFixedAssets = await Hive.openBox(boxFixedAssets);
+    _bAllocations = await Hive.openBox(boxAllocations);
 
     if (_bSettings.get('seeded') != true) {
       await _seed();
@@ -113,6 +116,7 @@ class AppDatabase {
   // ---------------------------- جهات الاتصال ----------------------------
   static List<Contact> get contacts => _bContacts.values
       .map((e) => Contact.fromMap(Map<String, dynamic>.from(e)))
+      .where((c) => !c.isDeleted)
       .toList();
 
   static Future<void> saveContact(Contact c) => _bContacts.put(c.id, c.toMap());
@@ -127,6 +131,7 @@ class AppDatabase {
   // ---------------------------- الأصناف ----------------------------
   static List<Item> get items => _bItems.values
       .map((e) => Item.fromMap(Map<String, dynamic>.from(e)))
+      .where((it) => !it.isDeleted)
       .toList();
 
   static Future<void> saveItem(Item it) => _bItems.put(it.id, it.toMap());
@@ -149,6 +154,7 @@ class AppDatabase {
   // ---------------------------- الفواتير ----------------------------
   static List<Invoice> get invoices => _bInvoices.values
       .map((e) => Invoice.fromMap(Map<String, dynamic>.from(e)))
+      .where((i) => !i.isDeleted)
       .toList();
 
   static Future<void> saveInvoice(Invoice inv) =>
@@ -158,14 +164,32 @@ class AppDatabase {
   // ---------------------------- السندات ----------------------------
   static List<Payment> get payments => _bPayments.values
       .map((e) => Payment.fromMap(Map<String, dynamic>.from(e)))
+      .where((p) => !p.isDeleted)
       .toList();
 
   static Future<void> savePayment(Payment p) => _bPayments.put(p.id, p.toMap());
   static Future<void> deletePayment(String id) => _bPayments.delete(id);
 
+  // ---------------------------- تخصيص الدفعات ----------------------------
+  static List<PaymentAllocation> get allocations => _bAllocations.values
+      .map((e) => PaymentAllocation.fromMap(Map<String, dynamic>.from(e)))
+      .toList();
+
+  static Future<void> saveAllocation(PaymentAllocation a) =>
+      _bAllocations.put(a.id, a.toMap());
+
+  static Future<void> deleteAllocation(String id) => _bAllocations.delete(id);
+
+  static List<PaymentAllocation> allocationsOfPayment(String paymentId) =>
+      allocations.where((a) => a.paymentId == paymentId).toList();
+
+  static List<PaymentAllocation> allocationsOfInvoice(String invoiceId) =>
+      allocations.where((a) => a.invoiceId == invoiceId).toList();
+
   // ---------------------------- المصروفات ----------------------------
   static List<Expense> get expenses => _bExpenses.values
       .map((e) => Expense.fromMap(Map<String, dynamic>.from(e)))
+      .where((e) => !e.isDeleted)
       .toList();
 
   static Future<void> saveExpense(Expense e) => _bExpenses.put(e.id, e.toMap());
@@ -325,8 +349,7 @@ class AppDatabase {
     final year = DateTime.now().year;
     return '$prefix$current/$year';
   }
-
-  // ---------------------------- حذف كل البيانات ----------------------------
+  // ============================ حذف كل البيانات ============================
   static Future<void> clearAll() async {
     for (final b in [
       _bAccounts,
@@ -348,13 +371,13 @@ class AppDatabase {
       _bPayroll,
       _bCurrencies,
       _bFixedAssets,
+      _bAllocations,
     ]) {
       await b.clear();
     }
     await _bSettings.delete('seeded');
     await _seed();
   }
-
   // ============================ البيانات الأولية ============================
   static Future<void> _seed() async {
     // 1. دليل الحسابات

@@ -129,7 +129,10 @@ class ERPProvider extends ChangeNotifier {
   }
 
   Future<void> deleteContact(String id) async {
-    await AppDatabase.deleteContact(id);
+    final c = AppDatabase.contactById(id);
+    if (c == null) return;
+    c.isDeleted = true;
+    await AppDatabase.saveContact(c);
     reload();
   }
 
@@ -145,7 +148,10 @@ class ERPProvider extends ChangeNotifier {
   }
 
   Future<void> deleteItem(String id) async {
-    await AppDatabase.deleteItem(id);
+    final it = AppDatabase.itemById(id);
+    if (it == null) return;
+    it.isDeleted = true;
+    await AppDatabase.saveItem(it);
     reload();
   }
 
@@ -342,7 +348,15 @@ class ERPProvider extends ChangeNotifier {
   }
 
   Future<void> deleteInvoice(String id) async {
-    await AppDatabase.deleteInvoice(id);
+    final inv = AppDatabase.invoices.where((i) => i.id == id).toList();
+    if (inv.isEmpty) {
+      // قد تكون محذوفة منطقياً سابقاً — نحذف فعلياً من الصندوق
+      await AppDatabase.deleteInvoice(id);
+    } else {
+      final i = inv.first;
+      i.isDeleted = true;
+      await AppDatabase.saveInvoice(i);
+    }
     reload();
   }
 

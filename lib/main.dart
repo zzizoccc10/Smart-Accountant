@@ -31,7 +31,7 @@ class EasyAccountantApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),
-      themeMode: ThemeMode.light,
+      themeMode: ThemeMode.system,
       locale: const Locale('ar', 'EG'),
       builder: (context, child) {
         return Directionality(
