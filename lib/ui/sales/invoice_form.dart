@@ -31,6 +31,7 @@ class _InvoiceFormState extends State<InvoiceForm> {
   double _paidAmount = 0.0;
   final _notes = TextEditingController();
   bool _saving = false;
+  String? _originalInvoiceId; // للمرتجعات: الفاتورة الأصلية
 
   bool get isSale =>
       widget.invoiceType == 'sale' || widget.invoiceType == 'sale_return';
@@ -135,6 +136,28 @@ class _InvoiceFormState extends State<InvoiceForm> {
                       ),
                     ],
                   ),
+                  if (isReturn) ...[
+                    const SizedBox(height: 12),
+                    DropdownButtonFormField<String>(
+                      initialValue: _originalInvoiceId,
+                      isExpanded: true,
+                      decoration: const InputDecoration(
+                        labelText: 'الفاتورة الأصلية (للتحقق من الكميات)',
+                        prefixIcon: Icon(Icons.receipt_long),
+                      ),
+                      items: prov.invoices
+                          .where((i) =>
+                              i.invoiceType == (isSale ? 'sale' : 'purchase'))
+                          .map((i) => DropdownMenuItem(
+                                value: i.id,
+                                child: Text(
+                                    '${i.invoiceNumber} — ${i.contactName} — ${Fmt.money(i.total, curr)}'),
+                              ))
+                          .toList(),
+                      onChanged: (v) =>
+                          setState(() => _originalInvoiceId = v),
+                    ),
+                  ],
                   const SizedBox(height: 12),
                   Row(
                     children: [
@@ -510,6 +533,7 @@ class _InvoiceFormState extends State<InvoiceForm> {
         shipping: isSale && !isReturn ? _shipping : 0,
         notes: _notes.text,
         paidAmount: _paidAmount,
+        originalInvoiceId: _originalInvoiceId,
       );
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(

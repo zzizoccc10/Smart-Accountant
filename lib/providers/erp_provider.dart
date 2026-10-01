@@ -190,11 +190,43 @@ class ERPProvider extends ChangeNotifier {
     double shipping = 0.0,
     String notes = '',
     double paidAmount = 0.0,
+    String? originalInvoiceId,
   }) async {
     final isSale = invoiceType == 'sale' || invoiceType == 'sale_return';
     final isReturn =
         invoiceType == 'sale_return' || invoiceType == 'purchase_return';
     final contact = AppDatabase.contactById(contactId);
+
+    // التحقق من الكمية المرتجعة ≤ الكمية المباعة - المرتجع سابقاً
+    if (isReturn && originalInvoiceId != null && originalInvoiceId.isNotEmpty) {
+      final original =
+          AppDatabase.invoices.where((i) => i.id == originalInvoiceId).toList();
+      if (original.isNotEmpty) {
+        final origInv = original.first;
+        // الرصيد المتاح للإرجاع لكل صنف
+        final Map<String, double> previouslyReturned = {};
+        for (final r in AppDatabase.invoices.where(
+            (i) => i.originalInvoiceId == originalInvoiceId)) {
+          for (final rl in r.lines) {
+            previouslyReturned[rl.itemId] =
+                (previouslyReturned[rl.itemId] ?? 0) + rl.quantity;
+          }
+        }
+        for (final l in lines) {
+          final soldLine = origInv.lines
+              .where((ol) => ol.itemId == l.itemId)
+              .fold(0.0, (s, ol) => s + ol.quantity);
+          final already = previouslyReturned[l.itemId] ?? 0;
+          final available = soldLine - already;
+          if (l.quantity > available + 0.001) {
+            throw Exception(
+              'الكمية المرتجعة للصنف "${l.itemName}" (${l.quantity}) تتجاوز '
+              'المتاح للإرجاع ($available)',
+            );
+          }
+        }
+      }
+    }
 
     // حساب المجاميع
     final subtotal = lines.fold(0.0, (s, l) => s + l.lineSubtotal);
@@ -247,6 +279,7 @@ class ERPProvider extends ChangeNotifier {
       remaining: paymentType == 'cash' ? 0 : total - paidAmount,
       status: 'posted',
       notes: notes,
+      originalInvoiceId: originalInvoiceId,
     );
 
     // 1) حفظ الفاتورة
@@ -368,6 +401,7 @@ class ERPProvider extends ChangeNotifier {
     String? cashboxId,
     required double amount,
     String description = '',
+    List<Map<String, dynamic>> allocations = const [],
   }) async {
     final contact = AppDatabase.contactById(contactId);
     final p = Payment(
@@ -398,8 +432,48 @@ class ERPProvider extends ChangeNotifier {
       cb.currentBalance += paymentType == 'receipt' ? amount : -amount;
       await AppDatabase.saveCashbox(cb);
     }
+
+    // تخصيص الدفعة على الفواتير الآجلة
+    for (final a in allocations) {
+      final invId = a['invoiceId'] as String? ?? '';
+      final allocAmt = (a['amount'] as num?)?.toDouble() ?? 0.0;
+      if (invId.isEmpty || allocAmt <= 0) continue;
+      final list = AppDatabase.invoices.where((i) => i.id == invId).toList();
+      if (list.isEmpty) continue;
+      final inv = list.first;
+      await AppDatabase.saveAllocation(PaymentAllocation(
+        id: AppDatabase.newId(),
+        paymentId: p.id,
+        invoiceType: inv.invoiceType,
+        invoiceId: inv.id,
+        invoiceNumber: inv.invoiceNumber,
+        amount: allocAmt,
+        date: date,
+      ));
+      inv.paidAmount += allocAmt;
+      inv.remaining = (inv.total - inv.paidAmount);
+      if (inv.remaining < 0.001) {
+        inv.remaining = 0;
+        inv.status = 'paid';
+      }
+      await AppDatabase.saveInvoice(inv);
+    }
     reload();
     return p;
+  }
+
+  /// الفواتير الآجلة غير المسددة لجهة اتصال معينة
+  List<Invoice> unpaidInvoices(String contactId, String paymentType) {
+    return invoices.where((inv) {
+      if (inv.contactId != contactId) return false;
+      if (inv.status == 'cancelled') return false;
+      if (inv.remaining <= 0.001) return false;
+      if (paymentType == 'receipt') {
+        return inv.invoiceType == 'sale';
+      } else {
+        return inv.invoiceType == 'purchase';
+      }
+    }).toList();
   }
 
   // ============================ المصروفات ============================
