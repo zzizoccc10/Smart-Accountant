@@ -20,3 +20,6 @@ ios/.symlinks/
 # IDE
 .idea/
 .vscode/
+
+# APK build outputs
+build/

@@ -1,4 +1,4 @@
-package com.easyaccountant.easy_accountant
+package com.easyaccountant.erp
 
 import io.flutter.embedding.android.FlutterActivity
 
