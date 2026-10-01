@@ -9,6 +9,7 @@ import 'balance_sheet_screen.dart';
 import 'sales_report_screen.dart';
 import 'inventory_report_screen.dart';
 import 'aging_report_screen.dart';
+import 'tax_report_screen.dart';
 
 class ReportsHome extends StatelessWidget {
   const ReportsHome({super.key});
@@ -28,6 +29,8 @@ class ReportsHome extends StatelessWidget {
           'الأرصدة والقيمة', () => const InventoryReportScreen()),
       _Report(Icons.hourglass_bottom, 'أعمار الديون', AppColors.warning,
           'الذمم حسب العمر', () => const AgingReportScreen()),
+      _Report(Icons.receipt_long, 'تقرير الضرائب', AppColors.danger,
+          'ضريبة القيمة المضافة', () => const TaxReportScreen()),
     ];
 
     return ListView(
