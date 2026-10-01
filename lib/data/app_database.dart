@@ -29,6 +29,7 @@ class AppDatabase {
   static const boxAttendance = 'attendance';
   static const boxPayroll = 'payroll';
   static const boxCurrencies = 'currencies';
+  static const boxFixedAssets = 'fixed_assets';
 
   static late Box _bAccounts;
   static late Box _bContacts;
@@ -49,6 +50,7 @@ class AppDatabase {
   static late Box _bAttendance;
   static late Box _bPayroll;
   static late Box _bCurrencies;
+  static late Box _bFixedAssets;
 
   static String newId() => _uuid.v4();
 
@@ -75,6 +77,7 @@ class AppDatabase {
     _bAttendance = await Hive.openBox(boxAttendance);
     _bPayroll = await Hive.openBox(boxPayroll);
     _bCurrencies = await Hive.openBox(boxCurrencies);
+    _bFixedAssets = await Hive.openBox(boxFixedAssets);
 
     if (_bSettings.get('seeded') != true) {
       await _seed();
@@ -287,6 +290,21 @@ class AppDatabase {
       _bCurrencies.put(c.id, c.toMap());
   static Future<void> deleteCurrency(String id) => _bCurrencies.delete(id);
 
+  // ---------------------------- الأصول الثابتة ----------------------------
+  static List<FixedAsset> get fixedAssets => _bFixedAssets.values
+      .map((e) => FixedAsset.fromMap(Map<String, dynamic>.from(e)))
+      .toList();
+
+  static Future<void> saveFixedAsset(FixedAsset a) =>
+      _bFixedAssets.put(a.id, a.toMap());
+  static Future<void> deleteFixedAsset(String id) => _bFixedAssets.delete(id);
+
+  static FixedAsset? fixedAssetById(String? id) {
+    if (id == null) return null;
+    final v = _bFixedAssets.get(id);
+    return v == null ? null : FixedAsset.fromMap(Map<String, dynamic>.from(v));
+  }
+
   // ---------------------------- الإعدادات ----------------------------
   static String getSetting(String key, [String def = '']) =>
       _bSettings.get(key, defaultValue: def).toString();
@@ -329,6 +347,7 @@ class AppDatabase {
       _bAttendance,
       _bPayroll,
       _bCurrencies,
+      _bFixedAssets,
     ]) {
       await b.clear();
     }

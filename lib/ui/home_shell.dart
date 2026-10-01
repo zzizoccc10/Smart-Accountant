@@ -12,6 +12,7 @@ import 'inventory/inventory_home.dart';
 import 'reports/reports_home.dart';
 import 'accounts/accounts_home.dart';
 import 'hr/hr_home.dart';
+import 'assets/assets_home.dart';
 import 'alerts_screen.dart';
 import 'settings_screen.dart';
 
@@ -191,6 +192,17 @@ class _HomeShellState extends State<HomeShell> {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => const HrHome()),
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.business, color: AppColors.warning),
+            title: const Text('الأصول الثابتة والإهلاك'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const AssetsHome()),
               );
             },
           ),

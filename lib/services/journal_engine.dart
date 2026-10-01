@@ -358,4 +358,69 @@ class JournalEngine {
       lines: lines,
     );
   }
+
+  // ============================ إهلاك أصل ثابت ============================
+  /// مدين: مصروف الإهلاك، دائن: مجمع الإهلاك
+  static Future<JournalEntry> depreciation({
+    required FixedAsset asset,
+    required double amount,
+  }) async {
+    final exp = AppDatabase.accountByCode(CoA.depreciationExpense);
+    final accDep =
+        AppDatabase.accountByCode(CoA.accumulatedDepreciation);
+    final lines = [
+      dr(exp, amount, 'إهلاك ${asset.name}'),
+      cr(accDep, amount, 'مجمع إهلاك ${asset.name}'),
+    ];
+    return post(
+      date: DateTime.now().toIso8601String().substring(0, 10),
+      description: 'قسط إهلاك: ${asset.name}',
+      sourceType: 'depreciation',
+      sourceId: asset.id,
+      lines: lines,
+    );
+  }
+
+  // ============================ تخريد/بيع أصل ============================
+  /// القيمة الدفترية = التكلفة - مجمع الإهلاك
+  /// - إذا بيع بمبلغ: مدين الصندوق + مجمع الإهلاك، دائن الأصل،
+  ///   والفرق ربح (إيراد) أو خسارة (مصروف).
+  static Future<JournalEntry> assetDisposal({
+    required FixedAsset asset,
+    required double saleAmount,
+    required Cashbox? cashbox,
+  }) async {
+    final cash = AppDatabase.accountByCode(CoA.cash);
+    final assetAcc = AppDatabase.accountByCode(asset.assetAccountCode);
+    final accDep = AppDatabase.accountByCode(CoA.accumulatedDepreciation);
+    final gain = AppDatabase.accountByCode(CoA.otherRevenue);
+    final loss = AppDatabase.accountByCode(CoA.inventoryLoss);
+
+    final bookValue = asset.bookValue;
+    final diff = saleAmount - bookValue; // موجب = ربح، سالب = خسارة
+
+    final lines = <JournalLine>[];
+    if (saleAmount > 0) {
+      lines.add(dr(cash, saleAmount, 'بيع أصل'));
+    }
+    if (asset.accumulatedDepreciation > 0) {
+      lines.add(dr(accDep, asset.accumulatedDepreciation, 'استبعاد مجمع الإهلاك'));
+    }
+    lines.add(cr(assetAcc, asset.cost, 'استبعاد الأصل'));
+    if (diff > 0.001) {
+      lines.add(cr(gain, diff, 'ربح بيع أصل'));
+    } else if (diff < -0.001) {
+      lines.add(dr(loss, diff.abs(), 'خسارة بيع أصل'));
+    }
+
+    return post(
+      date: asset.disposalDate.isEmpty
+          ? DateTime.now().toIso8601String().substring(0, 10)
+          : asset.disposalDate,
+      description: 'تخريد الأصل: ${asset.name}',
+      sourceType: 'asset_disposal',
+      sourceId: asset.id,
+      lines: lines,
+    );
+  }
 }

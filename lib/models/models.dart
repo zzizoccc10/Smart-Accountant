@@ -1101,3 +1101,100 @@ class Currency {
     isActive: m['isActive'] as bool? ?? true,
   );
 }
+
+// ============================================================================
+// الأصول الثابتة والإهلاك
+// ============================================================================
+
+/// أصل ثابت — fixed_assets
+class FixedAsset {
+  final String id;
+  String code;
+  String name;
+  String category; // أرض/مبنى/سيارة/أثاث/كمبيوتر/أخرى
+  String purchaseDate;
+  double cost; // التكلفة
+  double salvageValue; // القيمة التخريدية
+  int usefulLifeYears; // العمر الإنتاجي بالسنوات
+  double accumulatedDepreciation; // مجمع الإهلاك
+  String assetAccountCode; // حساب الأصل
+  String method; // straight_line / declining
+  String status; // active/disposed
+  double disposalAmount; // قيمة البيع عند التخريد
+  String disposalDate;
+  String notes;
+
+  FixedAsset({
+    required this.id,
+    this.code = '',
+    required this.name,
+    this.category = 'أخرى',
+    required this.purchaseDate,
+    required this.cost,
+    this.salvageValue = 0.0,
+    this.usefulLifeYears = 5,
+    this.accumulatedDepreciation = 0.0,
+    this.assetAccountCode = '',
+    this.method = 'straight_line',
+    this.status = 'active',
+    this.disposalAmount = 0.0,
+    this.disposalDate = '',
+    this.notes = '',
+  });
+
+  /// القيمة الدفترية = التكلفة - مجمع الإهلاك
+  double get bookValue => cost - accumulatedDepreciation;
+
+  /// القابل للإهلاك = التكلفة - القيمة التخريدية
+  double get depreciableAmount => cost - salvageValue;
+
+  /// قسط الإهلاك السنوي (القسط الثابت)
+  double get annualDepreciation {
+    if (usefulLifeYears <= 0) return 0;
+    return depreciableAmount / usefulLifeYears;
+  }
+
+  /// قسط الإهلاك الشهري
+  double get monthlyDepreciation => annualDepreciation / 12;
+
+  /// هل انتهى الإهلاك؟
+  bool get isFullyDepreciated =>
+      accumulatedDepreciation >= depreciableAmount - 0.001;
+
+  Map<String, dynamic> toMap() => {
+    'id': id,
+    'code': code,
+    'name': name,
+    'category': category,
+    'purchaseDate': purchaseDate,
+    'cost': cost,
+    'salvageValue': salvageValue,
+    'usefulLifeYears': usefulLifeYears,
+    'accumulatedDepreciation': accumulatedDepreciation,
+    'assetAccountCode': assetAccountCode,
+    'method': method,
+    'status': status,
+    'disposalAmount': disposalAmount,
+    'disposalDate': disposalDate,
+    'notes': notes,
+  };
+
+  factory FixedAsset.fromMap(Map<String, dynamic> m) => FixedAsset(
+    id: m['id'] as String,
+    code: m['code'] as String? ?? '',
+    name: m['name'] as String? ?? '',
+    category: m['category'] as String? ?? 'أخرى',
+    purchaseDate: m['purchaseDate'] as String? ?? '',
+    cost: (m['cost'] as num?)?.toDouble() ?? 0.0,
+    salvageValue: (m['salvageValue'] as num?)?.toDouble() ?? 0.0,
+    usefulLifeYears: (m['usefulLifeYears'] as num?)?.toInt() ?? 0,
+    accumulatedDepreciation:
+        (m['accumulatedDepreciation'] as num?)?.toDouble() ?? 0.0,
+    assetAccountCode: m['assetAccountCode'] as String? ?? '',
+    method: m['method'] as String? ?? 'straight_line',
+    status: m['status'] as String? ?? 'active',
+    disposalAmount: (m['disposalAmount'] as num?)?.toDouble() ?? 0.0,
+    disposalDate: m['disposalDate'] as String? ?? '',
+    notes: m['notes'] as String? ?? '',
+  );
+}

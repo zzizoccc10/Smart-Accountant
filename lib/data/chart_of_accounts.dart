@@ -32,6 +32,9 @@ class CoA {
   static const inventoryGain = '4-5'; // إيرادات جرد (تستخدم كإيراد آخر)
   static const inventoryLoss = '5-5'; // مصروفات أخرى (خسائر جرد)
   static const fxLoss = '5-4'; // خسائر فروق العملة
+  static const fixedAssets = '1-2-05'; // أصول ثابتة (افتراضي: أجهزة كمبيوتر)
+  static const accumulatedDepreciation = '1-2-99'; // مجمع الاستهلاك
+  static const otherRevenue = '4-5'; // إيرادات أخرى (ربح بيع الأصول)
 
   /// بناء الشجرة الكاملة
   static List<Account> build() {

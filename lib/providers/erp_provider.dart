@@ -53,6 +53,7 @@ class ERPProvider extends ChangeNotifier {
     attendance = AppDatabase.attendance;
     payrolls = AppDatabase.payrolls;
     currencies = AppDatabase.currencies;
+    fixedAssets = AppDatabase.fixedAssets;
     initialized = true;
     notifyListeners();
   }
@@ -872,4 +873,88 @@ class ERPProvider extends ChangeNotifier {
       return inv.dueDate.compareTo(today) < 0;
     }).toList();
   }
+
+  // ============================ الأصول الثابتة ============================
+  List<FixedAsset> fixedAssets = [];
+
+  Future<void> addFixedAsset(FixedAsset a) async {
+    await AppDatabase.saveFixedAsset(a);
+    await JournalEngine.post(
+      date: a.purchaseDate,
+      description: 'شراء أصل: ${a.name}',
+      sourceType: 'asset_purchase',
+      sourceId: a.id,
+      lines: [
+        JournalEngine.dr(
+            AppDatabase.accountByCode(a.assetAccountCode), a.cost, 'شراء أصل'),
+        JournalEngine.cr(
+            AppDatabase.accountByCode(CoA.cash), a.cost, 'دفع ثمن الأصل'),
+      ],
+    );
+    reload();
+  }
+
+  Future<void> updateFixedAsset(FixedAsset a) async {
+    await AppDatabase.saveFixedAsset(a);
+    reload();
+  }
+
+  Future<void> deleteFixedAsset(String id) async {
+    await AppDatabase.deleteFixedAsset(id);
+    reload();
+  }
+
+  /// تشغيل قسط إهلاك شهري لكل الأصول النشطة (أو أصل واحد)
+  Future<int> runMonthlyDepreciation({String? assetId, int months = 1}) async {
+    int count = 0;
+    for (final a in fixedAssets) {
+      if (a.status != 'active') continue;
+      if (assetId != null && a.id != assetId) continue;
+      if (a.isFullyDepreciated) continue;
+      double amount = a.monthlyDepreciation * months;
+      final remaining = a.depreciableAmount - a.accumulatedDepreciation;
+      if (amount > remaining) amount = remaining;
+      if (amount <= 0.001) continue;
+      a.accumulatedDepreciation += amount;
+      await AppDatabase.saveFixedAsset(a);
+      await JournalEngine.depreciation(asset: a, amount: amount);
+      count++;
+    }
+    reload();
+    return count;
+  }
+
+  /// تخريد أصل (بيع أو استبعاد)
+  Future<void> disposeAsset({
+    required String assetId,
+    required double saleAmount,
+    String? date,
+  }) async {
+    final a = AppDatabase.fixedAssetById(assetId);
+    if (a == null) return;
+    a.status = 'disposed';
+    a.disposalAmount = saleAmount;
+    a.disposalDate =
+        date ?? DateTime.now().toIso8601String().substring(0, 10);
+    await AppDatabase.saveFixedAsset(a);
+    await JournalEngine.assetDisposal(
+      asset: a,
+      saleAmount: saleAmount,
+      cashbox: null,
+    );
+    reload();
+  }
+
+  /// إجمالي قيمة الأصول بالتكلفة
+  double get totalAssetCost =>
+      fixedAssets.where((a) => a.status == 'active').fold(0.0, (s, a) => s + a.cost);
+
+  /// إجمالي مجمع الإهلاك
+  double get totalAccumulatedDepreciation => fixedAssets
+      .where((a) => a.status == 'active')
+      .fold(0.0, (s, a) => s + a.accumulatedDepreciation);
+
+  /// صافي القيمة الدفترية
+  double get totalAssetBookValue =>
+      fixedAssets.where((a) => a.status == 'active').fold(0.0, (s, a) => s + a.bookValue);
 }
