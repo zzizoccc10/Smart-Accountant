@@ -28,6 +28,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   late TextEditingController _address;
   late TextEditingController _tax;
   late TextEditingController _footer;
+  late TextEditingController _taxNumber;
+  late TextEditingController _crNumber;
   late String _currency;
   bool _allowNegative = false;
 
@@ -41,6 +43,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _tax = TextEditingController(
         text: AppDatabase.getSetting('taxRate', '15'));
     _footer = TextEditingController(text: prov.invoiceFooter);
+    _taxNumber = TextEditingController(
+        text: AppDatabase.getSetting('taxNumber', ''));
+    _crNumber = TextEditingController(
+        text: AppDatabase.getSetting('crNumber', ''));
     _currency = prov.currency;
     _allowNegative = prov.allowNegativeStock;
   }
@@ -52,6 +58,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _address.dispose();
     _tax.dispose();
     _footer.dispose();
+    _taxNumber.dispose();
+    _crNumber.dispose();
     super.dispose();
   }
 
@@ -63,6 +71,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       'companyAddress': _address.text.trim(),
       'taxRate': _tax.text.trim(),
       'invoiceFooter': _footer.text.trim(),
+      'taxNumber': _taxNumber.text.trim(),
+      'crNumber': _crNumber.text.trim(),
       'currency': _currency,
       'allowNegativeStock': _allowNegative.toString(),
     });
@@ -119,6 +129,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     decoration: const InputDecoration(
                       labelText: 'العنوان',
                       prefixIcon: Icon(Icons.location_on),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: _taxNumber,
+                    decoration: const InputDecoration(
+                      labelText: 'الرقم الضريبي (VAT)',
+                      prefixIcon: Icon(Icons.receipt_long),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: _crNumber,
+                    decoration: const InputDecoration(
+                      labelText: 'السجل التجاري',
+                      prefixIcon: Icon(Icons.badge),
                     ),
                   ),
                   const SizedBox(height: 12),

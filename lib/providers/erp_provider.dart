@@ -78,6 +78,8 @@ class ERPProvider extends ChangeNotifier {
   double get taxRate =>
       double.tryParse(AppDatabase.getSetting('taxRate', '15')) ?? 0.0;
   String get invoiceFooter => AppDatabase.getSetting('invoiceFooter');
+  String get companyTaxNumber => AppDatabase.getSetting('taxNumber');
+  String get companyCrNumber => AppDatabase.getSetting('crNumber');
   bool get allowNegativeStock =>
       AppDatabase.getSettingBool('allowNegativeStock', false);
   bool get isInit => AppDatabase.getSettingBool('isInit', false);

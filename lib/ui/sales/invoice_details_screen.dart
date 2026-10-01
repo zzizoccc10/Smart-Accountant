@@ -318,6 +318,8 @@ Future<void> _print(
         currency: prov.currency,
         companyPhone: prov.companyPhone,
         companyAddress: prov.companyAddress,
+        taxNumber: prov.companyTaxNumber,
+        crNumber: prov.companyCrNumber,
         footer: prov.invoiceFooter,
       );
     } else {
@@ -327,6 +329,8 @@ Future<void> _print(
         currency: prov.currency,
         companyPhone: prov.companyPhone,
         companyAddress: prov.companyAddress,
+        taxNumber: prov.companyTaxNumber,
+        crNumber: prov.companyCrNumber,
         footer: prov.invoiceFooter,
       );
     }

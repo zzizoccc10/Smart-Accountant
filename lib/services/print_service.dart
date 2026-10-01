@@ -27,6 +27,8 @@ class PrintService {
     required String currency,
     String companyPhone = '',
     String companyAddress = '',
+    String taxNumber = '',
+    String crNumber = '',
     String footer = '',
   }) async {
     final font = await _font();
@@ -57,6 +59,12 @@ class PrintService {
                           style: const pw.TextStyle(fontSize: 10)),
                     if (companyAddress.isNotEmpty)
                       pw.Text(companyAddress,
+                          style: const pw.TextStyle(fontSize: 10)),
+                    if (taxNumber.isNotEmpty)
+                      pw.Text('الرقم الضريبي: $taxNumber',
+                          style: const pw.TextStyle(fontSize: 10)),
+                    if (crNumber.isNotEmpty)
+                      pw.Text('سجل تجاري: $crNumber',
                           style: const pw.TextStyle(fontSize: 10)),
                   ],
                 ),
@@ -192,6 +200,8 @@ class PrintService {
     required String currency,
     String companyPhone = '',
     String companyAddress = '',
+    String taxNumber = '',
+    String crNumber = '',
     String footer = '',
   }) async {
     final bytes = await invoicePdf(
@@ -200,6 +210,8 @@ class PrintService {
       currency: currency,
       companyPhone: companyPhone,
       companyAddress: companyAddress,
+      taxNumber: taxNumber,
+      crNumber: crNumber,
       footer: footer,
     );
     await Printing.layoutPdf(
@@ -215,6 +227,8 @@ class PrintService {
     required String currency,
     String companyPhone = '',
     String companyAddress = '',
+    String taxNumber = '',
+    String crNumber = '',
     String footer = '',
   }) async {
     final bytes = await invoicePdf(
@@ -223,6 +237,8 @@ class PrintService {
       currency: currency,
       companyPhone: companyPhone,
       companyAddress: companyAddress,
+      taxNumber: taxNumber,
+      crNumber: crNumber,
       footer: footer,
     );
     await Printing.sharePdf(
