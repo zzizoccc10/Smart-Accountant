@@ -1,7 +1,9 @@
 // ============================================================================
 // شاشة الإعدادات
 // ============================================================================
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:provider/provider.dart';
 import '../providers/erp_provider.dart';
 import '../data/app_database.dart';
@@ -30,6 +32,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   late TextEditingController _footer;
   late TextEditingController _taxNumber;
   late TextEditingController _crNumber;
+  String? _logoBase64;
   late String _currency;
   bool _allowNegative = false;
 
@@ -47,6 +50,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
         text: AppDatabase.getSetting('taxNumber', ''));
     _crNumber = TextEditingController(
         text: AppDatabase.getSetting('crNumber', ''));
+    _logoBase64 = AppDatabase.getSetting('companyLogo').isEmpty
+        ? null
+        : AppDatabase.getSetting('companyLogo');
     _currency = prov.currency;
     _allowNegative = prov.allowNegativeStock;
   }
@@ -73,6 +79,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       'invoiceFooter': _footer.text.trim(),
       'taxNumber': _taxNumber.text.trim(),
       'crNumber': _crNumber.text.trim(),
+      'companyLogo': _logoBase64 ?? '',
       'currency': _currency,
       'allowNegativeStock': _allowNegative.toString(),
     });
@@ -83,6 +90,37 @@ class _SettingsScreenState extends State<SettingsScreen> {
         backgroundColor: AppColors.success,
       ),
     );
+  }
+
+  Future<void> _pickLogo() async {
+    try {
+      final picked = await FilePicker.platform.pickFiles(
+        type: FileType.image,
+        withData: true,
+      );
+      if (picked == null || picked.files.isEmpty) return;
+      final bytes = picked.files.first.bytes;
+      if (bytes == null) return;
+      if (bytes.length > 400 * 1024) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('حجم الصورة كبير (الحد 400KB)'),
+            backgroundColor: AppColors.danger,
+          ),
+        );
+        return;
+      }
+      setState(() => _logoBase64 = base64Encode(bytes));
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('تعذّر اختيار الصورة: $e'),
+          backgroundColor: AppColors.danger,
+        ),
+      );
+    }
   }
 
   @override
@@ -130,6 +168,59 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       labelText: 'العنوان',
                       prefixIcon: Icon(Icons.location_on),
                     ),
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Container(
+                        width: 64,
+                        height: 64,
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey.shade300),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: _logoBase64 == null
+                            ? const Icon(Icons.image_outlined,
+                                color: Colors.grey)
+                            : ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: Image.memory(
+                                  base64Decode(_logoBase64!),
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text('شعار المنشأة (يظهر في الفاتورة)',
+                                style: TextStyle(fontSize: 13)),
+                            const SizedBox(height: 6),
+                            Row(
+                              children: [
+                                OutlinedButton.icon(
+                                  onPressed: _pickLogo,
+                                  icon: const Icon(Icons.upload, size: 18),
+                                  label: const Text('اختيار صورة'),
+                                ),
+                                if (_logoBase64 != null) ...[
+                                  const SizedBox(width: 8),
+                                  TextButton.icon(
+                                    onPressed: () =>
+                                        setState(() => _logoBase64 = null),
+                                    icon: const Icon(Icons.delete_outline,
+                                        size: 18, color: AppColors.danger),
+                                    label: const Text('حذف'),
+                                  ),
+                                ],
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 12),
                   TextField(
@@ -314,6 +405,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               ? 'تم تصدير النسخة الاحتياطية'
                               : 'حُفظت في: $path'),
                           backgroundColor: AppColors.success,
+                        ),
+                      );
+                    }
+                  },
+                ),
+                const Divider(height: 1),
+                ListTile(
+                  leading: const Icon(Icons.share, color: AppColors.indigo),
+                  title: const Text('مشاركة النسخة الاحتياطية'),
+                  subtitle:
+                      const Text('إرسال الملف عبر واتساب/البريد/درايف'),
+                  onTap: () async {
+                    final ok = await BackupService.shareBackup();
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(ok
+                              ? 'تم تجهيز الملف للمشاركة'
+                              : 'تعذّرت المشاركة'),
+                          backgroundColor:
+                              ok ? AppColors.success : AppColors.danger,
                         ),
                       );
                     }

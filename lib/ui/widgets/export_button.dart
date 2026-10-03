@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import '../../services/export_service.dart';
 import '../../services/print_service.dart';
+import '../../services/share_service.dart';
 
 class ExportButton extends StatelessWidget {
   final String title;
@@ -61,6 +62,27 @@ class ExportButton extends StatelessWidget {
                 const SnackBar(content: Text('تم تصدير ملف CSV')),
               );
               break;
+            case 'share':
+              await PrintService.shareTable(
+                title: title,
+                companyName: companyName,
+                headers: headers,
+                rows: rows,
+                totals: totals,
+              );
+              break;
+            case 'whatsapp':
+              await ShareService.whatsapp(_asText());
+              messenger.showSnackBar(
+                const SnackBar(content: Text('تم فتح واتساب')),
+              );
+              break;
+            case 'sms':
+              await ShareService.sms(_asText());
+              messenger.showSnackBar(
+                const SnackBar(content: Text('تم فتح تطبيق الرسائل')),
+              );
+              break;
           }
         } catch (e) {
           messenger.showSnackBar(
@@ -93,7 +115,50 @@ class ExportButton extends StatelessWidget {
             dense: true,
           ),
         ),
+        PopupMenuItem(
+          value: 'share',
+          child: ListTile(
+            leading: Icon(Icons.ios_share),
+            title: Text('مشاركة PDF'),
+            dense: true,
+          ),
+        ),
+        PopupMenuItem(
+          value: 'whatsapp',
+          child: ListTile(
+            leading: Icon(Icons.chat, color: Color(0xFF25D366)),
+            title: Text('واتساب'),
+            dense: true,
+          ),
+        ),
+        PopupMenuItem(
+          value: 'sms',
+          child: ListTile(
+            leading: Icon(Icons.sms),
+            title: Text('رسالة SMS'),
+            dense: true,
+          ),
+        ),
       ],
     );
+  }
+
+  /// تحويل التقرير إلى نص لمشاركته عبر واتساب/SMS
+  String _asText() {
+    final sb = StringBuffer();
+    sb.writeln('*$title*');
+    sb.writeln(companyName);
+    sb.writeln('--------------------');
+    sb.writeln(headers.join(' | '));
+    for (final r in rows) {
+      sb.writeln(r.join(' | '));
+    }
+    if (totals.isNotEmpty) {
+      sb.writeln('--------------------');
+      for (final t in totals) {
+        sb.writeln(t);
+      }
+    }
+    return sb.toString();
   }
 }

@@ -321,6 +321,7 @@ Future<void> _print(
         taxNumber: prov.companyTaxNumber,
         crNumber: prov.companyCrNumber,
         footer: prov.invoiceFooter,
+        logoBytes: prov.companyLogoBytes,
       );
     } else {
       await PrintService.printInvoice(
@@ -332,6 +333,7 @@ Future<void> _print(
         taxNumber: prov.companyTaxNumber,
         crNumber: prov.companyCrNumber,
         footer: prov.invoiceFooter,
+        logoBytes: prov.companyLogoBytes,
       );
     }
   } catch (e) {

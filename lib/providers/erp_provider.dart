@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'dart:typed_data';
 // ============================================================================
 // المزود الرئيسي — ERPProvider
 // يربط الواجهات بطبقة البيانات ومحرك القيود
@@ -80,6 +82,17 @@ class ERPProvider extends ChangeNotifier {
   String get invoiceFooter => AppDatabase.getSetting('invoiceFooter');
   String get companyTaxNumber => AppDatabase.getSetting('taxNumber');
   String get companyCrNumber => AppDatabase.getSetting('crNumber');
+
+  /// شعار الشركة مخزّن كـ base64 (قد يكون فارغاً)
+  Uint8List? get companyLogoBytes {
+    final b64 = AppDatabase.getSetting('companyLogo');
+    if (b64.isEmpty) return null;
+    try {
+      return base64Decode(b64);
+    } catch (_) {
+      return null;
+    }
+  }
   bool get allowNegativeStock =>
       AppDatabase.getSettingBool('allowNegativeStock', false);
   bool get isInit => AppDatabase.getSettingBool('isInit', false);

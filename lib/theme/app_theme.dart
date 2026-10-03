@@ -15,6 +15,7 @@ class AppColors {
   static const card = Colors.white;
   static const purple = Color(0xFF6A1B9A);
   static const teal = Color(0xFF00695C);
+  static const indigo = Color(0xFF3949AB);
 }
 
 class AppTheme {

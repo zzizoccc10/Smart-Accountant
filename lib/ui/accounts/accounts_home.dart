@@ -10,6 +10,7 @@ import 'coa_screen.dart';
 import 'contacts_screen.dart';
 import 'cashboxes_screen.dart';
 import 'voucher_form.dart';
+import 'vouchers_screen.dart';
 import 'expenses_screen.dart';
 import 'journal_entries_screen.dart';
 
@@ -32,6 +33,8 @@ class AccountsHome extends StatelessWidget {
           () => const VoucherForm(type: 'receipt')),
       _MenuItem(Icons.payments, 'سند صرف', AppColors.warning,
           () => const VoucherForm(type: 'payment')),
+      _MenuItem(Icons.receipt_long, 'سجل السندات', AppColors.indigo,
+          () => const VouchersScreen()),
       _MenuItem(Icons.money_off, 'المصروفات', AppColors.danger,
           () => const ExpensesScreen()),
       _MenuItem(Icons.book, 'قيود اليومية', AppColors.purple,

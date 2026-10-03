@@ -7,6 +7,7 @@ import 'dart:typed_data';
 import 'package:file_picker/file_picker.dart';
 import '../data/app_database.dart';
 import 'download_io.dart' if (dart.library.html) 'download_web.dart' as dl;
+import 'file_share_io.dart' if (dart.library.html) 'file_share_web.dart' as fs;
 
 class BackupService {
   /// تصدير نسخة احتياطية وإرجاع مسار/اسم الملف
@@ -21,6 +22,24 @@ class BackupService {
         .first;
     final filename = 'easy_accountant_backup_$stamp.json';
     return dl.downloadBytesImpl(bytes, filename, 'application/json');
+  }
+
+  /// مشاركة النسخة الاحتياطية عبر ورقة المشاركة (واتساب/البريد/درايف...)
+  static Future<bool> shareBackup() async {
+    try {
+      final data = AppDatabase.exportAll();
+      final jsonStr = const JsonEncoder.withIndent('  ').convert(data);
+      final bytes = Uint8List.fromList(utf8.encode(jsonStr));
+      final stamp = DateTime.now()
+          .toIso8601String()
+          .replaceAll(':', '-')
+          .split('.')
+          .first;
+      final filename = 'easy_accountant_backup_$stamp.json';
+      return fs.shareBytesImpl(bytes, filename, 'application/json');
+    } catch (_) {
+      return false;
+    }
   }
 
   /// استيراد نسخة احتياطية من ملف يختاره المستخدم

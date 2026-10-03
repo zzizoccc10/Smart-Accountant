@@ -5606,3 +5606,1923 @@ Traceback (most recent call last):
                 ^^^^^^^^^^^
 FileNotFoundError: [Errno 2] No such file or directory
 ----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 51830)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 59528)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 59544)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 59550)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 33904)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 33906)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 33908)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 33130)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 33138)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 53792)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 53796)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 53802)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 36684)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 36686)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 36700)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 59812)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 59828)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 35056)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 35064)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 35072)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 53092)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 53096)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 53110)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 38622)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 38632)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 44124)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 44132)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 44148)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 42952)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 42956)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 42968)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 37672)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 37680)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 37396)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 37408)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 37418)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 56178)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 56190)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 56206)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 41080)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 41088)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 54222)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 54238)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 54244)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 41100)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 41116)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 56240)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 56246)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 56256)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 37692)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 37708)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 37710)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 41392)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 41404)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 47242)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 47244)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 47258)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 44388)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 44390)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 44396)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 54320)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 54324)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 45066)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 45074)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 59544)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 59554)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 59556)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 34426)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 34436)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 34442)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 49048)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 49062)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 49074)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 39170)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 39174)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 41264)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 41268)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 41278)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 36704)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 36714)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 36726)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 46832)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 46846)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 56478)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 56484)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 56500)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 36440)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 36452)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 57554)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 57556)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 57564)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 42446)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 42462)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 39786)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 39792)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 39798)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 37504)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 37512)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 54612)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 54618)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 54628)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 50194)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 50210)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 50218)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 35206)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 35218)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 52416)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 52430)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 52436)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 47654)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 47664)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 47668)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 52942)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 52950)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 52204)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 52206)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 52208)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 55032)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 55036)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 55044)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 56990)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 56998)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 36608)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 36612)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 36626)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 51102)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 51110)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 51112)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 48884)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 48888)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 49932)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 49940)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 49956)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 44600)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 44602)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 44608)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 51382)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 51398)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 57926)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 57938)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 57946)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 49086)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 49102)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 49106)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 41830)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 41846)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 45076)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 45082)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 45088)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 49854)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 49856)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 49864)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 44198)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 44210)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 34058)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 34062)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 34066)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 44186)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 44196)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('10.64.114.22', 44204)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/http/server.py", line 670, in __init__
+    directory = os.getcwd()
+                ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+----------------------------------------
