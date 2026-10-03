@@ -43,6 +43,10 @@ dependencies:
   share_plus: ^10.1.4
   path_provider: ^2.1.5
 
+  # Permissions & Contacts
+  permission_handler: ^11.4.0
+  flutter_contacts: ^1.1.9+2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
