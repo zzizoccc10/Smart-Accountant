@@ -2,6 +2,7 @@
 // سجل السندات (سندات القبض والصرف) — عرض + طباعة PDF + مشاركة
 // ============================================================================
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import '../../providers/erp_provider.dart';
 import '../../models/models.dart';
@@ -9,6 +10,7 @@ import '../../services/print_service.dart';
 import '../../services/share_service.dart';
 import '../../theme/app_theme.dart';
 import '../widgets/common.dart';
+import '../widgets/permission_helper.dart';
 
 class VouchersScreen extends StatefulWidget {
   const VouchersScreen({super.key});
@@ -244,6 +246,14 @@ class _VouchersScreenState extends State<VouchersScreen>
         .firstOrNull;
     final phone = contact?.phone ?? '';
     final isReceipt = p.paymentType == 'receipt';
+
+    // طلب الصلاحية المناسبة عند الحاجة فقط
+    if (via == 'sms') {
+      if (!await ensurePermission(context, Permission.sms)) return;
+    } else {
+      if (!await ensurePermission(context, Permission.phone)) return;
+    }
+
     final b = StringBuffer();
     b.writeln('*${prov.companyName}*');
     b.writeln(isReceipt ? 'سند قبض' : 'سند صرف');

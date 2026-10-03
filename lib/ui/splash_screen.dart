@@ -2,11 +2,8 @@
 // شاشة البداية (Splash) — ثم التوجيه لشاشة التهيئة أو الرئيسية
 // ============================================================================
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:provider/provider.dart';
-import '../data/app_database.dart';
 import '../providers/erp_provider.dart';
-import '../services/permission_service.dart';
 import '../theme/app_theme.dart';
 import 'setup_screen.dart';
 import 'home_shell.dart';
@@ -26,11 +23,6 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _go() async {
-    // طلب الصلاحيات الأساسية عند أول تشغيل (جهات الاتصال/التخزين/SMS/الهاتف)
-    if (!kIsWeb && !AppDatabase.getSettingBool('permsRequested', false)) {
-      await PermissionService.requestCore();
-      await AppDatabase.setSetting('permsRequested', 'true');
-    }
     await Future.delayed(const Duration(milliseconds: 1400));
     if (!mounted) return;
     final prov = Provider.of<ERPProvider>(context, listen: false);

@@ -8,6 +8,7 @@ import '../../models/models.dart';
 import '../../data/app_database.dart';
 import '../../theme/app_theme.dart';
 import '../widgets/common.dart';
+import '../widgets/export_button.dart';
 
 class JournalEntriesScreen extends StatelessWidget {
   const JournalEntriesScreen({super.key});
@@ -19,7 +20,36 @@ class JournalEntriesScreen extends StatelessWidget {
     final list = prov.journals.reversed.toList();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('قيود اليومية')),
+      appBar: AppBar(
+        title: const Text('قيود اليومية'),
+        actions: [
+          ExportButton(
+            title: 'دفتر اليومية',
+            companyName: prov.companyName,
+            filename: 'journal_entries',
+            headers: const [
+              'رقم القيد',
+              'التاريخ',
+              'البيان',
+              'الحساب',
+              'مدين',
+              'دائن'
+            ],
+            rows: [
+              for (final j in list)
+                for (final l in j.lines)
+                  [
+                    j.entryNumber,
+                    j.date,
+                    j.description,
+                    l.accountName,
+                    Fmt.num(l.debit),
+                    Fmt.num(l.credit),
+                  ],
+            ],
+          ),
+        ],
+      ),
       body: list.isEmpty
           ? const EmptyState(
               message: 'لا توجد قيود بعد',

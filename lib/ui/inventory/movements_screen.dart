@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../../providers/erp_provider.dart';
 import '../../theme/app_theme.dart';
 import '../widgets/common.dart';
+import '../widgets/export_button.dart';
 
 class MovementsScreen extends StatelessWidget {
   const MovementsScreen({super.key});
@@ -16,7 +17,28 @@ class MovementsScreen extends StatelessWidget {
     final movements = prov.movements.reversed.toList();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('حركات المخزون')),
+      appBar: AppBar(
+        title: const Text('حركات المخزون'),
+        actions: [
+          ExportButton(
+            title: 'سجل حركات المخزون',
+            companyName: prov.companyName,
+            filename: 'stock_movements',
+            headers: const ['التاريخ', 'الصنف', 'النوع', 'وارد', 'صادر', 'الرصيد'],
+            rows: [
+              for (final m in movements)
+                [
+                  m.date,
+                  m.itemName,
+                  _typeLabel(m.movementType),
+                  Fmt.num(m.quantityIn),
+                  Fmt.num(m.quantityOut),
+                  Fmt.num(m.balanceAfter),
+                ],
+            ],
+          ),
+        ],
+      ),
       body: movements.isEmpty
           ? const EmptyState(
               message: 'لا توجد حركات مخزون بعد',

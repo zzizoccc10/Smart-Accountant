@@ -175,7 +175,7 @@ class AppTheme {
 
 /// تنسيق الأرقام والعملة
 class Fmt {
-  static String money(double v, [String currency = 'ر.س']) {
+  static String money(double v, [String currency = 'ر.ي']) {
     final s = v.toStringAsFixed(2);
     final parts = s.split('.');
     final intPart = parts[0].replaceAllMapped(

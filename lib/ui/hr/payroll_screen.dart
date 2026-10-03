@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../../providers/erp_provider.dart';
 import '../../theme/app_theme.dart';
 import '../widgets/common.dart';
+import '../widgets/export_button.dart';
 
 class PayrollScreen extends StatefulWidget {
   const PayrollScreen({super.key});
@@ -75,7 +76,34 @@ class _PayrollScreenState extends State<PayrollScreen> {
     final total = list.fold(0.0, (s, p) => s + p.netPay);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('الرواتب')),
+      appBar: AppBar(
+        title: const Text('الرواتب'),
+        actions: [
+          ExportButton(
+            title: 'مسير الرواتب — $_period',
+            companyName: prov.companyName,
+            filename: 'payroll_$_period',
+            headers: const [
+              'الموظف',
+              'الأساسي',
+              'البدلات',
+              'الخصومات',
+              'الصافي'
+            ],
+            rows: [
+              for (final p in list)
+                [
+                  p.employeeName,
+                  Fmt.num(p.basicSalary),
+                  Fmt.num(p.allowances),
+                  Fmt.num(p.deductions),
+                  Fmt.num(p.netPay),
+                ],
+            ],
+            totals: ['إجمالي الرواتب: ${Fmt.money(total, curr)}'],
+          ),
+        ],
+      ),
       body: Column(
         children: [
           Container(

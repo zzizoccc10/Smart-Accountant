@@ -105,6 +105,8 @@ class AppDatabase {
 
     if (_bSettings.get('seeded') != true) {
       await _seed();
+    } else {
+      await _migrateDefaults();
     }
   }
 
@@ -683,8 +685,8 @@ class AppDatabase {
     await _bSettings.put('companyName', 'شركتي');
     await _bSettings.put('companyPhone', '');
     await _bSettings.put('companyAddress', '');
-    await _bSettings.put('currency', 'ر.س');
-    await _bSettings.put('taxRate', '15');
+    await _bSettings.put('currency', 'ر.ي');
+    await _bSettings.put('taxRate', '0');
     await _bSettings.put('invoiceFooter', 'شكراً لتعاملكم معنا');
     await _bSettings.put('allowNegativeStock', 'false');
     await _bSettings.put('isInit', 'false');
@@ -694,16 +696,16 @@ class AppDatabase {
 
     // 7. العملات الافتراضية
     await _bCurrencies.put('cur_base', Currency(
-      id: 'cur_base', code: 'SAR', name: 'ريال سعودي', symbol: 'ر.س',
+      id: 'cur_base', code: 'YER', name: 'ريال يمني', symbol: 'ر.ي',
       rate: 1.0, isBase: true,
     ).toMap());
     await _bCurrencies.put('cur_usd', Currency(
       id: 'cur_usd', code: 'USD', name: 'دولار أمريكي', symbol: '\$',
-      rate: 3.75, isBase: false,
+      rate: 530.0, isBase: false,
     ).toMap());
-    await _bCurrencies.put('cur_egp', Currency(
-      id: 'cur_egp', code: 'EGP', name: 'جنيه مصري', symbol: 'ج.م',
-      rate: 0.077, isBase: false,
+    await _bCurrencies.put('cur_sar', Currency(
+      id: 'cur_sar', code: 'SAR', name: 'ريال سعودي', symbol: 'ر.س',
+      rate: 141.0, isBase: false,
     ).toMap());
 
     // 8. الفروع
@@ -738,17 +740,47 @@ class AppDatabase {
       id: 'cc_wh', code: 'CC-03', name: 'المخازن',
     ).toMap());
 
-    // 11. أسعار الصرف الافتراضية (مقابل العملة الأساسية SAR)
+    // 11. أسعار الصرف الافتراضية (مقابل العملة الأساسية: الريال اليمني YER)
     final today = DateTime.now().toIso8601String().split('T').first;
     await _bExchangeRates.put('xr_usd', ExchangeRate(
       id: 'xr_usd', currencyId: 'cur_usd', currencyCode: 'USD',
-      rateDate: today, buyRate: 3.74, sellRate: 3.76,
+      rateDate: today, buyRate: 525.0, sellRate: 535.0,
     ).toMap());
-    await _bExchangeRates.put('xr_egp', ExchangeRate(
-      id: 'xr_egp', currencyId: 'cur_egp', currencyCode: 'EGP',
-      rateDate: today, buyRate: 0.076, sellRate: 0.078,
+    await _bExchangeRates.put('xr_sar', ExchangeRate(
+      id: 'xr_sar', currencyId: 'cur_sar', currencyCode: 'SAR',
+      rateDate: today, buyRate: 140.0, sellRate: 142.0,
     ).toMap());
 
     await _bSettings.put('seeded', true);
+  }
+
+  /// ترحيل الإعدادات الافتراضية للتركيبات القديمة (السعودية -> اليمن)
+  static Future<void> _migrateDefaults() async {
+    if (_bSettings.get('defaultsYemen') == true) return;
+    // إن كانت العملة لا تزال الافتراضية السعودية ولم يغيّرها المستخدم
+    final cur = _bSettings.get('currency');
+    if (cur == null || cur == 'ر.س') {
+      await _bSettings.put('currency', 'ر.ي');
+    }
+    final tax = _bSettings.get('taxRate');
+    if (tax == null || tax == '15') {
+      await _bSettings.put('taxRate', '0');
+    }
+    // استبدال العملة الأساسية السعودية باليمنية إن لم تُعدّل
+    final base = _bCurrencies.get('cur_base');
+    if (base != null) {
+      final bm = Map<String, dynamic>.from(base);
+      if (bm['code'] == 'SAR' && bm['isBase'] == true) {
+        await _bCurrencies.put('cur_base', Currency(
+          id: 'cur_base', code: 'YER', name: 'ريال يمني', symbol: 'ر.ي',
+          rate: 1.0, isBase: true,
+        ).toMap());
+        await _bCurrencies.put('cur_sar', Currency(
+          id: 'cur_sar', code: 'SAR', name: 'ريال سعودي', symbol: 'ر.س',
+          rate: 141.0, isBase: false,
+        ).toMap());
+      }
+    }
+    await _bSettings.put('defaultsYemen', true);
   }
 }

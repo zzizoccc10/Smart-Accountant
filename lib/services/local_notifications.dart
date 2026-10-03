@@ -38,11 +38,24 @@ class LocalNotifications {
           importance: Importance.high,
         ),
       );
-      await androidImpl?.requestNotificationsPermission();
       _inited = true;
     } catch (_) {
       // تجاهل الأخطاء على المنصات غير المدعومة
     }
+  }
+
+  static bool _permRequested = false;
+
+  /// طلب صلاحية الإشعارات عند الحاجة فقط (أول إشعار فعلي)
+  static Future<void> _ensurePermission() async {
+    if (kIsWeb || _permRequested) return;
+    _permRequested = true;
+    try {
+      final androidImpl =
+          _plugin.resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>();
+      await androidImpl?.requestNotificationsPermission();
+    } catch (_) {}
   }
 
   static const _details = NotificationDetails(
@@ -60,6 +73,7 @@ class LocalNotifications {
   static Future<void> show(int id, String title, String body) async {
     if (kIsWeb) return;
     if (!_inited) await init();
+    await _ensurePermission();
     try {
       await _plugin.show(
         id: id,

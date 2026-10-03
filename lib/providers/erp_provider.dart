@@ -80,7 +80,7 @@ class ERPProvider extends ChangeNotifier {
   String get companyName => AppDatabase.getSetting('companyName', 'شركتي');
   String get companyPhone => AppDatabase.getSetting('companyPhone');
   String get companyAddress => AppDatabase.getSetting('companyAddress');
-  String get currency => AppDatabase.getSetting('currency', 'ر.س');
+  String get currency => AppDatabase.getSetting('currency', 'ر.ي');
   double get taxRate =>
       double.tryParse(AppDatabase.getSetting('taxRate', '15')) ?? 0.0;
   String get invoiceFooter => AppDatabase.getSetting('invoiceFooter');

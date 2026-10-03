@@ -2,6 +2,7 @@
 // تفاصيل الفاتورة
 // ============================================================================
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import '../../providers/erp_provider.dart';
 import '../../models/models.dart';
@@ -9,6 +10,7 @@ import '../../services/print_service.dart';
 import '../../services/share_service.dart';
 import '../../theme/app_theme.dart';
 import '../widgets/common.dart';
+import '../widgets/permission_helper.dart';
 
 class InvoiceDetailsScreen extends StatelessWidget {
   final String invoiceId;
@@ -246,6 +248,14 @@ Future<void> _send(
 ) async {
   final phone = _contactPhone(prov, inv.contactId);
   final text = _invoiceText(prov, inv);
+
+  // طلب الصلاحية المناسبة عند الحاجة فقط
+  if (channel == 'sms') {
+    if (!await ensurePermission(context, Permission.sms)) return;
+  } else if (channel == 'whatsapp' || channel == 'call') {
+    if (!await ensurePermission(context, Permission.phone)) return;
+  }
+
   bool ok = false;
   switch (channel) {
     case 'whatsapp':

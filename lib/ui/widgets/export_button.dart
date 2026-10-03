@@ -2,9 +2,11 @@
 // زر تصدير موحّد (PDF + Excel + CSV) للتقارير
 // ============================================================================
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 import '../../services/export_service.dart';
 import '../../services/print_service.dart';
 import '../../services/share_service.dart';
+import 'permission_helper.dart';
 
 class ExportButton extends StatelessWidget {
   final String title;
@@ -72,12 +74,14 @@ class ExportButton extends StatelessWidget {
               );
               break;
             case 'whatsapp':
+              if (!await ensurePermission(context, Permission.phone)) break;
               await ShareService.whatsapp(_asText());
               messenger.showSnackBar(
                 const SnackBar(content: Text('تم فتح واتساب')),
               );
               break;
             case 'sms':
+              if (!await ensurePermission(context, Permission.sms)) break;
               await ShareService.sms(_asText());
               messenger.showSnackBar(
                 const SnackBar(content: Text('تم فتح تطبيق الرسائل')),

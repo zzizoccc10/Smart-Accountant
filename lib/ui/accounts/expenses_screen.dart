@@ -7,6 +7,7 @@ import '../../providers/erp_provider.dart';
 import '../../models/models.dart';
 import '../../theme/app_theme.dart';
 import '../widgets/common.dart';
+import '../widgets/export_button.dart';
 
 class ExpensesScreen extends StatelessWidget {
   const ExpensesScreen({super.key});
@@ -18,7 +19,30 @@ class ExpensesScreen extends StatelessWidget {
     final list = prov.expenses.reversed.toList();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('المصروفات')),
+      appBar: AppBar(
+        title: const Text('المصروفات'),
+        actions: [
+          ExportButton(
+            title: 'تقرير المصروفات',
+            companyName: prov.companyName,
+            filename: 'expenses',
+            headers: const ['رقم المصروف', 'التاريخ', 'التصنيف', 'البيان', 'المبلغ'],
+            rows: [
+              for (final e in list)
+                [
+                  e.expenseNumber,
+                  e.date,
+                  e.categoryName,
+                  e.description,
+                  Fmt.num(e.total),
+                ],
+            ],
+            totals: [
+              'الإجمالي: ${Fmt.money(list.fold(0.0, (s, e) => s + e.total), curr)}',
+            ],
+          ),
+        ],
+      ),
       body: list.isEmpty
           ? const EmptyState(
               message: 'لا توجد مصروفات',

@@ -18,7 +18,7 @@ class _SetupScreenState extends State<SetupScreen> {
   final _formKey = GlobalKey<FormState>();
   final _name = TextEditingController();
   final _phone = TextEditingController();
-  String _currency = 'ر.س';
+  String _currency = 'ر.ي';
 
   @override
   void dispose() {
@@ -105,8 +105,8 @@ class _SetupScreenState extends State<SetupScreen> {
                           prefixIcon: Icon(Icons.attach_money),
                         ),
                         items: const [
-                          DropdownMenuItem(value: 'ر.س', child: Text('ريال سعودي (ر.س)')),
                           DropdownMenuItem(value: 'ر.ي', child: Text('ريال يمني (ر.ي)')),
+                          DropdownMenuItem(value: 'ر.س', child: Text('ريال سعودي (ر.س)')),
                           DropdownMenuItem(value: 'ج.م', child: Text('جنيه مصري (ج.م)')),
                           DropdownMenuItem(value: 'د.إ', child: Text('درهم إماراتي (د.إ)')),
                           DropdownMenuItem(value: 'USD', child: Text('دولار أمريكي (\$)')),

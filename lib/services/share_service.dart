@@ -46,8 +46,8 @@ class ShareService {
   static String _cleanPhone(String phone) {
     var p = phone.replaceAll(RegExp(r'[^0-9+]'), '');
     if (p.startsWith('0')) p = p.substring(1);
-    // إضافة مفتاح السعودية الافتراضي إن لم يبدأ بـ +
-    if (!p.startsWith('+') && p.length == 9) p = '966$p';
+    // إضافة مفتاح اليمن الافتراضي إن لم يبدأ بـ +
+    if (!p.startsWith('+') && p.length == 9) p = '967$p';
     return p.replaceAll('+', '');
   }
 }

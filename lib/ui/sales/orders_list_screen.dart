@@ -8,6 +8,7 @@ import '../../providers/erp_provider.dart';
 import '../../models/models.dart';
 import '../../theme/app_theme.dart';
 import '../widgets/common.dart';
+import '../widgets/export_button.dart';
 import 'order_form.dart';
 
 class OrdersListScreen extends StatefulWidget {
@@ -51,6 +52,27 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('المستندات التجارية'),
+        actions: [
+          ExportButton(
+            title: 'المستندات التجارية — ${_tabs[_tab][0]}',
+            companyName: prov.companyName,
+            filename: 'orders_$type',
+            headers: const ['رقم المستند', 'التاريخ', 'الجهة', 'الحالة', 'الإجمالي'],
+            rows: [
+              for (final o in list)
+                [
+                  o.docNumber,
+                  o.date,
+                  o.contactName,
+                  _statusLabel(o.status),
+                  Fmt.num(o.total),
+                ],
+            ],
+            totals: [
+              'الإجمالي: ${Fmt.money(list.fold(0.0, (s, o) => s + o.total), prov.currency)}',
+            ],
+          ),
+        ],
         bottom: TabBar(
           isScrollable: true,
           onTap: (i) => setState(() => _tab = i),
@@ -287,5 +309,15 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
         SnackBar(content: Text('خطأ: $e'), backgroundColor: AppColors.danger),
       );
     }
+  }
+
+  String _statusLabel(String s) {
+    return switch (s) {
+      'draft' => 'مسودة',
+      'confirmed' => 'مؤكد',
+      'converted' => 'محوّل لفاتورة',
+      'cancelled' => 'ملغي',
+      _ => s,
+    };
   }
 }

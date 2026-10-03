@@ -8,6 +8,7 @@ import '../../models/models.dart';
 import '../../data/app_database.dart';
 import '../../theme/app_theme.dart';
 import '../widgets/common.dart';
+import '../widgets/export_button.dart';
 
 class AttendanceScreen extends StatefulWidget {
   const AttendanceScreen({super.key});
@@ -64,6 +65,21 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
       appBar: AppBar(
         title: const Text('الحضور والانصراف'),
         actions: [
+          ExportButton(
+            title: 'سجل الحضور — $_date',
+            companyName: prov.companyName,
+            filename: 'attendance_$_date',
+            headers: const ['الموظف', 'التاريخ', 'الحالة', 'ساعات إضافية'],
+            rows: [
+              for (final e in employees)
+                [
+                  e.name,
+                  _date,
+                  _statusLabel(_recordFor(e.id)?.status ?? 'absent'),
+                  Fmt.num(_recordFor(e.id)?.overtimeHours ?? 0),
+                ],
+            ],
+          ),
           IconButton(
             icon: const Icon(Icons.calendar_month),
             tooltip: 'تغيير التاريخ',
@@ -171,4 +187,15 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
         {'key': 'leave', 'label': 'إجازة'},
         {'key': 'holiday', 'label': 'عطلة'},
       ];
+
+  String _statusLabel(String s) {
+    return switch (s) {
+      'present' => 'حاضر',
+      'absent' => 'غائب',
+      'late' => 'متأخر',
+      'leave' => 'إجازة',
+      'holiday' => 'عطلة',
+      _ => 'غير محدد',
+    };
+  }
 }
