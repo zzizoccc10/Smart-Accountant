@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../../providers/erp_provider.dart';
 import '../../models/models.dart';
 import '../../data/app_database.dart';
+import '../../services/account_sync_service.dart';
 import '../../theme/app_theme.dart';
 import '../widgets/common.dart';
 
@@ -52,6 +53,9 @@ class _AccountFormState extends State<AccountForm> {
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
     final prov = context.read<ERPProvider>();
+    final Account? parent = _parentId == null
+        ? null
+        : prov.accounts.where((a) => a.id == _parentId).firstOrNull;
     final acc = Account(
       id: widget.account?.id ?? AppDatabase.newId(),
       code: _code.text.trim(),
@@ -59,13 +63,18 @@ class _AccountFormState extends State<AccountForm> {
       accountType: _type,
       accountNature: _nature,
       parentId: _parentId,
-      level: _parentId == null ? 1 : 2,
+      level: parent == null ? 1 : parent.level + 1,
       isLeaf: _isLeaf,
       openingBalance: double.tryParse(_opening.text) ?? 0,
       isSystem: widget.account?.isSystem ?? false,
     );
     if (widget.account == null) {
       await prov.addAccount(acc);
+      // الأب يصبح حساباً رئيسياً (غير قابل للقيود)
+      if (parent != null && parent.isLeaf) {
+        parent.isLeaf = false;
+        await prov.updateAccount(parent);
+      }
     } else {
       await prov.updateAccount(acc);
     }
@@ -167,7 +176,18 @@ class _AccountFormState extends State<AccountForm> {
                       child: Text('${a.code} — ${a.name}'),
                     )),
               ],
-              onChanged: (v) => setState(() => _parentId = v),
+              onChanged: (v) => setState(() {
+                _parentId = v;
+                // اقتراح كود فرعي تلقائي عند اختيار أب (للحسابات الجديدة)
+                if (v != null && widget.account == null) {
+                  final parent =
+                      prov.accounts.where((a) => a.id == v).firstOrNull;
+                  if (parent != null) {
+                    _code.text = AccountSyncService.nextChildCode(
+                        parent.code, prov.accounts);
+                  }
+                }
+              }),
             ),
             const SizedBox(height: 12),
             SwitchListTile(

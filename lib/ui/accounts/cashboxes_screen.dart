@@ -4,8 +4,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/erp_provider.dart';
-import '../../models/models.dart';
-import '../../data/app_database.dart';
 import '../../theme/app_theme.dart';
 
 class CashboxesScreen extends StatelessWidget {
@@ -81,7 +79,6 @@ class CashboxesScreen extends StatelessWidget {
 
   Future<void> _addCashbox(BuildContext context, ERPProvider prov) async {
     final nameCtrl = TextEditingController();
-    final acc = AppDatabase.accountByCode('1-1-01-001');
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -103,13 +100,7 @@ class CashboxesScreen extends StatelessWidget {
       ),
     );
     if (ok == true && nameCtrl.text.trim().isNotEmpty) {
-      await AppDatabase.saveCashbox(Cashbox(
-        id: AppDatabase.newId(),
-        name: nameCtrl.text.trim(),
-        accountId: acc?.id ?? '',
-        accountName: acc?.name ?? '',
-      ));
-      prov.reload();
+      await prov.addCashbox(nameCtrl.text.trim());
     }
   }
 }

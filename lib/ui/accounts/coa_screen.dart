@@ -38,6 +38,24 @@ class _CoaScreenState extends State<CoaScreen> {
         title: const Text('دليل الحسابات'),
         actions: [
           IconButton(
+            icon: const Icon(Icons.sync),
+            tooltip: 'مزامنة مع العملاء/الموردين/الصناديق/المخازن',
+            onPressed: () async {
+              final n = await prov.syncChartOfAccounts();
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(n > 0
+                        ? 'تمت المزامنة — تم تحديث $n عنصر'
+                        : 'الدليل متزامن بالفعل'),
+                    backgroundColor:
+                        n > 0 ? AppColors.success : AppColors.info,
+                  ),
+                );
+              }
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.add),
             onPressed: () => Navigator.push(
               context,

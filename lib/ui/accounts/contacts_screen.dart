@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../../providers/erp_provider.dart';
 import '../../theme/app_theme.dart';
 import '../widgets/common.dart';
+import '../widgets/export_button.dart';
 import '../contacts/contact_form.dart';
 import 'contact_statement_screen.dart';
 
@@ -32,7 +33,37 @@ class _ContactsScreenState extends State<ContactsScreen> {
     }).toList();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('العملاء والموردون')),
+      appBar: AppBar(
+        title: const Text('العملاء والموردون'),
+        actions: [
+          ExportButton(
+            title: 'العملاء والموردون',
+            companyName: prov.companyName,
+            filename: 'contacts',
+            headers: const [
+              'الكود',
+              'الاسم',
+              'النوع',
+              'الهاتف',
+              'البريد',
+              'الرقم الضريبي',
+              'الرصيد'
+            ],
+            rows: [
+              for (final c in list)
+                [
+                  c.code,
+                  c.name,
+                  _typeLabel(c.contactType),
+                  c.phone,
+                  c.email,
+                  c.taxNumber,
+                  Fmt.num(prov.contactBalance(c.id)),
+                ],
+            ],
+          ),
+        ],
+      ),
       body: Column(
         children: [
           Padding(

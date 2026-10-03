@@ -10,6 +10,7 @@ import '../data/chart_of_accounts.dart';
 import '../models/models.dart';
 import '../services/journal_engine.dart';
 import '../services/local_notifications.dart';
+import '../services/account_sync_service.dart';
 import '../theme/app_theme.dart';
 
 class ERPProvider extends ChangeNotifier {
@@ -132,10 +133,38 @@ class ERPProvider extends ChangeNotifier {
     reload();
   }
 
+  /// مزامنة دليل الحسابات مع كل الكيانات التشغيلية
+  /// (عملاء/موردون/صناديق/مخازن/موظفون) — تُستدعى يدوياً من شاشة الدليل
+  Future<int> syncChartOfAccounts() async {
+    final n = await AccountSyncService.syncAll();
+    reload();
+    return n;
+  }
+
+  /// إضافة صندوق جديد مع إنشاء حسابه تلقائياً في الدليل
+  Future<void> addCashbox(String name) async {
+    var cb = Cashbox(id: AppDatabase.newId(), name: name);
+    cb = await AccountSyncService.ensureCashboxAccount(cb);
+    await AppDatabase.saveCashbox(cb);
+    reload();
+  }
+
+  /// إضافة مخزن جديد مع إنشاء حسابه تلقائياً في الدليل
+  Future<void> addWarehouse(String name, {String location = ''}) async {
+    final w = Warehouse(
+      id: AppDatabase.newId(),
+      name: name,
+      location: location,
+    );
+    await AppDatabase.saveWarehouse(w);
+    await AccountSyncService.ensureWarehouseAccount(w);
+    reload();
+  }
+
   // ============================ جهات الاتصال ============================
   Future<Contact> addContact(Contact c) async {
     final id = c.id.isEmpty ? AppDatabase.newId() : c.id;
-    final contact = Contact(
+    var contact = Contact(
       id: id,
       code: c.code,
       name: c.name,
@@ -150,12 +179,28 @@ class ERPProvider extends ChangeNotifier {
       notes: c.notes,
     );
     await AppDatabase.saveContact(contact);
+    // مزامنة دليل الحسابات: إنشاء حساب فرعي تحت العملاء/الموردين
+    try {
+      final accId = await AccountSyncService.ensureContactAccount(contact);
+      if (accId.isNotEmpty && accId != contact.accountId) {
+        contact.accountId = accId;
+        await AppDatabase.saveContact(contact);
+      }
+    } catch (_) {}
     reload();
     return contact;
   }
 
   Future<void> updateContact(Contact c) async {
     await AppDatabase.saveContact(c);
+    // تحديث الحساب المرتبط (الاسم/الرصيد الافتتاحي)
+    try {
+      final accId = await AccountSyncService.ensureContactAccount(c);
+      if (accId.isNotEmpty && accId != c.accountId) {
+        c.accountId = accId;
+        await AppDatabase.saveContact(c);
+      }
+    } catch (_) {}
     reload();
   }
 
@@ -164,6 +209,9 @@ class ERPProvider extends ChangeNotifier {
     if (c == null) return;
     c.isDeleted = true;
     await AppDatabase.saveContact(c);
+    try {
+      await AccountSyncService.removeContactAccount(c.accountId);
+    } catch (_) {}
     reload();
   }
 

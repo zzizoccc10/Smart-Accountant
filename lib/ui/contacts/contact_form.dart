@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../../providers/erp_provider.dart';
 import '../../models/models.dart';
 import '../../data/app_database.dart';
+import '../widgets/phone_field.dart';
 
 class ContactForm extends StatefulWidget {
   final Contact? contact;
@@ -110,13 +111,14 @@ class _ContactFormState extends State<ContactForm> {
                   (v == null || v.trim().isEmpty) ? 'مطلوب' : null,
             ),
             const SizedBox(height: 12),
-            TextFormField(
+            PhoneField(
               controller: _phone,
-              keyboardType: TextInputType.phone,
-              decoration: const InputDecoration(
-                labelText: 'الهاتف',
-                prefixIcon: Icon(Icons.phone),
-              ),
+              label: 'الهاتف',
+              onNamePicked: (name) {
+                if (_name.text.trim().isEmpty) {
+                  _name.text = name;
+                }
+              },
             ),
             const SizedBox(height: 12),
             TextFormField(

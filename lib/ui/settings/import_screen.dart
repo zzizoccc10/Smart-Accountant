@@ -1,12 +1,18 @@
 // ============================================================================
-// شاشة استيراد البيانات — Excel / CSV
+// شاشة الاستيراد والتصدير — Excel/CSV لكل أجزاء النظام
+// اختيار الكيان + تصدير (مع اختيار مكان الحفظ) + استيراد من ملف
 // ============================================================================
+import 'dart:typed_data';
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/erp_provider.dart';
+import '../../services/data_registry.dart';
+import '../../services/file_saver_io.dart'
+    if (dart.library.html) '../../services/file_saver_web.dart' as saver;
+import '../../services/excel_service.dart';
 import '../../services/import_service.dart';
 import '../../theme/app_theme.dart';
 import '../widgets/common.dart';
@@ -19,15 +25,79 @@ class ImportScreen extends StatefulWidget {
 }
 
 class _ImportScreenState extends State<ImportScreen> {
-  String _target = 'items'; // items / contacts
+  String _entity = 'contacts';
   bool _busy = false;
   ImportResult? _result;
   String? _fileName;
+  String? _savedPath;
 
-  Future<void> _pickAndImport() async {
+  DataEntity get _current => DataRegistry.byId(_entity)!;
+
+  // ---------------------------- التصدير ----------------------------
+  Future<void> _exportExcel() async {
+    setState(() {
+      _busy = true;
+      _result = null;
+      _savedPath = null;
+    });
+    try {
+      final bytes = DataRegistry.exportExcel(_entity);
+      final filename = '${_entity}_${_stamp()}.xlsx';
+      final path = await saver.saveBytesToPickedLocationImpl(
+        bytes,
+        filename,
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      );
+      if (!mounted) return;
+      setState(() {
+        _busy = false;
+        _savedPath = path;
+      });
+      _snack(path == null
+          ? 'تم تجهيز ملف Excel'
+          : 'تم حفظ الملف في: $path', AppColors.success);
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _busy = false);
+      _snack('فشل التصدير: $e', AppColors.danger);
+    }
+  }
+
+  Future<void> _exportCsv() async {
+    setState(() {
+      _busy = true;
+      _result = null;
+      _savedPath = null;
+    });
+    try {
+      final lines = DataRegistry.exportCsv(_entity);
+      final csv = '\uFEFF${lines.join('\n')}';
+      final bytes = Uint8List.fromList(csv.codeUnits);
+      final filename = '${_entity}_${_stamp()}.csv';
+      final path = await saver.saveBytesToPickedLocationImpl(
+        bytes,
+        filename,
+        'text/csv',
+      );
+      if (!mounted) return;
+      setState(() {
+        _busy = false;
+        _savedPath = path;
+      });
+      _snack(path == null ? 'تم تصدير CSV' : 'تم الحفظ في: $path',
+          AppColors.success);
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _busy = false);
+      _snack('فشل التصدير: $e', AppColors.danger);
+    }
+  }
+
+  // ---------------------------- الاستيراد ----------------------------
+  Future<void> _import() async {
     final picked = await FilePicker.platform.pickFiles(
       type: FileType.custom,
-      allowedExtensions: ['csv', 'xlsx'],
+      allowedExtensions: ['xlsx', 'xls', 'csv'],
       withData: true,
     );
     if (picked == null || picked.files.isEmpty) return;
@@ -42,10 +112,11 @@ class _ImportScreenState extends State<ImportScreen> {
     });
 
     try {
-      final rows = ImportService.parseBytes(file.name, bytes);
-      final res = _target == 'items'
-          ? await ImportService.importItems(rows)
-          : await ImportService.importContacts(rows);
+      final lower = file.name.toLowerCase();
+      final rows = lower.endsWith('.csv')
+          ? ImportService.parseBytes(file.name, bytes)
+          : ExcelService.parse(bytes);
+      final res = await DataRegistry.importFromRows(_entity, rows);
       if (!mounted) return;
       context.read<ERPProvider>().reload();
       setState(() {
@@ -55,94 +126,105 @@ class _ImportScreenState extends State<ImportScreen> {
     } catch (e) {
       if (!mounted) return;
       setState(() => _busy = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('فشل قراءة الملف: $e'),
-          backgroundColor: AppColors.danger,
-        ),
-      );
+      _snack('فشل قراءة الملف: $e', AppColors.danger);
     }
   }
 
-  Future<void> _copyTemplate() async {
-    final csv = _target == 'items'
-        ? ImportService.itemsTemplateCsv()
-        : ImportService.contactsTemplateCsv();
-    await Clipboard.setData(ClipboardData(text: csv));
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('تم نسخ القالب — الصقه في Excel ثم املأه وارفع الملف'),
-      ),
-    );
+  void _snack(String msg, Color c) {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(msg), backgroundColor: c));
   }
+
+  String _stamp() => DateTime.now()
+      .toIso8601String()
+      .replaceAll(':', '-')
+      .split('.')
+      .first;
 
   @override
   Widget build(BuildContext context) {
+    final headers = _current.headers;
+
     return Scaffold(
-      appBar: AppBar(title: const Text('استيراد البيانات')),
+      appBar: AppBar(title: const Text('الاستيراد والتصدير')),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
           const SectionTitle('نوع البيانات', icon: Icons.category),
-          SegmentedButton<String>(
-            segments: const [
-              ButtonSegment(
-                value: 'items',
-                label: Text('الأصناف'),
-                icon: Icon(Icons.inventory_2),
-              ),
-              ButtonSegment(
-                value: 'contacts',
-                label: Text('العملاء والموردون'),
-                icon: Icon(Icons.people),
-              ),
+          DropdownButtonFormField<String>(
+            initialValue: _entity,
+            isExpanded: true,
+            decoration: const InputDecoration(
+              labelText: 'اختر القسم',
+              prefixIcon: Icon(Icons.list_alt),
+            ),
+            items: [
+              for (final e in DataRegistry.entities)
+                DropdownMenuItem(value: e.id, child: Text(e.title)),
             ],
-            selected: {_target},
-            onSelectionChanged: (s) => setState(() {
-              _target = s.first;
+            onChanged: (v) => setState(() {
+              _entity = v ?? 'contacts';
               _result = null;
               _fileName = null;
+              _savedPath = null;
             }),
           ),
           const SizedBox(height: 16),
+
+          // الأعمدة
           Card(
             child: Padding(
               padding: const EdgeInsets.all(14),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('الأعمدة المطلوبة (الصف الأول = العناوين):',
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                  const Text('الأعمدة (الصف الأول = العناوين):',
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
                   const SizedBox(height: 8),
-                  Text(
-                    _target == 'items'
-                        ? 'الكود | الاسم | الباركود | سعر الشراء | سعر البيع | حد الطلب'
-                        : 'الكود | الاسم | النوع | الهاتف | البريد | الرقم الضريبي',
-                    style: TextStyle(fontSize: 12, color: Colors.grey.shade700),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    _target == 'items'
-                        ? 'ملاحظة: عمود «الاسم» إلزامي.'
-                        : 'ملاحظة: النوع = عميل / مورد / كلاهما.',
-                    style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
-                  ),
+                  Text(headers.join(' | '),
+                      style: TextStyle(
+                          fontSize: 12, color: Colors.grey.shade700)),
                 ],
               ),
             ),
           ),
           const SizedBox(height: 16),
-          OutlinedButton.icon(
-            onPressed: _copyTemplate,
-            icon: const Icon(Icons.copy_all),
-            label: const Text('نسخ قالب CSV (لصقه في Excel)'),
+
+          // التصدير
+          const SectionTitle('تصدير', icon: Icons.upload),
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: _busy ? null : _exportExcel,
+                  icon: const Icon(Icons.table_chart),
+                  label: const Text('Excel (.xlsx)'),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: _busy ? null : _exportCsv,
+                  icon: const Icon(Icons.description),
+                  label: const Text('CSV'),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 6),
+          Text(
+            'سيتم عرض نافذة لاختيار مكان الحفظ في ذاكرة الهاتف.',
+            style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
+          ),
+
+          const SizedBox(height: 20),
+          // الاستيراد
+          const SectionTitle('استيراد', icon: Icons.download),
           ElevatedButton.icon(
-            onPressed: _busy ? null : _pickAndImport,
-            icon: const Icon(Icons.upload_file),
-            label: Text(_busy ? 'جارٍ الاستيراد...' : 'اختيار ملف Excel/CSV'),
+            onPressed: _busy ? null : _import,
+            icon: const Icon(Icons.file_open),
+            label: Text(_busy ? 'جارٍ المعالجة...' : 'اختيار ملف Excel/CSV'),
           ),
           if (_busy) ...[
             const SizedBox(height: 16),
@@ -152,6 +234,19 @@ class _ImportScreenState extends State<ImportScreen> {
             const SizedBox(height: 12),
             Text('الملف: $_fileName',
                 style: TextStyle(fontSize: 12, color: Colors.grey.shade700)),
+          ],
+          if (_savedPath != null) ...[
+            const SizedBox(height: 12),
+            Card(
+              color: AppColors.success.withValues(alpha: 0.08),
+              child: ListTile(
+                leading:
+                    const Icon(Icons.check_circle, color: AppColors.success),
+                title: const Text('تم حفظ الملف'),
+                subtitle: Text(_savedPath!,
+                    style: const TextStyle(fontSize: 11)),
+              ),
+            ),
           ],
           if (_result != null) ...[
             const SizedBox(height: 20),

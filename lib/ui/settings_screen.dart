@@ -18,6 +18,8 @@ import 'settings/audit_log_screen.dart';
 import 'settings/permissions_screen.dart';
 import 'settings/notifications_screen.dart';
 import 'contacts/contacts_import_screen.dart';
+import 'settings/backup_location_screen.dart';
+import 'settings/restore_screen.dart';
 import '../services/backup_service.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -437,12 +439,39 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: Column(
               children: [
                 ListTile(
+                  leading: const Icon(Icons.folder_special,
+                      color: AppColors.info),
+                  title: const Text('مكان النسخة الاحتياطية'),
+                  subtitle: Text(BackupService.suggestedFolder),
+                  trailing: const Icon(Icons.chevron_left),
+                  onTap: () async {
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => const BackupLocationScreen()),
+                    );
+                    if (context.mounted) setState(() {});
+                  },
+                ),
+                const Divider(height: 1),
+                ListTile(
                   leading: const Icon(Icons.backup, color: AppColors.success),
                   title: const Text('نسخة احتياطية (تصدير)'),
                   subtitle: const Text('حفظ كل البيانات في ملف JSON'),
                   onTap: () async {
+                    if (!BackupService.hasFolder) {
+                      final chosen = await Navigator.push<bool>(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) =>
+                                const BackupLocationScreen(firstTime: true)),
+                      );
+                      if (chosen != true) return;
+                    }
+                    if (!context.mounted) return;
                     final path = await BackupService.exportBackup();
                     if (context.mounted) {
+                      setState(() {});
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(path == null
@@ -480,27 +509,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   leading: const Icon(Icons.restore, color: AppColors.info),
                   title: const Text('استعادة من نسخة احتياطية'),
                   subtitle: const Text('استرجاع البيانات من ملف JSON'),
-                  onTap: () async {
-                    final ok = await confirmDialog(
-                      context,
-                      title: 'استعادة نسخة احتياطية',
-                      message:
-                          'سيتم استبدال كل البيانات الحالية بالبيانات من الملف. هل أنت متأكد؟',
-                    );
-                    if (!ok) return;
-                    final res = await BackupService.restoreBackup();
-                    if (context.mounted) {
-                      context.read<ERPProvider>().reload();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(res.message),
-                          backgroundColor: res.success
-                              ? AppColors.success
-                              : AppColors.danger,
-                        ),
-                      );
-                    }
-                  },
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => const RestoreScreen()),
+                  ),
                 ),
                 const Divider(height: 1),
                 ListTile(
