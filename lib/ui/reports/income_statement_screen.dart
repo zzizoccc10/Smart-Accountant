@@ -27,11 +27,17 @@ class IncomeStatementScreen extends StatelessWidget {
       final c = b['credit'] ?? 0;
 
       if (a.accountType == 'revenue') {
-        // الإيرادات طبيعتها دائن، والمردودات مدين
+        // الإيرادات طبيعتها دائن؛ المردودات/الخصم طبيعتها مدين => تُطرح من الإيراد
         final amount = a.accountNature == 'credit' ? (c - d) : (d - c);
         if (amount.abs() < 0.001) continue;
-        revenues.add({'name': a.name, 'amount': amount});
-        revenueTotal += amount;
+        if (a.accountNature == 'credit') {
+          revenues.add({'name': a.name, 'amount': amount});
+          revenueTotal += amount;
+        } else {
+          // مردودات ومسموحات المبيعات / الخصم المسموح به (حساب مقابل للإيراد)
+          revenues.add({'name': a.name, 'amount': -amount});
+          revenueTotal -= amount;
+        }
       } else if (a.accountType == 'expense') {
         final amount = d - c;
         if (amount.abs() < 0.001) continue;

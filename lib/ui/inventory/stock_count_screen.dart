@@ -16,9 +16,20 @@ class StockCountScreen extends StatefulWidget {
 }
 
 class _StockCountScreenState extends State<StockCountScreen> {
-  String _warehouseId = 'wh_main';
+  String _warehouseId = '';
   final Map<String, TextEditingController> _controllers = {};
   bool _saving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final prov = context.read<ERPProvider>();
+      if (prov.warehouses.isNotEmpty) {
+        setState(() => _warehouseId = prov.warehouses.first.id);
+      }
+    });
+  }
 
   @override
   void dispose() {

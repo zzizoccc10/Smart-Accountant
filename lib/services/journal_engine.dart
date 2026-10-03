@@ -54,17 +54,56 @@ class JournalEngine {
         description: desc,
       );
 
+  // ======================= حلّ الحسابات الفرعية (الترحيل الصحيح) =======================
+  /// حساب الصندوق: يُستخدم حساب الصندوق الفرعي إن وُجد وإلا الحساب الرئيسي.
+  static Account? _cashAcc(Cashbox? cb) {
+    if (cb != null && cb.accountId.isNotEmpty) {
+      final a = AppDatabase.accountById(cb.accountId);
+      if (a != null && a.isLeaf) return a;
+    }
+    return AppDatabase.accountByCode(CoA.cash);
+  }
+
+  /// حساب جهة الاتصال: يُستخدم الحساب الفرعي للعميل/المورد إن وُجد.
+  static Account? _contactAcc(String? contactId, String fallbackCode) {
+    if (contactId != null && contactId.isNotEmpty) {
+      final c = AppDatabase.contactById(contactId);
+      final accId = c?.accountId;
+      if (accId != null && accId.isNotEmpty) {
+        final a = AppDatabase.accountById(accId);
+        if (a != null && a.isLeaf) return a;
+      }
+    }
+    return AppDatabase.accountByCode(fallbackCode);
+  }
+
+  /// حساب المخزون: يُستخدم حساب المخزن الفرعي إن وُجد وإلا الحساب الرئيسي.
+  static Account? _invAcc(String? warehouseId) {
+    if (warehouseId != null && warehouseId.isNotEmpty) {
+      final w = AppDatabase.warehouses
+          .where((x) => x.id == warehouseId)
+          .firstOrNull;
+      if (w != null) {
+        final acc = AppDatabase.accounts
+            .where((a) => a.name == 'مخزون: ${w.name}')
+            .firstOrNull;
+        if (acc != null && acc.isLeaf) return acc;
+      }
+    }
+    return AppDatabase.accountByCode(CoA.inventory);
+  }
+
   // ============================ فاتورة مبيعات ============================
   /// تدفق 4.1 / 4.2 — نقدية أو آجلة
   static Future<JournalEntry> salesInvoice({
     required Invoice inv,
     required Cashbox? cashbox,
   }) async {
-    final cash = AppDatabase.accountByCode(CoA.cash);
-    final ar = AppDatabase.accountByCode(CoA.arCustomers);
+    final cash = _cashAcc(cashbox);
+    final ar = _contactAcc(inv.contactId, CoA.arCustomers);
     final revenue = AppDatabase.accountByCode(CoA.salesRevenue);
     final vat = AppDatabase.accountByCode(CoA.vatPayable);
-    final invAcc = AppDatabase.accountByCode(CoA.inventory);
+    final invAcc = _invAcc(inv.warehouseId);
     final cogs = AppDatabase.accountByCode(CoA.cogs);
 
     final netSales = inv.subtotal - inv.discountAmount;
@@ -103,11 +142,11 @@ class JournalEngine {
     required Invoice inv,
     required Cashbox? cashbox,
   }) async {
-    final cash = AppDatabase.accountByCode(CoA.cash);
-    final ar = AppDatabase.accountByCode(CoA.arCustomers);
+    final cash = _cashAcc(cashbox);
+    final ar = _contactAcc(inv.contactId, CoA.arCustomers);
     final returns = AppDatabase.accountByCode(CoA.salesReturns);
     final vat = AppDatabase.accountByCode(CoA.vatPayable);
-    final invAcc = AppDatabase.accountByCode(CoA.inventory);
+    final invAcc = _invAcc(inv.warehouseId);
     final cogs = AppDatabase.accountByCode(CoA.cogs);
 
     final netSales = inv.subtotal - inv.discountAmount;
@@ -145,9 +184,9 @@ class JournalEngine {
     required Invoice inv,
     required Cashbox? cashbox,
   }) async {
-    final cash = AppDatabase.accountByCode(CoA.cash);
-    final ap = AppDatabase.accountByCode(CoA.apSuppliers);
-    final invAcc = AppDatabase.accountByCode(CoA.inventory);
+    final cash = _cashAcc(cashbox);
+    final ap = _contactAcc(inv.contactId, CoA.apSuppliers);
+    final invAcc = _invAcc(inv.warehouseId);
     final vat = AppDatabase.accountByCode(CoA.vatReceivable);
 
     final lines = <JournalLine>[];
@@ -177,9 +216,9 @@ class JournalEngine {
     required Invoice inv,
     required Cashbox? cashbox,
   }) async {
-    final cash = AppDatabase.accountByCode(CoA.cash);
-    final ap = AppDatabase.accountByCode(CoA.apSuppliers);
-    final invAcc = AppDatabase.accountByCode(CoA.inventory);
+    final cash = _cashAcc(cashbox);
+    final ap = _contactAcc(inv.contactId, CoA.apSuppliers);
+    final invAcc = _invAcc(inv.warehouseId);
     final vat = AppDatabase.accountByCode(CoA.vatReceivable);
 
     final lines = <JournalLine>[];
@@ -210,8 +249,8 @@ class JournalEngine {
     required Payment p,
     required Cashbox? cashbox,
   }) async {
-    final cash = AppDatabase.accountByCode(CoA.cash);
-    final ar = AppDatabase.accountByCode(CoA.arCustomers);
+    final cash = _cashAcc(cashbox);
+    final ar = _contactAcc(p.contactId, CoA.arCustomers);
     final lines = [
       dr(cash, p.amount, 'قبض نقدية'),
       cr(ar, p.amount, 'تحصيل من ${p.contactName}'),
@@ -231,8 +270,8 @@ class JournalEngine {
     required Payment p,
     required Cashbox? cashbox,
   }) async {
-    final cash = AppDatabase.accountByCode(CoA.cash);
-    final ap = AppDatabase.accountByCode(CoA.apSuppliers);
+    final cash = _cashAcc(cashbox);
+    final ap = _contactAcc(p.contactId, CoA.apSuppliers);
     final lines = [
       dr(ap, p.amount, 'سداد إلى ${p.contactName}'),
       cr(cash, p.amount, 'صرف نقدية'),
@@ -252,7 +291,7 @@ class JournalEngine {
     required Expense e,
     required Cashbox? cashbox,
   }) async {
-    final cash = AppDatabase.accountByCode(CoA.cash);
+    final cash = _cashAcc(cashbox);
     final expAcc = AppDatabase.accountById(e.accountId);
     final lines = [
       dr(expAcc, e.total, e.description.isEmpty ? 'مصروف' : e.description),
@@ -268,17 +307,18 @@ class JournalEngine {
   }
 
   // ============================ تحويل مخزني ============================
-  /// تدفق 4.8 — قيد بقيمة التكلفة (نفس المخزون)
+  /// تدفق 4.8 — قيد بقيمة التكلفة (تحويل بين حسابي المخزنين)
   static Future<JournalEntry> stockTransfer({
     required String date,
     required double cost,
     required String fromWh,
     required String toWh,
   }) async {
-    final invAcc = AppDatabase.accountByCode(CoA.inventory);
+    final fromAcc = _invAcc(fromWh);
+    final toAcc = _invAcc(toWh);
     final lines = [
-      dr(invAcc, cost, 'مخزون محوّل إلى $toWh'),
-      cr(invAcc, cost, 'مخزون محوّل من $fromWh'),
+      dr(toAcc, cost, 'مخزون محوّل إلى $toWh'),
+      cr(fromAcc, cost, 'مخزون محوّل من $fromWh'),
     ];
     return post(
       date: date,
@@ -294,8 +334,9 @@ class JournalEngine {
     required String date,
     required double diffValue, // موجب=زيادة، سالب=نقص
     required String notes,
+    String? warehouseId,
   }) async {
-    final invAcc = AppDatabase.accountByCode(CoA.inventory);
+    final invAcc = _invAcc(warehouseId);
     final gain = AppDatabase.accountByCode(CoA.inventoryGain);
     final loss = AppDatabase.accountByCode(CoA.inventoryLoss);
 
@@ -322,7 +363,7 @@ class JournalEngine {
     required bool isInjection, // true=إيداع، false=مسحوبات
     required Cashbox? cashbox,
   }) async {
-    final cash = AppDatabase.accountByCode(CoA.cash);
+    final cash = _cashAcc(cashbox);
     final capital = AppDatabase.accountByCode(CoA.capital);
     final drawings = AppDatabase.accountByCode(CoA.drawings);
 
@@ -344,7 +385,7 @@ class JournalEngine {
     required PayrollRecord rec,
     required Cashbox? cashbox,
   }) async {
-    final cash = AppDatabase.accountByCode(CoA.cash);
+    final cash = _cashAcc(cashbox);
     final salary = AppDatabase.accountByCode(CoA.salariesExpense);
     final lines = [
       dr(salary, rec.netPay, 'راتب ${rec.employeeName} — ${rec.period}'),
@@ -390,7 +431,7 @@ class JournalEngine {
     required double saleAmount,
     required Cashbox? cashbox,
   }) async {
-    final cash = AppDatabase.accountByCode(CoA.cash);
+    final cash = _cashAcc(cashbox);
     final assetAcc = AppDatabase.accountByCode(asset.assetAccountCode);
     final accDep = AppDatabase.accountByCode(CoA.accumulatedDepreciation);
     final gain = AppDatabase.accountByCode(CoA.otherRevenue);

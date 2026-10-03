@@ -46,13 +46,21 @@ class _OrderFormState extends State<OrderForm> {
     if (e != null) {
       _lines.addAll(e.lines);
       _contactId = e.contactId;
-      _warehouseId = e.warehouseId.isEmpty ? 'wh_main' : e.warehouseId;
+      _warehouseId = e.warehouseId;
       _date = e.date;
       _validUntil = e.validUntil;
       _discountAmount = e.discountAmount;
       _shipping = e.shipping;
       _notes.text = e.notes;
     }
+    // تهيئة المخزن من القائمة الفعلية
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final prov = context.read<ERPProvider>();
+      if ((_warehouseId.isEmpty || !prov.warehouses.any((w) => w.id == _warehouseId)) &&
+          prov.warehouses.isNotEmpty) {
+        setState(() => _warehouseId = prov.warehouses.first.id);
+      }
+    });
   }
 
   @override

@@ -63,6 +63,11 @@ class _BarcodeScreenState extends State<BarcodeScreen> {
   Widget build(BuildContext context) {
     final prov = context.watch<ERPProvider>();
     final items = prov.items;
+    // ضمان أن الصنف المحدد ما زال ضمن القائمة (مطابقة بالمعرّف لتفادي اختفاء الشاشة)
+    if (_selected != null &&
+        !items.any((i) => i.id == _selected!.id)) {
+      _selected = null;
+    }
 
     return Scaffold(
       appBar: AppBar(

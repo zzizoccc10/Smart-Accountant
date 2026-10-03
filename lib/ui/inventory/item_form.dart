@@ -73,12 +73,15 @@ class _ItemFormState extends State<ItemForm> {
 
     if (widget.item == null) {
       await prov.addItem(item);
-      // رصيد افتتاحي للمخزون
+      // رصيد افتتاحي للمخزون (في المخزن الافتراضي إن وُجد)
       final qty = item.openingQty;
       if (qty > 0) {
+        final whId = prov.warehouses.isNotEmpty
+            ? prov.warehouses.first.id
+            : 'wh_main';
         await AppDatabase.saveBalance(InventoryBalance(
           itemId: item.id,
-          warehouseId: 'wh_main',
+          warehouseId: whId,
           quantity: qty,
           avgCost: item.purchasePrice,
         ));
@@ -86,7 +89,7 @@ class _ItemFormState extends State<ItemForm> {
           id: AppDatabase.newId(),
           itemId: item.id,
           itemName: item.name,
-          warehouseId: 'wh_main',
+          warehouseId: whId,
           date: DateTime.now().toIso8601String().split('T')[0],
           movementType: 'opening',
           quantityIn: qty,

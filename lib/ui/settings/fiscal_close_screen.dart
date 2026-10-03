@@ -61,12 +61,15 @@ class _FiscalCloseScreenState extends State<FiscalCloseScreen> {
     if (!ok) return;
     setState(() => _busy = true);
     try {
-      await prov.closeFiscalYear('$_year');
+      final entry = await prov.closeFiscalYear('$_year');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('تم إقفال السنة المالية بنجاح'),
-            backgroundColor: AppColors.success,
+          SnackBar(
+            content: Text(entry == null
+                ? 'لا توجد أرصدة إيرادات/مصروفات لإقفالها لهذه السنة'
+                : 'تم إقفال السنة المالية بنجاح (${entry.entryNumber})'),
+            backgroundColor:
+                entry == null ? AppColors.warning : AppColors.success,
           ),
         );
       }

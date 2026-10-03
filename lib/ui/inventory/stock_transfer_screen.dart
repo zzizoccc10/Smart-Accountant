@@ -148,20 +148,31 @@ class _StockTransferScreenState extends State<StockTransferScreen> {
     setState(() => _saving = true);
     final prov = context.read<ERPProvider>();
     final date = DateTime.now().toIso8601String().split('T')[0];
-    await prov.createStockTransfer(
-      fromWh: _from,
-      toWh: _to,
-      date: date,
-      lines: _lines,
-    );
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('تم التحويل المخزني'),
-        backgroundColor: AppColors.success,
-      ),
-    );
-    Navigator.pop(context);
+    try {
+      await prov.createStockTransfer(
+        fromWh: _from,
+        toWh: _to,
+        date: date,
+        lines: _lines,
+      );
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('تم التحويل المخزني'),
+          backgroundColor: AppColors.success,
+        ),
+      );
+      Navigator.pop(context);
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _saving = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('تعذّر التحويل: $e'),
+          backgroundColor: AppColors.danger,
+        ),
+      );
+    }
   }
 }
 

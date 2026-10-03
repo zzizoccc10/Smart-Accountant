@@ -45,7 +45,8 @@ class BalanceSheetScreen extends StatelessWidget {
         equity.add({'name': a.name, 'amount': amt});
         totalEquity += amt;
       } else if (a.accountType == 'revenue') {
-        revenueTotal += a.accountNature == 'credit' ? (c - d) : (d - c);
+        // الإيرادات دائنة؛ المردودات/الخصم (مدين) تُطرح
+        revenueTotal += a.accountNature == 'credit' ? (c - d) : -(d - c);
       } else if (a.accountType == 'expense') {
         expenseTotal += (d - c);
       }

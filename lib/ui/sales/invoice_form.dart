@@ -533,9 +533,48 @@ class _InvoiceFormState extends State<InvoiceForm> {
       );
       return;
     }
+    // التحقق من صحة الكميات والأسعار
+    for (final l in _lines) {
+      if (l.quantity <= 0) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('كمية الصنف "${l.itemName}" يجب أن تكون أكبر من صفر'),
+            backgroundColor: AppColors.danger,
+          ),
+        );
+        return;
+      }
+      if (l.unitPrice < 0) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('سعر الصنف "${l.itemName}" غير صالح'),
+            backgroundColor: AppColors.danger,
+          ),
+        );
+        return;
+      }
+    }
     if (isCredit && _contactId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('البيع الآجل يتطلب اختيار عميل/مورد')),
+      );
+      return;
+    }
+    if (isCredit && _paidAmount > _total + 0.001) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('المبلغ المدفوع أكبر من إجمالي الفاتورة'),
+          backgroundColor: AppColors.danger,
+        ),
+      );
+      return;
+    }
+    if (isCredit && _paidAmount < 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('المبلغ المدفوع لا يمكن أن يكون سالباً'),
+          backgroundColor: AppColors.danger,
+        ),
       );
       return;
     }
@@ -594,12 +633,14 @@ class _ItemPickerSheetState extends State<_ItemPickerSheet> {
   final _qty = TextEditingController(text: '1');
   final _price = TextEditingController();
   final _discount = TextEditingController(text: '0');
+  late final TextEditingController _taxCtrl;
   double _taxRate = 0;
 
   @override
   void initState() {
     super.initState();
     _taxRate = widget.defaultTaxRate;
+    _taxCtrl = TextEditingController(text: _taxRate.toStringAsFixed(0));
   }
 
   @override
@@ -607,6 +648,7 @@ class _ItemPickerSheetState extends State<_ItemPickerSheet> {
     _qty.dispose();
     _price.dispose();
     _discount.dispose();
+    _taxCtrl.dispose();
     super.dispose();
   }
 
@@ -699,9 +741,7 @@ class _ItemPickerSheetState extends State<_ItemPickerSheet> {
                 child: TextField(
                   keyboardType: TextInputType.number,
                   decoration: const InputDecoration(labelText: 'ضريبة %'),
-                  controller: TextEditingController(
-                    text: _taxRate.toStringAsFixed(0),
-                  ),
+                  controller: _taxCtrl,
                   onChanged: (v) =>
                       setState(() => _taxRate = double.tryParse(v) ?? 0),
                 ),

@@ -9,6 +9,7 @@ import '../../models/models.dart';
 import '../../theme/app_theme.dart';
 import '../widgets/common.dart';
 import '../widgets/export_button.dart';
+import '../widgets/dropdown_safe.dart';
 import 'order_form.dart';
 
 class OrdersListScreen extends StatefulWidget {
@@ -243,6 +244,7 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
     String paymentType = 'credit';
     String? cashboxId =
         prov.cashboxes.isNotEmpty ? prov.cashboxes.first.id : null;
+    cashboxId = safeValue(cashboxId, prov.cashboxes.map((c) => c.id));
 
     final go = await showDialog<bool>(
       context: context,

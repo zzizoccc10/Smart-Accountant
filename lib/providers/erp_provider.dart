@@ -121,16 +121,22 @@ class ERPProvider extends ChangeNotifier {
   Future<void> addAccount(Account acc) async {
     await AppDatabase.saveAccount(acc);
     reload();
+    await logAction('create', 'account',
+        entityId: acc.id, description: 'إضافة حساب: ${acc.code} ${acc.name}');
   }
 
   Future<void> updateAccount(Account acc) async {
     await AppDatabase.saveAccount(acc);
     reload();
+    await logAction('update', 'account',
+        entityId: acc.id, description: 'تعديل حساب: ${acc.code} ${acc.name}');
   }
 
   Future<void> deleteAccount(String id) async {
     await AppDatabase.deleteAccount(id);
     reload();
+    await logAction('delete', 'account',
+        entityId: id, description: 'حذف حساب');
   }
 
   /// مزامنة دليل الحسابات مع كل الكيانات التشغيلية
@@ -177,12 +183,16 @@ class ERPProvider extends ChangeNotifier {
       await AccountSyncService.ensureWarehouseAccount(saved);
     } catch (_) {}
     reload();
+    await logAction('save', 'warehouse',
+        entityId: saved.id, description: 'حفظ مخزن: ${saved.name}');
   }
 
   /// حذف مخزن
   Future<void> deleteWarehouse(String id) async {
     await AppDatabase.deleteWarehouse(id);
     reload();
+    await logAction('delete', 'warehouse',
+        entityId: id, description: 'حذف مخزن');
   }
 
   /// إضافة صندوق كامل (مع الكود) وربطه بالدليل
@@ -203,12 +213,16 @@ class ERPProvider extends ChangeNotifier {
     } catch (_) {}
     await AppDatabase.saveCashbox(box);
     reload();
+    await logAction('save', 'cashbox',
+        entityId: box.id, description: 'حفظ صندوق: ${box.name}');
   }
 
   /// حذف صندوق
   Future<void> deleteCashbox(String id) async {
     await AppDatabase.deleteCashbox(id);
     reload();
+    await logAction('delete', 'cashbox',
+        entityId: id, description: 'حذف صندوق');
   }
 
   // ============================ جهات الاتصال ============================
@@ -238,6 +252,8 @@ class ERPProvider extends ChangeNotifier {
       }
     } catch (_) {}
     reload();
+    await logAction('create', 'contact',
+        entityId: contact.id, description: 'إضافة جهة اتصال: ${contact.name}');
     return contact;
   }
 
@@ -252,6 +268,8 @@ class ERPProvider extends ChangeNotifier {
       }
     } catch (_) {}
     reload();
+    await logAction('update', 'contact',
+        entityId: c.id, description: 'تعديل جهة اتصال: ${c.name}');
   }
 
   Future<void> deleteContact(String id) async {
@@ -263,17 +281,23 @@ class ERPProvider extends ChangeNotifier {
       await AccountSyncService.removeContactAccount(c.accountId);
     } catch (_) {}
     reload();
+    await logAction('delete', 'contact',
+        entityId: c.id, description: 'حذف جهة اتصال: ${c.name}');
   }
 
   // ============================ الأصناف ============================
   Future<void> addItem(Item it) async {
     await AppDatabase.saveItem(it);
     reload();
+    await logAction('create', 'item',
+        entityId: it.id, description: 'إضافة صنف: ${it.name}');
   }
 
   Future<void> updateItem(Item it) async {
     await AppDatabase.saveItem(it);
     reload();
+    await logAction('update', 'item',
+        entityId: it.id, description: 'تعديل صنف: ${it.name}');
   }
 
   Future<void> deleteItem(String id) async {
@@ -282,6 +306,8 @@ class ERPProvider extends ChangeNotifier {
     it.isDeleted = true;
     await AppDatabase.saveItem(it);
     reload();
+    await logAction('delete', 'item',
+        entityId: it.id, description: 'حذف صنف: ${it.name}');
   }
 
   Future<void> addCategory(ItemCategory c) async {
@@ -325,6 +351,33 @@ class ERPProvider extends ChangeNotifier {
     final isReturn =
         invoiceType == 'sale_return' || invoiceType == 'purchase_return';
     final contact = AppDatabase.contactById(contactId);
+
+    // تحقق مسبق من الكميات والأسعار
+    for (final l in lines) {
+      if (l.quantity <= 0) {
+        throw Exception('كمية الصنف "${l.itemName}" يجب أن تكون أكبر من صفر');
+      }
+      if (l.unitPrice < 0) {
+        throw Exception('سعر الصنف "${l.itemName}" غير صالح');
+      }
+    }
+
+    // تحقق مسبق من توفر المخزون للبيع/التحويل (قبل حفظ الفاتورة)
+    final wh = AppDatabase.warehouses
+        .where((w) => w.id == warehouseId)
+        .firstOrNull;
+    final allowNeg = allowNegativeStock || (wh != null && wh.allowNegative);
+    if (!allowNeg && (invoiceType == 'sale' || invoiceType == 'purchase_return')) {
+      for (final l in lines) {
+        final avail = AppDatabase.balanceOf(l.itemId, warehouseId).quantity;
+        if (l.quantity > avail + 0.0001) {
+          throw Exception(
+            'الرصيد غير كافٍ للصنف "${l.itemName}". '
+            'المتاح: ${Fmt.num(avail)}، المطلوب: ${Fmt.num(l.quantity)}',
+          );
+        }
+      }
+    }
 
     // التحقق من الكمية المرتجعة ≤ الكمية المباعة - المرتجع سابقاً
     if (isReturn && originalInvoiceId != null && originalInvoiceId.isNotEmpty) {
@@ -448,6 +501,11 @@ class ERPProvider extends ChangeNotifier {
         entry = await JournalEngine.purchaseReturn(inv: inv, cashbox: cashbox);
         break;
     }
+    // ربط الفاتورة بقيدها المحاسبي
+    if (entry != null) {
+      inv.journalEntryId = entry.id;
+      await AppDatabase.saveInvoice(inv);
+    }
 
     // 4) تحديث الصندوق (النقدي)
     if (paymentType == 'cash' && cashbox != null && entry != null) {
@@ -479,6 +537,21 @@ class ERPProvider extends ChangeNotifier {
   }) async {
     final bal = AppDatabase.balanceOf(itemId, warehouseId);
     final newQty = isIn ? bal.quantity + qty : bal.quantity - qty;
+
+    // حماية من الرصيد السالب: يُسمح بالسالب فقط إذا سمح المخزن أو الإعداد العام
+    if (!isIn && newQty < -0.0001) {
+      final wh = AppDatabase.warehouses
+          .where((w) => w.id == warehouseId)
+          .firstOrNull;
+      final allowed =
+          allowNegativeStock || (wh != null && wh.allowNegative);
+      if (!allowed) {
+        throw Exception(
+          'الرصيد غير كافٍ للصنف "$itemName" في المخزن. '
+          'المتاح: ${Fmt.num(bal.quantity)}، المطلوب: ${Fmt.num(qty)}',
+        );
+      }
+    }
 
     // متوسط التكلفة المرجّح
     double newCost = bal.avgCost;
@@ -512,18 +585,109 @@ class ERPProvider extends ChangeNotifier {
     ));
   }
 
+  /// عكس قيد محاسبي (قيد مطابق بالمقلوب) — يُستخدم عند حذف/إلغاء المستندات
+  Future<void> _reverseEntry(JournalEntry original, {String? date}) async {
+    final reversed = original.lines
+        .map((l) => JournalLine(
+              accountId: l.accountId,
+              accountName: l.accountName,
+              debit: l.credit,
+              credit: l.debit,
+              description: 'عكس: ${l.description}',
+            ))
+        .toList();
+    await JournalEngine.post(
+      date: date ??
+          DateTime.now().toIso8601String().substring(0, 10),
+      description: 'عكس قيد ${original.entryNumber} (${original.description})',
+      sourceType: 'reversal',
+      sourceId: original.id,
+      lines: reversed,
+    );
+  }
+
   Future<void> deleteInvoice(String id) async {
-    final inv = AppDatabase.invoices.where((i) => i.id == id).toList();
-    if (inv.isEmpty) {
-      // قد تكون محذوفة منطقياً سابقاً — نحذف فعلياً من الصندوق
+    final matches = AppDatabase.invoices.where((i) => i.id == id).toList();
+    if (matches.isEmpty) {
       await AppDatabase.deleteInvoice(id);
-    } else {
-      final i = inv.first;
-      i.isDeleted = true;
-      await AppDatabase.saveInvoice(i);
-      await logAction('delete', 'invoice',
-          entityId: i.id, description: 'حذف فاتورة ${i.invoiceNumber}');
+      reload();
+      return;
     }
+    final i = matches.first;
+
+    // 1) عكس القيد المحاسبي إن وُجد (أو بالبحث بالمصدر)
+    JournalEntry? je;
+    if (i.journalEntryId != null && i.journalEntryId!.isNotEmpty) {
+      je = AppDatabase.journals
+          .where((j) => j.id == i.journalEntryId)
+          .firstOrNull;
+    }
+    je ??= AppDatabase.journals
+        .where((j) => j.sourceId == i.id && j.sourceType != 'reversal')
+        .firstOrNull;
+    if (je != null) {
+      await _reverseEntry(je, date: i.date);
+    }
+
+    // 2) عكس المخزون (إرجاع/إخراج عكسي)
+    final isSale = i.invoiceType == 'sale' || i.invoiceType == 'sale_return';
+    final isReturn =
+        i.invoiceType == 'sale_return' || i.invoiceType == 'purchase_return';
+    for (final l in i.lines) {
+      final wasIn = (!isSale && !isReturn) || (isSale && isReturn);
+      // عكس الحركة: إذا كانت إدخالاً نصبح إخراجاً والعكس
+      try {
+        await _applyStock(
+          itemId: l.itemId,
+          itemName: l.itemName,
+          warehouseId: i.warehouseId,
+          date: DateTime.now().toIso8601String().substring(0, 10),
+          qty: l.quantity,
+          unitCost: l.costPrice,
+          isIn: !wasIn,
+          refType: 'reversal',
+          refId: i.id,
+        );
+      } catch (_) {
+        // نتجاهل فشل عكس المخزون إن كان الرصيد غير كافٍ
+      }
+    }
+
+    // 3) عكس أثر الصندوق (النقدي)
+    if (i.paymentType == 'cash' &&
+        i.cashboxId != null &&
+        i.cashboxId!.isNotEmpty) {
+      final cb = AppDatabase.cashboxById(i.cashboxId);
+      if (cb != null) {
+        final wasIn = isSale ? true : false; // بيع=قبض، شراء=صرف
+        final effectiveIn = isReturn ? !wasIn : wasIn;
+        cb.currentBalance += effectiveIn ? -i.total : i.total;
+        await AppDatabase.saveCashbox(cb);
+      }
+    }
+
+    // 4) عكس تأثير الفاتورة على أرصدة السندات المخصّصة إن وُجدت
+    for (final alloc in AppDatabase.allocations
+        .where((a) => a.invoiceId == i.id)
+        .toList()) {
+      final inv = AppDatabase.invoices
+          .where((x) => x.id == alloc.invoiceId)
+          .firstOrNull;
+      if (inv != null) {
+        inv.paidAmount -= alloc.amount;
+        if (inv.paidAmount < 0) inv.paidAmount = 0;
+        inv.remaining = inv.total - inv.paidAmount;
+        if (inv.remaining > 0.001) inv.status = 'posted';
+        await AppDatabase.saveInvoice(inv);
+      }
+    }
+
+    // 5) حذف منطقي للفاتورة
+    i.isDeleted = true;
+    await AppDatabase.saveInvoice(i);
+    await logAction('delete', 'invoice',
+        entityId: i.id,
+        description: 'حذف/عكس فاتورة ${i.invoiceNumber} بمبلغ ${i.total}');
     reload();
   }
 
@@ -664,6 +828,30 @@ class ERPProvider extends ChangeNotifier {
     required List<Map<String, dynamic>> lines, // {itemId, qty}
     String notes = '',
   }) async {
+    if (fromWh == toWh) {
+      throw Exception('لا يمكن التحويل إلى نفس المخزن');
+    }
+    // تحقق مسبق من توفر الكميات في المخزن المصدر (لتفادي تحويل جزئي)
+    final wh = AppDatabase.warehouses.where((w) => w.id == fromWh).firstOrNull;
+    final allowNeg = allowNegativeStock || (wh != null && wh.allowNegative);
+    if (!allowNeg) {
+      for (final l in lines) {
+        final itemId = l['itemId'] as String;
+        final qty = (l['qty'] as num).toDouble();
+        if (qty <= 0) {
+          throw Exception('الكمية يجب أن تكون أكبر من صفر');
+        }
+        final avail = AppDatabase.balanceOf(itemId, fromWh).quantity;
+        if (qty > avail + 0.0001) {
+          final it = AppDatabase.itemById(itemId);
+          throw Exception(
+            'الرصيد غير كافٍ للصنف "${it?.name ?? ''}" في المخزن المصدر. '
+            'المتاح: ${Fmt.num(avail)}، المطلوب: ${Fmt.num(qty)}',
+          );
+        }
+      }
+    }
+
     double totalCost = 0;
     for (final l in lines) {
       final itemId = l['itemId'] as String;
@@ -751,6 +939,7 @@ class ERPProvider extends ChangeNotifier {
         date: date,
         diffValue: diffValue,
         notes: notes,
+        warehouseId: warehouseId,
       );
     }
     reload();
@@ -970,6 +1159,9 @@ class ERPProvider extends ChangeNotifier {
       await AppDatabase.saveCashbox(cb);
     }
     reload();
+    await logAction('create', 'payroll',
+        entityId: rec.id,
+        description: 'صرف راتب ${rec.employeeName} بمبلغ ${rec.netPay}');
     return rec;
   }
 
@@ -1019,53 +1211,74 @@ class ERPProvider extends ChangeNotifier {
   String get fiscalYearClosed =>
       AppDatabase.getSetting('fiscalYearClosed', '');
 
-  /// إقفال السنة المالية: ترحيل صافي الربح إلى الأرباح المحتجزة
+  /// إقفال السنة المالية: قيود إغلاق حقيقية تُصفّر حسابات الإيرادات والمصروفات
+  /// وترحّل صافي الربح/الخسارة إلى الأرباح المحتجزة.
   Future<JournalEntry?> closeFiscalYear(String year) async {
-    // حساب صافي الربح من الإيرادات والمصروفات
     final bals = accountBalances();
-    double revenue = 0, expense = 0;
-    for (final a in accounts) {
-      if (!a.isLeaf) continue;
+    final lines = <JournalLine>[];
+    double totalDebitAdded = 0, totalCreditAdded = 0;
+
+    // 1) إغلاق كل حساب إيراد/مصروف فرعي إلى الصفر
+    for (final a in accounts.where((a) => a.isLeaf)) {
+      if (a.accountType != 'revenue' && a.accountType != 'expense') continue;
       final b = bals[a.id];
       if (b == null) continue;
-      final bal = (b['debit'] ?? 0) - (b['credit'] ?? 0);
-      if (a.accountType == 'revenue') {
-        revenue += -bal; // الإيراد طبيعته دائن
-      } else if (a.accountType == 'expense') {
-        expense += bal; // المصروف طبيعته مدين
+      final d = b['debit'] ?? 0;
+      final c = b['credit'] ?? 0;
+      final net = d - c; // موجب = رصيد مدين، سالب = رصيد دائن
+      if (net.abs() < 0.001) continue;
+
+      if (net < 0) {
+        // رصيد دائن (إيراد) => نجعله مديناً للإغلاق
+        lines.add(JournalLine(
+          accountId: a.id,
+          accountName: a.name,
+          debit: -net,
+          description: 'إغلاق حساب $year',
+        ));
+        totalDebitAdded += -net;
+      } else {
+        // رصيد مدين (مصروف) => نجعله دائناً للإغلاق
+        lines.add(JournalLine(
+          accountId: a.id,
+          accountName: a.name,
+          credit: net,
+          description: 'إغلاق حساب $year',
+        ));
+        totalCreditAdded += net;
       }
     }
-    final netProfit = revenue - expense;
-    final date = '$year-12-31';
-    final retained = AppDatabase.accountByCode(CoA.retainedEarnings);
-    final netProfitAcc = AppDatabase.accountByCode(CoA.inventoryGain);
-    final lines = <JournalLine>[];
-    if (netProfit >= 0) {
-      lines.add(JournalLine(
-          accountId: netProfitAcc?.id ?? '',
-          accountName: netProfitAcc?.name ?? 'صافي الربح',
-          debit: netProfit,
-          description: 'صافي ربح السنة'));
-      lines.add(JournalLine(
-          accountId: retained?.id ?? '',
-          accountName: retained?.name ?? 'أرباح محتجزة',
-          credit: netProfit,
-          description: 'ترحيل للأرباح المحتجزة'));
-    } else {
-      lines.add(JournalLine(
-          accountId: retained?.id ?? '',
-          accountName: retained?.name ?? 'أرباح محتجزة',
-          debit: netProfit.abs(),
-          description: 'تغطية خسارة'));
-      lines.add(JournalLine(
-          accountId: netProfitAcc?.id ?? '',
-          accountName: netProfitAcc?.name ?? 'صافي الخسارة',
-          credit: netProfit.abs(),
-          description: 'صافي خسارة السنة'));
+
+    if (lines.isEmpty) {
+      // لا توجد أرصدة إيراد/مصروف لإغلاقها
+      return null;
     }
+
+    // 2) ترحيل الصافي إلى الأرباح المحتجزة لموازنة القيد
+    final retained = AppDatabase.accountByCode(CoA.retainedEarnings);
+    final diff = totalDebitAdded - totalCreditAdded; // موجب = ربح
+    if (diff.abs() > 0.001) {
+      if (diff > 0) {
+        lines.add(JournalLine(
+          accountId: retained?.id ?? '',
+          accountName: retained?.name ?? 'الأرباح المحتجزة',
+          credit: diff,
+          description: 'صافي ربح $year إلى الأرباح المحتجزة',
+        ));
+      } else {
+        lines.add(JournalLine(
+          accountId: retained?.id ?? '',
+          accountName: retained?.name ?? 'الأرباح المحتجزة',
+          debit: -diff,
+          description: 'صافي خسارة $year على الأرباح المحتجزة',
+        ));
+      }
+    }
+
+    final date = '$year-12-31';
     final closed = await JournalEngine.post(
       date: date,
-      description: 'ترحيل صافي الربح/الخسارة للسنة $year',
+      description: 'قيود إغلاق السنة المالية $year',
       sourceType: 'fiscal_close',
       lines: lines,
     );
@@ -1488,7 +1701,9 @@ class ERPProvider extends ChangeNotifier {
       cashboxId: cashboxId,
       lines: o.lines,
       discountAmount: o.discountAmount,
-      taxAmount: o.taxAmount,
+      // ملاحظة: سطور الأمر تحمل معدل الضريبة الخاص بها، لذا نمرّر صفراً هنا
+      // لتفادي احتساب الضريبة مرتين (كانت تُضاعف الإجمالي).
+      taxAmount: 0,
       shipping: o.shipping,
       notes: 'محوّل من ${o.typeLabel} ${o.docNumber}',
     );
