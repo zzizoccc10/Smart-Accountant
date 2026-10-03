@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- طريقة التوزيع: development / ad-hoc / app-store / enterprise -->
+    <key>method</key>
+    <string>development</string>
+
+    <!-- توقيع تلقائي (يستخدم فريق Apple المربوط في Xcode) -->
+    <key>signingStyle</key>
+    <string>automatic</string>
+
+    <!-- إزالة الشفرة خلال التصدير -->
+    <key>stripSwiftSymbols</key>
+    <true/>
+
+    <!-- تضمين رموز Swift للتنقيح -->
+    <key>compileBitcode</key>
+    <false/>
+
+    <!-- تحميل رموز التنقيح لتقليل الحجم -->
+    <key>uploadSymbols</key>
+    <false/>
+
+    <!-- تصدير للأجهزة الحقيقية فقط (لا المحاكي) -->
+    <key>destination</key>
+    <string>export</string>
+</dict>
+</plist>
