@@ -2,6 +2,7 @@
 // وحدة الموارد البشرية — الموظفون، الحضور، الرواتب
 // ============================================================================
 import 'package:flutter/material.dart';
+import '../../services/quick_export.dart';
 import 'package:provider/provider.dart';
 import '../../providers/erp_provider.dart';
 import '../../theme/app_theme.dart';
@@ -32,7 +33,16 @@ class _HrHomeState extends State<HrHome> {
         .toList();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('الموارد البشرية')),
+      appBar: AppBar(
+        title: const Text('الموارد البشرية'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.ios_share),
+            tooltip: 'تصدير الموظفين Excel',
+            onPressed: () => exportEntityExcel(context, 'employees'),
+          ),
+        ],
+      ),
       body: Column(
         children: [
           // إجراءات

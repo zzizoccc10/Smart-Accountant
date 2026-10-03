@@ -11,6 +11,8 @@ import 'stock_count_screen.dart';
 import 'stock_transfer_screen.dart';
 import 'movements_screen.dart';
 import 'barcode_screen.dart';
+import '../../services/quick_export.dart';
+import '../settings/import_screen.dart';
 
 class InventoryHome extends StatefulWidget {
   const InventoryHome({super.key});
@@ -118,12 +120,52 @@ class _InventoryHomeState extends State<InventoryHome> {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: TextField(
-              decoration: const InputDecoration(
-                hintText: 'بحث بالاسم أو الباركود...',
-                prefixIcon: Icon(Icons.search),
-              ),
-              onChanged: (v) => setState(() => _search = v),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    decoration: const InputDecoration(
+                      hintText: 'بحث بالاسم أو الباركود...',
+                      prefixIcon: Icon(Icons.search),
+                    ),
+                    onChanged: (v) => setState(() => _search = v),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                PopupMenuButton<String>(
+                  icon: const Icon(Icons.ios_share, color: AppColors.primary),
+                  tooltip: 'استيراد / تصدير',
+                  onSelected: (v) {
+                    if (v == 'excel') {
+                      exportEntityExcel(context, 'items');
+                    } else if (v == 'center') {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => const ImportScreen()),
+                      );
+                    }
+                  },
+                  itemBuilder: (_) => const [
+                    PopupMenuItem(
+                      value: 'excel',
+                      child: ListTile(
+                        dense: true,
+                        leading: Icon(Icons.table_view, color: AppColors.success),
+                        title: Text('تصدير الأصناف Excel'),
+                      ),
+                    ),
+                    PopupMenuItem(
+                      value: 'center',
+                      child: ListTile(
+                        dense: true,
+                        leading: Icon(Icons.upload_file, color: AppColors.teal),
+                        title: Text('مركز الاستيراد/التصدير'),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
           const SizedBox(height: 8),

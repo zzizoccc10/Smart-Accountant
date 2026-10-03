@@ -8,6 +8,8 @@ import '../../models/models.dart';
 import '../../data/app_database.dart';
 import '../../theme/app_theme.dart';
 import '../widgets/common.dart';
+import '../../services/quick_export.dart';
+import 'import_screen.dart';
 
 class BasicTablesScreen extends StatelessWidget {
   const BasicTablesScreen({super.key});
@@ -19,6 +21,54 @@ class BasicTablesScreen extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('الجداول الأساسية'),
+          actions: [
+            PopupMenuButton<String>(
+              icon: const Icon(Icons.ios_share),
+              tooltip: 'تصدير / استيراد',
+              onSelected: (v) {
+                switch (v) {
+                  case 'branches':
+                    exportEntityExcel(context, 'branches');
+                    break;
+                  case 'units':
+                    exportEntityExcel(context, 'units');
+                    break;
+                  case 'center':
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const ImportScreen()),
+                    );
+                    break;
+                }
+              },
+              itemBuilder: (_) => const [
+                PopupMenuItem(
+                  value: 'branches',
+                  child: ListTile(
+                    dense: true,
+                    leading: Icon(Icons.storefront, color: AppColors.success),
+                    title: Text('تصدير الفروع Excel'),
+                  ),
+                ),
+                PopupMenuItem(
+                  value: 'units',
+                  child: ListTile(
+                    dense: true,
+                    leading: Icon(Icons.straighten, color: AppColors.success),
+                    title: Text('تصدير الوحدات Excel'),
+                  ),
+                ),
+                PopupMenuItem(
+                  value: 'center',
+                  child: ListTile(
+                    dense: true,
+                    leading: Icon(Icons.upload_file, color: AppColors.teal),
+                    title: Text('مركز الاستيراد/التصدير'),
+                  ),
+                ),
+              ],
+            ),
+          ],
           bottom: const TabBar(
             isScrollable: true,
             tabs: [

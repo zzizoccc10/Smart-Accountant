@@ -2,6 +2,7 @@
 // شاشة الصناديق
 // ============================================================================
 import 'package:flutter/material.dart';
+import '../../services/quick_export.dart';
 import 'package:provider/provider.dart';
 import '../../providers/erp_provider.dart';
 import '../../theme/app_theme.dart';
@@ -15,7 +16,16 @@ class CashboxesScreen extends StatelessWidget {
     final curr = prov.currency;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('الصناديق')),
+      appBar: AppBar(
+        title: const Text('الصناديق'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.ios_share),
+            tooltip: 'تصدير الصناديق Excel',
+            onPressed: () => exportEntityExcel(context, 'cashboxes'),
+          ),
+        ],
+      ),
       body: ListView(
         padding: const EdgeInsets.all(12),
         children: [

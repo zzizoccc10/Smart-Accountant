@@ -7,6 +7,7 @@ import '../../providers/erp_provider.dart';
 import '../../models/models.dart';
 import '../../theme/app_theme.dart';
 import 'account_form.dart';
+import '../../services/quick_export.dart';
 
 class CoaScreen extends StatefulWidget {
   const CoaScreen({super.key});
@@ -54,6 +55,11 @@ class _CoaScreenState extends State<CoaScreen> {
                 );
               }
             },
+          ),
+          IconButton(
+            icon: const Icon(Icons.ios_share),
+            tooltip: 'تصدير دليل الحسابات Excel',
+            onPressed: () => exportEntityExcel(context, 'accounts'),
           ),
           IconButton(
             icon: const Icon(Icons.add),
