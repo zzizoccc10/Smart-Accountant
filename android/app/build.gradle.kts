@@ -9,6 +9,13 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+// ✅ تطبيق إضافة Firebase فقط إن وُجد ملف google-services.json
+//    (لتفادي فشل البناء قبل رفع الإعدادات)
+val googleServicesFile = file("google-services.json")
+if (googleServicesFile.exists()) {
+    apply(plugin = "com.google.gms.google-services")
+}
+
 // ✅ تحميل إعدادات التوقيع من key.properties
 val keystoreProperties = Properties()
 val keystorePropertiesFile = rootProject.file("key.properties")

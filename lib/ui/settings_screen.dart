@@ -20,7 +20,13 @@ import 'settings/notifications_screen.dart';
 import 'contacts/contacts_import_screen.dart';
 import 'settings/backup_location_screen.dart';
 import 'settings/restore_screen.dart';
+import 'settings/users_screen.dart';
+import 'settings/sync_screen.dart';
 import '../services/backup_service.dart';
+import '../services/firebase_config.dart';
+import '../services/user_service.dart';
+import '../models/user_models.dart';
+import '../providers/session_provider.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -40,6 +46,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
   String? _logoBase64;
   late String _currency;
   bool _allowNegative = false;
+
+  /// اسم المستخدم الحالي (للعرض في بطاقة المستخدمين)
+  String _currentUserName() {
+    try {
+      final u = context.read<SessionProvider>().currentUser;
+      if (u == null) return 'غير مسجّل';
+      return '${u.name} (${u.role.labelAr})';
+    } catch (_) {
+      return 'غير مسجّل';
+    }
+  }
 
   @override
   void initState() {
@@ -428,6 +445,50 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     context,
                     MaterialPageRoute(
                         builder: (_) => const ImportScreen()),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          const SectionTitle('المستخدمون والسحابة', icon: Icons.cloud_sync),
+          Card(
+            child: Column(
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.people_alt,
+                      color: AppColors.primary),
+                  title: const Text('المستخدمون والصلاحيات'),
+                  subtitle: Text(
+                      '${UserService.all().length} مستخدم • ${_currentUserName()}'),
+                  trailing: const Icon(Icons.chevron_left),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => const UsersScreen()),
+                  ),
+                ),
+                const Divider(height: 1),
+                ListTile(
+                  leading: Icon(
+                    FirebaseConfig.isConfigured
+                        ? Icons.cloud_done
+                        : Icons.cloud_off,
+                    color: FirebaseConfig.isConfigured
+                        ? AppColors.success
+                        : Colors.orange,
+                  ),
+                  title: const Text('المزامنة السحابية'),
+                  subtitle: Text(
+                    FirebaseConfig.isConfigured
+                        ? 'متصل بمشروع Firebase'
+                        : 'غير مُفعّلة — ارفع google-services.json',
+                  ),
+                  trailing: const Icon(Icons.chevron_left),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => const SyncScreen()),
                   ),
                 ),
               ],

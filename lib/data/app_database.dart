@@ -103,6 +103,10 @@ class AppDatabase {
     _bOrders = await Hive.openBox(boxOrders);
     _bNotifications = await Hive.openBox(boxNotifications);
 
+    // صناديق المستخدمين والصلاحيات وسجل النشاط (Firebase)
+    await Hive.openBox('users');
+    await Hive.openBox('user_activity');
+
     if (_bSettings.get('seeded') != true) {
       await _seed();
     } else {
