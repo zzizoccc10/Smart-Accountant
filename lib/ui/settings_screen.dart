@@ -16,6 +16,7 @@ import 'settings/import_screen.dart';
 import 'settings/basic_tables_screen.dart';
 import 'settings/audit_log_screen.dart';
 import 'settings/permissions_screen.dart';
+import 'settings/notifications_screen.dart';
 import 'contacts/contacts_import_screen.dart';
 import '../services/backup_service.dart';
 
@@ -357,6 +358,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     context,
                     MaterialPageRoute(
                         builder: (_) => const FiscalCloseScreen()),
+                  ),
+                ),
+                const Divider(height: 1),
+                ListTile(
+                  leading: const Icon(Icons.notifications_active,
+                      color: AppColors.danger),
+                  title: const Text('مركز الإشعارات'),
+                  subtitle: Text(
+                      '${prov.unreadNotifications} إشعار غير مقروء • ${prov.notifications.length} إجمالي'),
+                  trailing: const Icon(Icons.chevron_left),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => const NotificationsScreen()),
                   ),
                 ),
                 const Divider(height: 1),

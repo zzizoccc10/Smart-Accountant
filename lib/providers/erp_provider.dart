@@ -9,6 +9,8 @@ import '../data/app_database.dart';
 import '../data/chart_of_accounts.dart';
 import '../models/models.dart';
 import '../services/journal_engine.dart';
+import '../services/local_notifications.dart';
+import '../theme/app_theme.dart';
 
 class ERPProvider extends ChangeNotifier {
   // ---------------------------- البيانات ----------------------------
@@ -35,6 +37,7 @@ class ERPProvider extends ChangeNotifier {
   List<ExchangeRate> exchangeRates = [];
   List<AuditLog> auditLogs = [];
   List<OrderDoc> orders = [];
+  List<AppNotification> notifications = [];
 
   bool initialized = false;
 
@@ -67,6 +70,7 @@ class ERPProvider extends ChangeNotifier {
     exchangeRates = AppDatabase.exchangeRates;
     auditLogs = AppDatabase.auditLogs;
     orders = AppDatabase.orders;
+    notifications = AppDatabase.notifications;
     fixedAssets = AppDatabase.fixedAssets;
     initialized = true;
     notifyListeners();
@@ -997,6 +1001,100 @@ class ERPProvider extends ChangeNotifier {
       if (inv.dueDate.isEmpty) return false;
       return inv.dueDate.compareTo(today) < 0;
     }).toList();
+  }
+
+  // ==================== إدارة الإشعارات ====================
+  int get unreadNotifications => notifications.where((n) => !n.isRead).length;
+
+  Future<void> markNotificationRead(String id) async {
+    await AppDatabase.markNotificationRead(id);
+    reload();
+  }
+
+  Future<void> markAllNotificationsRead() async {
+    await AppDatabase.markAllNotificationsRead();
+    reload();
+  }
+
+  Future<void> clearNotifications() async {
+    await AppDatabase.clearNotifications();
+    reload();
+  }
+
+  /// فحص دوري (يُستدعى بعد العمليات المهمة) لتوليد إشعارات جديدة:
+  /// نقص المخزون + الفواتير المستحقة + تجاوز حد الائتمان
+  Future<int> generateAlerts({bool push = true}) async {
+    final existing = notifications;
+    final existingKeys = existing
+        .map((n) => '${n.type}:${n.referenceId ?? ''}')
+        .toSet();
+    var created = 0;
+
+    // 1) نقص المخزون
+    for (final it in lowStockItems) {
+      final key = 'low_stock:${it.id}';
+      if (existingKeys.contains(key)) continue;
+      final qty = stockQty(it.id);
+      final n = AppNotification(
+        id: AppDatabase.newId(),
+        type: 'low_stock',
+        title: 'نقص في المخزون',
+        body:
+            'الصنف "${it.name}" وصل للحد الأدنى (المتاح: ${Fmt.num(qty)}، حد الطلب: ${Fmt.num(it.reorderLevel)})',
+        referenceType: 'item',
+        referenceId: it.id,
+      );
+      await AppDatabase.saveNotification(n);
+      if (push) await LocalNotifications.lowStock(it.name, qty, it.reorderLevel);
+      created++;
+    }
+
+    // 2) الفواتير المستحقة (تاريخ الاستحقاق قريب أو فائت)
+    for (final inv in overdueInvoices) {
+      final key = 'invoice_due:${inv.id}';
+      if (existingKeys.contains(key)) continue;
+      final n = AppNotification(
+        id: AppDatabase.newId(),
+        type: 'invoice_due',
+        title: 'فاتورة مستحقة السداد',
+        body:
+            'الفاتورة ${inv.invoiceNumber} للجهة "${inv.contactName}" — المتبقي: ${Fmt.money(inv.remaining, currency)}',
+        referenceType: 'invoice',
+        referenceId: inv.id,
+      );
+      await AppDatabase.saveNotification(n);
+      if (push) {
+        await LocalNotifications.invoiceDue(
+            inv.invoiceNumber, inv.contactName, inv.remaining, currency);
+      }
+      created++;
+    }
+
+    // 3) تجاوز حد الائتمان للعملاء
+    for (final c in contacts) {
+      if (c.creditLimit <= 0) continue;
+      final bal = contactBalance(c.id);
+      if (bal <= c.creditLimit) continue;
+      final key = 'credit_limit:${c.id}';
+      if (existingKeys.contains(key)) continue;
+      final n = AppNotification(
+        id: AppDatabase.newId(),
+        type: 'credit_limit',
+        title: 'تجاوز حد الائتمان',
+        body:
+            'الجهة "${c.name}" تجاوزت حد الائتمان (الرصيد: ${Fmt.money(bal, currency)}، الحد: ${Fmt.money(c.creditLimit, currency)})',
+        referenceType: 'contact',
+        referenceId: c.id,
+      );
+      await AppDatabase.saveNotification(n);
+      if (push) {
+        await LocalNotifications.creditLimitExceeded(c.name, bal, c.creditLimit);
+      }
+      created++;
+    }
+
+    if (created > 0) reload();
+    return created;
   }
 
   // ============================ الأصول الثابتة ============================

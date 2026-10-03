@@ -1594,3 +1594,66 @@ class OrderDoc {
     createdAt: m['createdAt'] as String?,
   );
 }
+
+/// الإشعار — notifications
+/// يخزّن تنبيهات النظام (نقص مخزون، فواتير مستحقة، مديونية، نسخ احتياطي)
+class AppNotification {
+  final String id;
+  String type; // low_stock / invoice_due / credit_limit / backup / payment_due
+  String title;
+  String body;
+  String? referenceType; // item / invoice / contact
+  String? referenceId;
+  bool isRead;
+  String createdAt;
+
+  AppNotification({
+    required this.id,
+    required this.type,
+    required this.title,
+    required this.body,
+    this.referenceType,
+    this.referenceId,
+    this.isRead = false,
+    String? createdAt,
+  }) : createdAt = createdAt ?? DateTime.now().toIso8601String();
+
+  String get typeLabel {
+    switch (type) {
+      case 'low_stock':
+        return 'نقص مخزون';
+      case 'invoice_due':
+        return 'فاتورة مستحقة';
+      case 'credit_limit':
+        return 'تجاوز حد ائتمان';
+      case 'backup':
+        return 'نسخة احتياطية';
+      case 'payment_due':
+        return 'دفعة مستحقة';
+      default:
+        return 'تنبيه';
+    }
+  }
+
+  Map<String, dynamic> toMap() => {
+    'id': id,
+    'type': type,
+    'title': title,
+    'body': body,
+    'referenceType': referenceType,
+    'referenceId': referenceId,
+    'isRead': isRead,
+    'createdAt': createdAt,
+  };
+
+  factory AppNotification.fromMap(Map<String, dynamic> m) => AppNotification(
+    id: m['id'] as String,
+    type: m['type'] as String? ?? 'low_stock',
+    title: m['title'] as String? ?? '',
+    body: m['body'] as String? ?? '',
+    referenceType: m['referenceType'] as String?,
+    referenceId: m['referenceId'] as String?,
+    isRead: m['isRead'] as bool? ?? false,
+    createdAt: m['createdAt'] as String?,
+  );
+}

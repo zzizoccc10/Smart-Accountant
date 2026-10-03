@@ -37,6 +37,7 @@ class AppDatabase {
   static const boxExchangeRates = 'exchange_rates';
   static const boxAuditLog = 'audit_log';
   static const boxOrders = 'orders';
+  static const boxNotifications = 'notifications';
 
   static late Box _bAccounts;
   static late Box _bContacts;
@@ -65,6 +66,7 @@ class AppDatabase {
   static late Box _bExchangeRates;
   static late Box _bAuditLog;
   static late Box _bOrders;
+  static late Box _bNotifications;
 
   static String newId() => _uuid.v4();
 
@@ -99,6 +101,7 @@ class AppDatabase {
     _bExchangeRates = await Hive.openBox(boxExchangeRates);
     _bAuditLog = await Hive.openBox(boxAuditLog);
     _bOrders = await Hive.openBox(boxOrders);
+    _bNotifications = await Hive.openBox(boxNotifications);
 
     if (_bSettings.get('seeded') != true) {
       await _seed();
@@ -452,6 +455,50 @@ class AppDatabase {
 
   static Future<void> clearAuditLog() => _bAuditLog.clear();
 
+  // ---------------------------- الإشعارات ----------------------------
+  static const int _maxNotifications = 500;
+
+  static List<AppNotification> get notifications {
+    final list = _bNotifications.values
+        .map((e) => AppNotification.fromMap(Map<String, dynamic>.from(e)))
+        .toList();
+    list.sort((a, b) => b.createdAt.compareTo(a.createdAt)); // الأحدث أولاً
+    return list;
+  }
+
+  static int get unreadNotificationsCount => notifications
+      .where((n) => !n.isRead)
+      .length;
+
+  static Future<void> saveNotification(AppNotification n) async {
+    await _bNotifications.put(n.id, n.toMap());
+    if (_bNotifications.length > _maxNotifications) {
+      final all = notifications;
+      for (final old in all.sublist(_maxNotifications)) {
+        await _bNotifications.delete(old.id);
+      }
+    }
+  }
+
+  static Future<void> markNotificationRead(String id) async {
+    final v = _bNotifications.get(id);
+    if (v == null) return;
+    final n = AppNotification.fromMap(Map<String, dynamic>.from(v));
+    n.isRead = true;
+    await _bNotifications.put(id, n.toMap());
+  }
+
+  static Future<void> markAllNotificationsRead() async {
+    for (final n in notifications) {
+      if (!n.isRead) {
+        n.isRead = true;
+        await _bNotifications.put(n.id, n.toMap());
+      }
+    }
+  }
+
+  static Future<void> clearNotifications() => _bNotifications.clear();
+
   // ---------------------------- الإعدادات ----------------------------
   static String getSetting(String key, [String def = '']) =>
       _bSettings.get(key, defaultValue: def).toString();
@@ -502,6 +549,7 @@ class AppDatabase {
     boxExchangeRates: _bExchangeRates,
     boxAuditLog: _bAuditLog,
     boxOrders: _bOrders,
+    boxNotifications: _bNotifications,
   };
 
   /// تصدير كل البيانات كخريطة JSON قابلة للتحويل إلى نص
@@ -569,6 +617,7 @@ class AppDatabase {
       _bExchangeRates,
       _bAuditLog,
       _bOrders,
+      _bNotifications,
     ]) {
       await b.clear();
     }

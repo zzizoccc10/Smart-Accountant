@@ -23,3 +23,6 @@ ios/.symlinks/
 
 # APK build outputs
 build/
+
+# Logs
+*.log

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'data/app_database.dart';
 import 'providers/erp_provider.dart';
+import 'services/local_notifications.dart';
 import 'theme/app_theme.dart';
 import 'ui/splash_screen.dart';
 import 'ui/lock_screen.dart';
@@ -12,6 +13,8 @@ import 'ui/lock_screen.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await AppDatabase.init();
+  // تهيئة قناة الإشعارات المحلية (تُتجاهل على الويب)
+  await LocalNotifications.init();
 
   runApp(
     ChangeNotifierProvider(

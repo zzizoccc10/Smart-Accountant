@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import '../../providers/erp_provider.dart';
 import '../../models/models.dart';
 import '../../theme/app_theme.dart';
+import '../inventory/barcode_scanner_screen.dart';
 
 class ItemPickerSheet extends StatefulWidget {
   final bool isSale;
@@ -68,6 +69,40 @@ class _ItemPickerSheetState extends State<ItemPickerSheet> {
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const Spacer(),
+              IconButton(
+                tooltip: 'مسح الباركود',
+                icon: const Icon(Icons.qr_code_scanner,
+                    color: AppColors.primary),
+                onPressed: () async {
+                  final code = await Navigator.push<String>(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => const BarcodeScannerScreen()),
+                  );
+                  if (code == null || code.isEmpty) return;
+                  final match = prov.items
+                      .where((i) =>
+                          i.barcode.trim() == code || i.code.trim() == code)
+                      .firstOrNull;
+                  if (match == null) {
+                    if (!context.mounted) return;
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('لا يوجد صنف بالباركود: $code'),
+                        backgroundColor: AppColors.danger,
+                      ),
+                    );
+                    return;
+                  }
+                  setState(() {
+                    _item = match;
+                    _price.text = (widget.isSale
+                            ? match.salePrice
+                            : match.purchasePrice)
+                        .toString();
+                  });
+                },
+              ),
               IconButton(
                 icon: const Icon(Icons.close),
                 onPressed: () => Navigator.pop(context),

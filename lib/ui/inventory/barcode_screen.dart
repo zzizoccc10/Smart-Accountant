@@ -7,6 +7,7 @@ import 'package:barcode_widget/barcode_widget.dart';
 import '../../providers/erp_provider.dart';
 import '../../models/models.dart';
 import '../../theme/app_theme.dart';
+import 'barcode_scanner_screen.dart';
 
 class BarcodeScreen extends StatefulWidget {
   final String? itemId;
@@ -35,13 +36,45 @@ class _BarcodeScreenState extends State<BarcodeScreen> {
     return i.code.isNotEmpty ? i.code : i.id.substring(0, 8).toUpperCase();
   }
 
+  Future<void> _scanToSelect(ERPProvider prov) async {
+    final code = await Navigator.push<String>(
+      context,
+      MaterialPageRoute(builder: (_) => const BarcodeScannerScreen()),
+    );
+    if (code == null || code.isEmpty) return;
+    final match = prov.items.where((i) =>
+        i.barcode.trim() == code ||
+        i.code.trim() == code ||
+        i.id == code).firstOrNull;
+    if (match == null) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('لا يوجد صنف بالباركود: $code'),
+          backgroundColor: AppColors.danger,
+        ),
+      );
+      return;
+    }
+    setState(() => _selected = match);
+  }
+
   @override
   Widget build(BuildContext context) {
     final prov = context.watch<ERPProvider>();
     final items = prov.items;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('ملصق الباركود')),
+      appBar: AppBar(
+        title: const Text('ملصق الباركود'),
+        actions: [
+          IconButton(
+            tooltip: 'مسح باركود صنف',
+            icon: const Icon(Icons.qr_code_scanner),
+            onPressed: () => _scanToSelect(prov),
+          ),
+        ],
+      ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [

@@ -15,6 +15,7 @@ import 'accounts/accounts_home.dart';
 import 'hr/hr_home.dart';
 import 'assets/assets_home.dart';
 import 'alerts_screen.dart';
+import 'settings/notifications_screen.dart';
 import 'settings_screen.dart';
 
 class HomeShell extends StatefulWidget {
@@ -34,6 +35,15 @@ class _HomeShellState extends State<HomeShell> {
     AccountsHome(),
     ReportsHome(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    // توليد التنبيهات (نقص مخزون/فواتير مستحقة/حد ائتمان) ودفع إشعارات النظام
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<ERPProvider>().generateAlerts();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -139,17 +149,13 @@ class _HomeShellState extends State<HomeShell> {
     return [
             Builder(
               builder: (ctx) {
-                final count = prov.lowStockItems.length +
-                    prov.overdueInvoices.length;
+                final count = prov.unreadNotifications;
                 return Stack(
                   children: [
                     IconButton(
-                      tooltip: 'التنبيهات',
+                      tooltip: 'الإشعارات',
                       icon: const Icon(Icons.notifications_none),
-                      onPressed: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => const AlertsScreen()),
-                      ),
+                      onPressed: () => _showNotificationsMenu(context, prov),
                     ),
                     if (count > 0)
                       Positioned(
@@ -164,7 +170,7 @@ class _HomeShellState extends State<HomeShell> {
                           constraints: const BoxConstraints(
                               minWidth: 16, minHeight: 16),
                           child: Text(
-                            '$count',
+                            count > 99 ? '99+' : '$count',
                             textAlign: TextAlign.center,
                             style: const TextStyle(
                               color: Colors.white,
@@ -187,6 +193,72 @@ class _HomeShellState extends State<HomeShell> {
               ),
             ),
     ];
+  }
+
+  /// قائمة الإشعارات: التنبيهات السريعة + مركز الإشعارات
+  void _showNotificationsMenu(BuildContext context, ERPProvider prov) {
+    final unread = prov.unreadNotifications;
+    final alerts = prov.lowStockItems.length + prov.overdueInvoices.length;
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 8),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+            const SizedBox(height: 8),
+            ListTile(
+              leading: const CircleAvatar(
+                backgroundColor: Color(0x1AC62828),
+                child: Icon(Icons.notifications, color: AppColors.danger, size: 20),
+              ),
+              title: const Text('مركز الإشعارات'),
+              subtitle: Text('$unread إشعار غير مقروء',
+                  style: const TextStyle(fontSize: 12)),
+              trailing: const Icon(Icons.chevron_left),
+              onTap: () {
+                Navigator.pop(ctx);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) => const NotificationsScreen()),
+                );
+              },
+            ),
+            ListTile(
+              leading: const CircleAvatar(
+                backgroundColor: Color(0x1AF57C00),
+                child: Icon(Icons.warning_amber_rounded,
+                    color: AppColors.warning, size: 20),
+              ),
+              title: const Text('التنبيهات السريعة'),
+              subtitle: Text('$alerts تنبيه حالي',
+                  style: const TextStyle(fontSize: 12)),
+              trailing: const Icon(Icons.chevron_left),
+              onTap: () {
+                Navigator.pop(ctx);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const AlertsScreen()),
+                );
+              },
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _buildDrawer(BuildContext context) {
