@@ -2,6 +2,7 @@
 // المحاسب السهل — نقطة البداية
 // ============================================================================
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'data/app_database.dart';
 import 'providers/erp_provider.dart';
@@ -35,7 +36,18 @@ class EasyAccountantApp extends StatelessWidget {
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),
       themeMode: ThemeMode.system,
+      // دعم اللغة العربية (أندرويد + iOS)
       locale: const Locale('ar', 'EG'),
+      supportedLocales: const [
+        Locale('ar', 'EG'),
+        Locale('ar'),
+        Locale('en', 'US'),
+      ],
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
       builder: (context, child) {
         return Directionality(
           textDirection: TextDirection.rtl,

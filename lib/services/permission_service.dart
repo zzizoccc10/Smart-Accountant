@@ -1,19 +1,34 @@
 // ============================================================================
-// خدمة الصلاحيات — طلب وإدارة أذونات أندرويد وقت التشغيل
-// جهات الاتصال / التخزين / الهاتف وواتساب / رسائل SMS / الكاميرا
+// خدمة الصلاحيات — طلب وإدارة أذونات وقت التشغيل (أندرويد + iOS)
+// جهات الاتصال / التخزين أو الصور / الهاتف وواتساب / SMS / الكاميرا
 // ============================================================================
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart'
+    show kIsWeb, defaultTargetPlatform, TargetPlatform;
 import 'package:permission_handler/permission_handler.dart';
 
 class PermissionService {
-  /// الصلاحيات التي يحتاجها التطبيق بشكل أساسي
-  static const List<Permission> corePermissions = [
-    Permission.contacts, // جهات الاتصال
-    Permission.storage, // التخزين الداخلي
-    Permission.phone, // الهاتف (للاتصال)
-    Permission.sms, // رسائل SMS
-    Permission.camera, // الكاميرا
-  ];
+  static bool get _isIOS =>
+      !kIsWeb && defaultTargetPlatform == TargetPlatform.iOS;
+
+  /// الصلاحيات التي يحتاجها التطبيق بشكل أساسي (تختلف حسب المنصة)
+  static List<Permission> get corePermissions {
+    if (_isIOS) {
+      // iOS لا يدعم SMS/التخزين المباشر؛ نستخدم الصور بدلاً من التخزين
+      return [
+        Permission.contacts, // جهات الاتصال
+        Permission.photos, // مكتبة الصور (للتصدير/الشعار)
+        Permission.phone, // الهاتف (للاتصال/واتساب)
+        Permission.camera, // الكاميرا (مسح الباركود)
+      ];
+    }
+    return [
+      Permission.contacts, // جهات الاتصال
+      Permission.storage, // التخزين الداخلي
+      Permission.phone, // الهاتف (للاتصال)
+      Permission.sms, // رسائل SMS
+      Permission.camera, // الكاميرا
+    ];
+  }
 
   /// طلب كل الصلاحيات الأساسية دفعة واحدة
   /// ترجع خريطة: الصلاحية -> هل مُنحت
@@ -74,6 +89,7 @@ class PermissionService {
   static String label(Permission p) {
     if (p == Permission.contacts) return 'جهات الاتصال';
     if (p == Permission.storage) return 'وحدة التخزين';
+    if (p == Permission.photos) return 'مكتبة الصور';
     if (p == Permission.phone) return 'الهاتف / واتساب';
     if (p == Permission.sms) return 'رسائل SMS';
     if (p == Permission.camera) return 'الكاميرا';
@@ -87,6 +103,9 @@ class PermissionService {
     }
     if (p == Permission.storage) {
       return 'لحفظ الفواتير والتقارير والنسخ الاحتياطية';
+    }
+    if (p == Permission.photos) {
+      return 'لحفظ ومشاركة التقارير والملصقات من مكتبة الصور';
     }
     if (p == Permission.phone) {
       return 'للاتصال بالعميل أو فتح واتساب لإرسال الفاتورة';

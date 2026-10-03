@@ -20,7 +20,16 @@ class LocalNotifications {
     try {
       const androidInit =
           AndroidInitializationSettings('@mipmap/ic_launcher');
-      const initSettings = InitializationSettings(android: androidInit);
+      const darwinInit = DarwinInitializationSettings(
+        requestAlertPermission: false,
+        requestBadgePermission: false,
+        requestSoundPermission: false,
+      );
+      const initSettings = InitializationSettings(
+        android: androidInit,
+        iOS: darwinInit,
+        macOS: darwinInit,
+      );
 
       await _plugin.initialize(
         settings: initSettings,
@@ -55,6 +64,13 @@ class LocalNotifications {
           _plugin.resolvePlatformSpecificImplementation<
               AndroidFlutterLocalNotificationsPlugin>();
       await androidImpl?.requestNotificationsPermission();
+      final iosImpl = _plugin.resolvePlatformSpecificImplementation<
+          IOSFlutterLocalNotificationsPlugin>();
+      await iosImpl?.requestPermissions(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
     } catch (_) {}
   }
 
@@ -66,6 +82,16 @@ class LocalNotifications {
       importance: Importance.high,
       priority: Priority.high,
       icon: '@mipmap/ic_launcher',
+    ),
+    iOS: DarwinNotificationDetails(
+      presentAlert: true,
+      presentBadge: true,
+      presentSound: true,
+    ),
+    macOS: DarwinNotificationDetails(
+      presentAlert: true,
+      presentBadge: true,
+      presentSound: true,
     ),
   );
 
