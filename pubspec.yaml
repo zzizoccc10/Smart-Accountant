@@ -60,6 +60,18 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: ^5.0.0
 
+# ============================================================================
+# تجاوزات التبعيات (Dependency Overrides)
+# ----------------------------------------------------------------------------
+# permission_handler 11.4.0 يعتمد على permission_handler_apple ^9.4.6
+# لكن الإصدار 9.4.6+ يستخدم الرمز CNAuthorizationStatusLimited الجديد في
+# iOS 18 SDK، مما يفشل البناء على Xcode الأقدم (iOS 17 SDK) برسالة:
+#   "Use of undeclared identifier 'CNAuthorizationStatusLimited'"
+# لذلك نُثبّت 9.4.5 (آخر نسخة متوافقة مع Xcode القديم — لا تستخدم هذا الرمز).
+# ============================================================================
+dependency_overrides:
+  permission_handler_apple: 9.4.5
+
 flutter:
   uses-material-design: true
   assets:

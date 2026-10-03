@@ -60,4 +60,32 @@ post_install do |installer|
       ]
     end
   end
+
+  # --------------------------------------------------------------------------
+  # طبقة حماية: رقعة تلقائية لمكتبة permission_handler_apple
+  # --------------------------------------------------------------------------
+  # الرمز CNAuthorizationStatusLimited أُضيف في iOS 18 SDK. إذا كان Xcode
+  # أقدم (iOS 17 SDK أو أقل) يفشل البناء برسالة:
+  #   "Use of undeclared identifier 'CNAuthorizationStatusLimited'"
+  # نُطبّق رقعة نصّية تُزيل الحالة غير المدعومة، لضمان نجاح البناء على أي Xcode.
+  # --------------------------------------------------------------------------
+  pod_root = File.join(installer.sandbox.root, 'permission_handler_apple')
+  if File.exist?(pod_root)
+    Dir.glob(File.join(pod_root, '**', '*.{m,h}')).each do |file|
+      content = File.read(file)
+      next unless content.include?('CNAuthorizationStatusLimited')
+
+      patched = content.gsub(
+        /^\s*case\s+CNAuthorizationStatusLimited:.*?$\n?/m,
+        ''
+      ).gsub(
+        /^\s*case\s+CNAuthorizationStatusLimited\s*:/,
+        'case CNAuthorizationStatusDenied:'
+      )
+      if patched != content
+        File.write(file, patched)
+        puts "[Podfile patch] تم إصلاح توافق iOS 18 في: #{File.basename(file)}"
+      end
+    end
+  end
 end
