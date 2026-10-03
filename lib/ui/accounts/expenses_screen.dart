@@ -7,6 +7,7 @@ import '../../providers/erp_provider.dart';
 import '../../models/models.dart';
 import '../../theme/app_theme.dart';
 import '../widgets/common.dart';
+import '../widgets/dropdown_safe.dart';
 import '../widgets/export_button.dart';
 
 class ExpensesScreen extends StatelessWidget {
@@ -172,7 +173,8 @@ class _ExpenseFormState extends State<_ExpenseForm> {
               child: Column(
                 children: [
                   DropdownButtonFormField<ExpenseCategory>(
-                    initialValue: _category,
+                    initialValue: safeValue(
+                        _category, prov.expenseCategories),
                     isExpanded: true,
                     decoration: const InputDecoration(
                       labelText: 'التصنيف',
@@ -188,7 +190,8 @@ class _ExpenseFormState extends State<_ExpenseForm> {
                   ),
                   const SizedBox(height: 12),
                   DropdownButtonFormField<String>(
-                    initialValue: _cashboxId,
+                    initialValue: safeValue(
+                        _cashboxId, prov.cashboxes.map((c) => c.id)),
                     isExpanded: true,
                     decoration: const InputDecoration(
                       labelText: 'الصندوق الدافع',

@@ -122,7 +122,9 @@ class _CashboxStatementScreenState extends State<CashboxStatementScreen> {
           Padding(
             padding: const EdgeInsets.all(12),
             child: DropdownButtonFormField<String>(
-              initialValue: _cashboxId,
+              initialValue: prov.cashboxes.any((c) => c.id == _cashboxId)
+                  ? _cashboxId
+                  : null,
               isExpanded: true,
               decoration: const InputDecoration(
                 labelText: 'اختر الصندوق',

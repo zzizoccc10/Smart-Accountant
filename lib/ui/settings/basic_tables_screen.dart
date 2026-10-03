@@ -10,6 +10,7 @@ import '../../theme/app_theme.dart';
 import '../widgets/common.dart';
 import '../../services/quick_export.dart';
 import 'import_screen.dart';
+import 'branch_form.dart';
 
 class BasicTablesScreen extends StatelessWidget {
   const BasicTablesScreen({super.key});
@@ -145,68 +146,9 @@ class _BranchesTab extends StatelessWidget {
   }
 
   void _edit(BuildContext context, ERPProvider prov, Branch? b) {
-    final code = TextEditingController(text: b?.code ?? '');
-    final name = TextEditingController(text: b?.name ?? '');
-    final address = TextEditingController(text: b?.address ?? '');
-    final phone = TextEditingController(text: b?.phone ?? '');
-    final email = TextEditingController(text: b?.email ?? '');
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(b == null ? 'فرع جديد' : 'تعديل فرع'),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                  controller: code,
-                  decoration: const InputDecoration(labelText: 'الكود')),
-              const SizedBox(height: 8),
-              TextField(
-                  controller: name,
-                  decoration: const InputDecoration(labelText: 'الاسم')),
-              const SizedBox(height: 8),
-              TextField(
-                  controller: address,
-                  decoration: const InputDecoration(labelText: 'العنوان')),
-              const SizedBox(height: 8),
-              TextField(
-                  controller: phone,
-                  keyboardType: TextInputType.phone,
-                  decoration: const InputDecoration(labelText: 'الهاتف')),
-              const SizedBox(height: 8),
-              TextField(
-                  controller: email,
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: const InputDecoration(labelText: 'البريد')),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(ctx), child: const Text('إلغاء')),
-          ElevatedButton(
-            onPressed: () async {
-              final br = Branch(
-                id: b?.id ?? AppDatabase.newId(),
-                code: code.text.trim(),
-                name: name.text.trim(),
-                address: address.text.trim(),
-                phone: phone.text.trim(),
-                email: email.text.trim(),
-                isActive: b?.isActive ?? true,
-              );
-              if (b == null) {
-                await prov.addBranch(br);
-              } else {
-                await prov.updateBranch(br);
-              }
-              if (ctx.mounted) Navigator.pop(ctx);
-            },
-            child: const Text('حفظ'),
-          ),
-        ],
-      ),
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => BranchForm(branch: b)),
     );
   }
 }

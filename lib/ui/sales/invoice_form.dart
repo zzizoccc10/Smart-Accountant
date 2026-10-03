@@ -82,6 +82,28 @@ class _InvoiceFormState extends State<InvoiceForm> {
             isSale ? c.contactType != 'supplier' : c.contactType != 'customer')
         .toList();
 
+    // قيم آمنة للقوائم المنسدلة (تجنّب اختفاء المحتوى عند عدم تطابق القيمة)
+    final contactIds = customers.map((c) => c.id).toSet();
+    final safeContact = (_contactId != null && contactIds.contains(_contactId))
+        ? _contactId
+        : null;
+
+    final whIds = prov.warehouses.map((w) => w.id).toSet();
+    final safeWarehouse =
+        whIds.contains(_warehouseId) ? _warehouseId : null;
+
+    final cbIds = prov.cashboxes.map((c) => c.id).toSet();
+    final safeCashbox = cbIds.contains(_cashboxId) ? _cashboxId : null;
+
+    final origInvIds = prov.invoices
+        .where((i) => i.invoiceType == (isSale ? 'sale' : 'purchase'))
+        .map((i) => i.id)
+        .toSet();
+    final safeOrigInv = (_originalInvoiceId != null &&
+            origInvIds.contains(_originalInvoiceId))
+        ? _originalInvoiceId
+        : null;
+
     return Scaffold(
       appBar: AppBar(title: Text(title)),
       body: ListView(
@@ -97,7 +119,7 @@ class _InvoiceFormState extends State<InvoiceForm> {
                     children: [
                       Expanded(
                         child: DropdownButtonFormField<String>(
-                          initialValue: _contactId,
+                          initialValue: safeContact,
                           isExpanded: true,
                           decoration: InputDecoration(
                             labelText: isSale ? 'العميل' : 'المورد',
@@ -139,7 +161,7 @@ class _InvoiceFormState extends State<InvoiceForm> {
                   if (isReturn) ...[
                     const SizedBox(height: 12),
                     DropdownButtonFormField<String>(
-                      initialValue: _originalInvoiceId,
+                      initialValue: safeOrigInv,
                       isExpanded: true,
                       decoration: const InputDecoration(
                         labelText: 'الفاتورة الأصلية (للتحقق من الكميات)',
@@ -176,7 +198,7 @@ class _InvoiceFormState extends State<InvoiceForm> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: DropdownButtonFormField<String>(
-                          initialValue: _warehouseId,
+                          initialValue: safeWarehouse,
                           isExpanded: true,
                           decoration: const InputDecoration(
                             labelText: 'المخزن',
@@ -257,7 +279,7 @@ class _InvoiceFormState extends State<InvoiceForm> {
                   if (!isCredit) ...[
                     const SizedBox(height: 12),
                     DropdownButtonFormField<String>(
-                      initialValue: _cashboxId,
+                      initialValue: safeCashbox,
                       isExpanded: true,
                       decoration: const InputDecoration(
                         labelText: 'الصندوق',

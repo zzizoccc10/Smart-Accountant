@@ -1275,6 +1275,11 @@ class Branch {
   bool isActive;
   bool isDeleted;
 
+  /// مكوّنات الفرع — المخازن والصناديق والمستخدمون المرتبطون به
+  List<String> warehouseIds;
+  List<String> cashboxIds;
+  List<String> userNames;
+
   Branch({
     required this.id,
     this.code = '',
@@ -1284,7 +1289,12 @@ class Branch {
     this.email = '',
     this.isActive = true,
     this.isDeleted = false,
-  });
+    List<String>? warehouseIds,
+    List<String>? cashboxIds,
+    List<String>? userNames,
+  })  : warehouseIds = warehouseIds ?? [],
+        cashboxIds = cashboxIds ?? [],
+        userNames = userNames ?? [];
 
   Map<String, dynamic> toMap() => {
     'id': id,
@@ -1295,6 +1305,9 @@ class Branch {
     'email': email,
     'isActive': isActive,
     'isDeleted': isDeleted,
+    'warehouseIds': warehouseIds,
+    'cashboxIds': cashboxIds,
+    'userNames': userNames,
   };
 
   factory Branch.fromMap(Map<String, dynamic> m) => Branch(
@@ -1306,6 +1319,9 @@ class Branch {
     email: m['email'] as String? ?? '',
     isActive: m['isActive'] as bool? ?? true,
     isDeleted: m['isDeleted'] as bool? ?? false,
+    warehouseIds: (m['warehouseIds'] as List?)?.map((e) => e.toString()).toList(),
+    cashboxIds: (m['cashboxIds'] as List?)?.map((e) => e.toString()).toList(),
+    userNames: (m['userNames'] as List?)?.map((e) => e.toString()).toList(),
   );
 }
 

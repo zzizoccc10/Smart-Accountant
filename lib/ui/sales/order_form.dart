@@ -7,6 +7,7 @@ import '../../providers/erp_provider.dart';
 import '../../models/models.dart';
 import '../../theme/app_theme.dart';
 import '../widgets/common.dart';
+import '../widgets/dropdown_safe.dart';
 import '../widgets/item_picker_sheet.dart';
 
 class OrderForm extends StatefulWidget {
@@ -72,6 +73,12 @@ class _OrderFormState extends State<OrderForm> {
         .where((c) => isSale ? c.contactType != 'supplier' : c.contactType != 'customer')
         .toList();
 
+    // قيم آمنة للقوائم المنسدلة
+    final safeContact = safeValue(
+        _contactId, contacts.map((c) => c.id).toSet());
+    final safeWarehouse = safeValueOrFirst(
+        _warehouseId, prov.warehouses.map((w) => w.id).toList());
+
     return Scaffold(
       appBar: AppBar(title: Text(widget.existing == null ? 'جديد: $title' : 'تعديل: $title')),
       body: ListView(
@@ -83,7 +90,7 @@ class _OrderFormState extends State<OrderForm> {
               child: Column(
                 children: [
                   DropdownButtonFormField<String>(
-                    initialValue: _contactId,
+                    initialValue: safeContact,
                     isExpanded: true,
                     decoration: InputDecoration(
                       labelText: isSale ? 'العميل' : 'المورد',
@@ -130,7 +137,7 @@ class _OrderFormState extends State<OrderForm> {
                   ),
                   const SizedBox(height: 12),
                   DropdownButtonFormField<String>(
-                    initialValue: _warehouseId,
+                    initialValue: safeWarehouse,
                     isExpanded: true,
                     decoration: const InputDecoration(
                       labelText: 'المخزن',

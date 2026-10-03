@@ -161,6 +161,56 @@ class ERPProvider extends ChangeNotifier {
     reload();
   }
 
+  /// حفظ مخزن (إضافة أو تعديل) مع ربطه بدليل الحسابات
+  Future<void> saveWarehouse(Warehouse w) async {
+    final id = w.id.isEmpty ? AppDatabase.newId() : w.id;
+    final saved = Warehouse(
+      id: id,
+      name: w.name,
+      code: w.code,
+      location: w.location,
+      isActive: w.isActive,
+      allowNegative: w.allowNegative,
+    );
+    await AppDatabase.saveWarehouse(saved);
+    try {
+      await AccountSyncService.ensureWarehouseAccount(saved);
+    } catch (_) {}
+    reload();
+  }
+
+  /// حذف مخزن
+  Future<void> deleteWarehouse(String id) async {
+    await AppDatabase.deleteWarehouse(id);
+    reload();
+  }
+
+  /// إضافة صندوق كامل (مع الكود) وربطه بالدليل
+  Future<void> saveCashboxFull(Cashbox cb) async {
+    final id = cb.id.isEmpty ? AppDatabase.newId() : cb.id;
+    var box = Cashbox(
+      id: id,
+      name: cb.name,
+      code: cb.code,
+      accountId: cb.accountId,
+      accountName: cb.accountName,
+      openingBalance: cb.openingBalance,
+      currentBalance: cb.currentBalance,
+      isActive: cb.isActive,
+    );
+    try {
+      box = await AccountSyncService.ensureCashboxAccount(box);
+    } catch (_) {}
+    await AppDatabase.saveCashbox(box);
+    reload();
+  }
+
+  /// حذف صندوق
+  Future<void> deleteCashbox(String id) async {
+    await AppDatabase.deleteCashbox(id);
+    reload();
+  }
+
   // ============================ جهات الاتصال ============================
   Future<Contact> addContact(Contact c) async {
     final id = c.id.isEmpty ? AppDatabase.newId() : c.id;
@@ -1231,11 +1281,28 @@ class ERPProvider extends ChangeNotifier {
 
   // ============================ الفروع ============================
   Future<void> addBranch(Branch b) async {
-    await AppDatabase.saveBranch(b);
+    if (b.id.isEmpty) {
+      final nb = Branch(
+        id: AppDatabase.newId(),
+        code: b.code,
+        name: b.name,
+        address: b.address,
+        phone: b.phone,
+        email: b.email,
+        isActive: b.isActive,
+        warehouseIds: b.warehouseIds,
+        cashboxIds: b.cashboxIds,
+        userNames: b.userNames,
+      );
+      await AppDatabase.saveBranch(nb);
+    } else {
+      await AppDatabase.saveBranch(b);
+    }
     reload();
   }
 
   Future<void> updateBranch(Branch b) async {
+    if (b.id.isEmpty) return addBranch(b);
     await AppDatabase.saveBranch(b);
     reload();
   }

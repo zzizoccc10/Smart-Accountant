@@ -1,20 +1,24 @@
 // ============================================================================
 // حقل الهاتف — مع قائمة اختيار مفتاح الدولة (اليمن افتراضي) + جلب من جهات الاتصال
+// - تحميل جهات الاتصال بشكل غير حاجب مع تخزين مؤقت (سريع ولا يعلّق الواجهة)
+// - يحفظ الرقم كاملاً (مفتاح الدولة + الرقم) في المتحكم الخارجي دائماً
 // ============================================================================
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_contacts/flutter_contacts.dart' as fc;
-import 'package:permission_handler/permission_handler.dart';
 
+import '../../services/contacts_service.dart';
 import '../../services/country_codes.dart';
 import '../../theme/app_theme.dart';
 import 'permission_helper.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class PhoneField extends StatefulWidget {
   final TextEditingController controller;
   final String label;
   final bool allowPickContact;
   final ValueChanged<String>? onNamePicked;
+  final ValueChanged<String>? onPhoneChanged;
   final FormFieldValidator<String>? validator;
 
   const PhoneField({
@@ -23,6 +27,7 @@ class PhoneField extends StatefulWidget {
     this.label = 'الهاتف',
     this.allowPickContact = true,
     this.onNamePicked,
+    this.onPhoneChanged,
     this.validator,
   });
 
@@ -33,6 +38,7 @@ class PhoneField extends StatefulWidget {
 class _PhoneFieldState extends State<PhoneField> {
   Country _country = Countries.defaultCountry;
   final _local = TextEditingController();
+  bool _loadingContacts = false;
 
   @override
   void initState() {
@@ -40,16 +46,37 @@ class _PhoneFieldState extends State<PhoneField> {
     final (dial, local) = Countries.split(widget.controller.text);
     _country = Countries.byDial(dial) ?? Countries.defaultCountry;
     _local.text = local;
+    _local.addListener(_syncOut);
+    // اكتب القيمة الموحّدة فوراً لضمان وجود الرقم كاملاً
+    WidgetsBinding.instance.addPostFrameCallback((_) => _syncOut());
+  }
+
+  @override
+  void didUpdateWidget(covariant PhoneField old) {
+    super.didUpdateWidget(old);
+    // إن تغيّر النص من الخارج ولم يكن مطابقاً لما نبني محلياً، أعِد المزامنة
+    final (dial, local) = Countries.split(widget.controller.text);
+    if (_local.text != local ||
+        (_country.dial != dial && Countries.byDial(dial) != null)) {
+      _country = Countries.byDial(dial) ?? _country;
+      _local.text = local;
+    }
   }
 
   @override
   void dispose() {
+    _local.removeListener(_syncOut);
     _local.dispose();
     super.dispose();
   }
 
+  /// يكتب الرقم الكامل (مفتاح + رقم) في المتحكم الخارجي
   void _syncOut() {
-    widget.controller.text = Countries.compose(_country.dial, _local.text);
+    final full = Countries.compose(_country.dial, _local.text);
+    if (widget.controller.text != full) {
+      widget.controller.text = full;
+    }
+    widget.onPhoneChanged?.call(full);
   }
 
   Future<void> _pickDial() async {
@@ -88,19 +115,33 @@ class _PhoneFieldState extends State<PhoneField> {
       reason: 'لجلب رقم الهاتف واسم الجهة من دفتر هاتفك مباشرة',
     );
     if (!ok) return;
-    List<fc.Contact> contacts;
-    try {
-      contacts = await fc.FlutterContacts.getContacts(
-        withProperties: true,
-        withPhoto: false,
-      );
-    } catch (_) {
-      return;
+
+    // جهات الاتصال من الذاكرة المؤقتة (فوري) أو تحميل أولي مع مؤشر تقدّم
+    List<fc.Contact> all;
+    if (ContactsService.hasCache) {
+      all = await ContactsService.load();
+    } else {
+      setState(() => _loadingContacts = true);
+      try {
+        all = await ContactsService.load();
+      } catch (_) {
+        if (mounted) setState(() => _loadingContacts = false);
+        return;
+      }
+      if (!mounted) return;
+      setState(() => _loadingContacts = false);
     }
     if (!mounted) return;
-    final withPhone =
-        contacts.where((c) => c.phones.isNotEmpty).toList();
 
+    final withPhone = ContactsService.withValidPhone(all);
+    if (withPhone.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('لا توجد جهات اتصال بأرقام هاتف')),
+      );
+      return;
+    }
+
+    if (!mounted) return;
     final picked = await showModalBottomSheet<fc.Contact>(
       context: context,
       isScrollControlled: true,
@@ -112,7 +153,7 @@ class _PhoneFieldState extends State<PhoneField> {
             final list = q.isEmpty
                 ? withPhone
                 : withPhone
-                    .where((c) => c.displayName.contains(q))
+                    .where((c) => c.displayName.toLowerCase().contains(q.toLowerCase()))
                     .toList();
             return SizedBox(
               height: MediaQuery.of(ctx).size.height * 0.75,
@@ -121,6 +162,7 @@ class _PhoneFieldState extends State<PhoneField> {
                   Padding(
                     padding: const EdgeInsets.all(12),
                     child: TextField(
+                      autofocus: true,
                       decoration: const InputDecoration(
                         hintText: 'بحث في جهات الاتصال...',
                         prefixIcon: Icon(Icons.search),
@@ -132,7 +174,7 @@ class _PhoneFieldState extends State<PhoneField> {
                   ),
                   Expanded(
                     child: list.isEmpty
-                        ? const Center(child: Text('لا توجد جهات اتصال'))
+                        ? const Center(child: Text('لا توجد نتائج'))
                         : ListView.builder(
                             itemCount: list.length,
                             itemBuilder: (_, i) {
@@ -147,10 +189,7 @@ class _PhoneFieldState extends State<PhoneField> {
                                     ? '(بدون اسم)'
                                     : c.displayName),
                                 subtitle: Text(
-                                  c.phones
-                                      .map((p) => p.number)
-                                      .whereType<String>()
-                                      .join(' • '),
+                                  ContactsService.bestPhone(c) ?? '',
                                   style: const TextStyle(fontSize: 12),
                                 ),
                                 onTap: () => Navigator.pop(ctx, c),
@@ -167,8 +206,7 @@ class _PhoneFieldState extends State<PhoneField> {
     );
 
     if (picked == null) return;
-    // خذ أول رقم متاح
-    final raw = picked.phones.first.number;
+    final raw = ContactsService.bestPhone(picked) ?? '';
     final (dial, local) = Countries.split(raw);
     setState(() {
       _country = Countries.byDial(dial) ?? Countries.defaultCountry;
@@ -216,11 +254,20 @@ class _PhoneFieldState extends State<PhoneField> {
               labelText: widget.label,
               prefixIcon: const Icon(Icons.phone),
               suffixIcon: widget.allowPickContact
-                  ? IconButton(
-                      icon: const Icon(Icons.contacts),
-                      tooltip: 'من جهات الاتصال',
-                      onPressed: _pickFromContacts,
-                    )
+                  ? (_loadingContacts
+                      ? const Padding(
+                          padding: EdgeInsets.all(12),
+                          child: SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                        )
+                      : IconButton(
+                          icon: const Icon(Icons.contacts),
+                          tooltip: 'من جهات الاتصال',
+                          onPressed: _pickFromContacts,
+                        ))
                   : null,
             ),
             onChanged: (_) => _syncOut(),

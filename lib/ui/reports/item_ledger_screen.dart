@@ -101,7 +101,8 @@ class _ItemLedgerScreenState extends State<ItemLedgerScreen> {
           Padding(
             padding: const EdgeInsets.all(12),
             child: DropdownButtonFormField<String>(
-              initialValue: _itemId,
+              initialValue:
+                  items.any((it) => it.id == _itemId) ? _itemId : null,
               isExpanded: true,
               decoration: const InputDecoration(
                 labelText: 'اختر الصنف',

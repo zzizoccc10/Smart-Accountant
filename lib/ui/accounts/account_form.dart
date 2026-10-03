@@ -163,7 +163,9 @@ class _AccountFormState extends State<AccountForm> {
             ),
             const SizedBox(height: 12),
             DropdownButtonFormField<String>(
-              initialValue: _parentId,
+              initialValue: parents.any((a) => a.id == _parentId)
+                  ? _parentId
+                  : null,
               isExpanded: true,
               decoration: const InputDecoration(
                 labelText: 'الحساب الأب',

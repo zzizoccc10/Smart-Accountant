@@ -15,14 +15,24 @@ class StockTransferScreen extends StatefulWidget {
 }
 
 class _StockTransferScreenState extends State<StockTransferScreen> {
-  String _from = 'wh_main';
-  String _to = 'wh_branch1';
+  String _from = '';
+  String _to = '';
+  bool _init = false;
   final List<Map<String, dynamic>> _lines = [];
   bool _saving = false;
 
   @override
   Widget build(BuildContext context) {
     final prov = context.watch<ERPProvider>();
+    // تهيئة المخازن من القائمة الفعلية (آمنة ضد التغيير)
+    if (!_init && prov.warehouses.length >= 2) {
+      _init = true;
+      _from = prov.warehouses[0].id;
+      _to = prov.warehouses[1].id;
+    }
+    final whIds = prov.warehouses.map((w) => w.id).toList();
+    final safeFrom = whIds.contains(_from) ? _from : null;
+    final safeTo = whIds.contains(_to) ? _to : null;
 
     return Scaffold(
       appBar: AppBar(title: const Text('تحويل مخزني')),
@@ -36,7 +46,7 @@ class _StockTransferScreenState extends State<StockTransferScreen> {
                 children: [
                   Expanded(
                     child: DropdownButtonFormField<String>(
-                      initialValue: _from,
+                      initialValue: safeFrom,
                       isExpanded: true,
                       decoration: const InputDecoration(labelText: 'من مخزن'),
                       items: prov.warehouses
@@ -52,7 +62,7 @@ class _StockTransferScreenState extends State<StockTransferScreen> {
                   ),
                   Expanded(
                     child: DropdownButtonFormField<String>(
-                      initialValue: _to,
+                      initialValue: safeTo,
                       isExpanded: true,
                       decoration: const InputDecoration(labelText: 'إلى مخزن'),
                       items: prov.warehouses

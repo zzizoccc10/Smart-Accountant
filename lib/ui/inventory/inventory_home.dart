@@ -13,6 +13,7 @@ import 'movements_screen.dart';
 import 'barcode_screen.dart';
 import '../../services/quick_export.dart';
 import '../settings/import_screen.dart';
+import 'warehouses_screen.dart';
 
 class InventoryHome extends StatefulWidget {
   const InventoryHome({super.key});
@@ -88,6 +89,16 @@ class _InventoryHomeState extends State<InventoryHome> {
                   () => Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => const BarcodeScreen()),
+                  ),
+                ),
+                _actionBtn(
+                  context,
+                  Icons.warehouse,
+                  'المخازن',
+                  () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => const WarehousesScreen()),
                   ),
                 ),
               ],

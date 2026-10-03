@@ -123,10 +123,27 @@ class _VoucherFormState extends State<VoucherForm> {
   Widget build(BuildContext context) {
     final prov = context.watch<ERPProvider>();
     final curr = prov.currency;
-    final contacts = prov.contacts
+    // القائمة المفلترة حسب النوع
+    final eligible = prov.contacts
         .where((c) =>
             isReceipt ? c.contactType != 'supplier' : c.contactType != 'customer')
         .toList();
+
+    // ضمان أن القيمة المختارة موجودة ضمن العناصر (تجنّب اختفاء الشاشة
+    // عندما تُحذف الجهة أو تكون من نوع آخر)
+    final ids = eligible.map((c) => c.id).toSet();
+    if (_contactId != null && !ids.contains(_contactId)) {
+      // أضف الجهة الحالية إن وُجدت فعلاً، وإلا صفّر الاختيار
+      final current = prov.contacts.where((c) => c.id == _contactId).firstOrNull;
+      if (current != null && !eligible.any((c) => c.id == current.id)) {
+        eligible.insert(0, current);
+        ids.add(current.id);
+      } else {
+        _contactId = null;
+      }
+    }
+    final contacts = eligible;
+
     final unpaid = _contactId == null
         ? <Invoice>[]
         : prov.unpaidInvoices(_contactId!, widget.type);
@@ -160,7 +177,9 @@ class _VoucherFormState extends State<VoucherForm> {
                   ),
                   const SizedBox(height: 12),
                   DropdownButtonFormField<String>(
-                    initialValue: _cashboxId,
+                    initialValue: prov.cashboxes.any((c) => c.id == _cashboxId)
+                        ? _cashboxId
+                        : null,
                     isExpanded: true,
                     decoration: const InputDecoration(
                       labelText: 'الصندوق',

@@ -49,7 +49,9 @@ class _StockCountScreenState extends State<StockCountScreen> {
           Padding(
             padding: const EdgeInsets.all(12),
             child: DropdownButtonFormField<String>(
-              initialValue: _warehouseId,
+              initialValue: prov.warehouses.any((w) => w.id == _warehouseId)
+                  ? _warehouseId
+                  : null,
               isExpanded: true,
               decoration: const InputDecoration(
                 labelText: 'المخزن',

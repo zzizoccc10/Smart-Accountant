@@ -225,7 +225,7 @@ class _ManualJournalFormState extends State<_ManualJournalForm> {
         padding: const EdgeInsets.all(16),
         children: [
           DropdownButtonFormField<Account>(
-            initialValue: _debitAcc,
+            initialValue: leaves.contains(_debitAcc) ? _debitAcc : null,
             isExpanded: true,
             decoration: const InputDecoration(
               labelText: 'الحساب المدين',
@@ -241,7 +241,7 @@ class _ManualJournalFormState extends State<_ManualJournalForm> {
           ),
           const SizedBox(height: 12),
           DropdownButtonFormField<Account>(
-            initialValue: _creditAcc,
+            initialValue: leaves.contains(_creditAcc) ? _creditAcc : null,
             isExpanded: true,
             decoration: const InputDecoration(
               labelText: 'الحساب الدائن',
