@@ -1,0 +1,28 @@
+name: Build iOS IPA
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+jobs:
+  build:
+    runs-on: macos-14
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.35.4'
+          channel: stable
+      - run: flutter config --enable-ios --no-analytics
+      - run: flutter pub get
+      - run: pod install --repo-update
+        working-directory: ios
+      - run: flutter build ios --release --no-codesign
+      - run: |
+          mkdir -p build/ios/ipa/Payload
+          cp -R build/ios/iphoneos/Runner.app build/ios/ipa/Payload/
+          cd build/ios/ipa && zip -qry EasyAccountant.ipa Payload
+      - uses: actions/upload-artifact@v4
+        with:
+          name: EasyAccountant-ipa
+          path: build/ios/ipa/EasyAccountant.ipa
