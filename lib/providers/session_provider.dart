@@ -60,6 +60,8 @@ class SessionProvider extends ChangeNotifier {
     _error = null;
     notifyListeners();
     try {
+      // تأمين: تسجيل دخول مجهول قبل الكتابة السحابية (إن كانت السحابة مُفعّلة)
+      await AuthService.ensureSignedIn();
       final owner = await UserService.ensureOwner(
         name: name,
         email: email,

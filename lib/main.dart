@@ -16,6 +16,7 @@ import 'package:provider/provider.dart';
 import 'data/app_database.dart';
 import 'providers/erp_provider.dart';
 import 'providers/session_provider.dart';
+import 'services/auth_service.dart';
 import 'services/firebase_config.dart';
 import 'services/local_notifications.dart';
 import 'services/push_notifications.dart';
@@ -76,6 +77,9 @@ Future<void> _initFirebase() async {
     if (kDebugMode) {
       debugPrint('[main] Firebase initialized ✓ (${FirebaseConfig.projectId})');
     }
+    // تأمين الكتابة: تسجيل دخول مجهول إن لم يوجد مستخدم
+    // (يتخطى بهدوء إن كان المزوّد المجهول غير مُفعّل)
+    await AuthService.ensureSignedIn();
   } catch (e) {
     if (kDebugMode) debugPrint('[main] Firebase init failed: $e');
   }

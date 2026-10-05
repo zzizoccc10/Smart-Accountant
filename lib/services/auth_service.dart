@@ -120,6 +120,24 @@ class AuthService {
     }
   }
 
+  /// تسجيل دخول مجهول (Anonymous) — لتأمين الكتابة في Firestore.
+  /// يُستخدم عندما لا يوجد مستخدم مسجّل، حتى تُفعَّل قواعد الأمان
+  /// (request.auth != null) دون كسر المزامنة.
+  /// يُعيد true عند النجاح (أو عند وجود مستخدم بالفعل).
+  static Future<bool> ensureSignedIn() async {
+    final auth = _auth;
+    if (auth == null) return false;
+    try {
+      if (auth.currentUser != null) return true;
+      await auth.signInAnonymously();
+      return true;
+    } catch (e) {
+      // قد يكون المزوّد المجهول غير مُفعّل في Firebase Console — نكمل محلياً
+      if (kDebugMode) debugPrint('[AuthService] anonymous sign-in skipped: $e');
+      return false;
+    }
+  }
+
   /// تسجيل الخروج
   static Future<void> signOut() async {
     try {
