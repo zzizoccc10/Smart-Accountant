@@ -14,6 +14,7 @@ import '../models/user_models.dart';
 import '../providers/erp_provider.dart';
 import '../providers/session_provider.dart';
 import '../services/admin_notification_service.dart';
+import '../services/sync_queue.dart';
 import '../theme/app_theme.dart';
 import 'accounts/accounts_home.dart';
 import 'alerts_screen.dart';
@@ -321,6 +322,8 @@ class _HomeShellState extends State<HomeShell> {
           );
         },
       ),
+      // مؤشر المزامنة (يعرض العمليات المعلّقة عند عدم الاتصال)
+      _SyncIndicator(session: session),
       IconButton(
         tooltip: 'الإعدادات',
         icon: const Icon(Icons.settings),
@@ -558,6 +561,29 @@ class _HomeShellState extends State<HomeShell> {
             const Divider(),
           ],
 
+          // فتح لوحة المالك من حساب «أول منشأة» (إن سمح مالك النظام)
+          if (session.isCompanyMode &&
+              session.canOpenOwnerPanelFromCompany) ...[
+            ListTile(
+              leading: const Icon(Icons.open_in_new, color: AppColors.purple),
+              title: const Text('فتح لوحة مالك النظام'),
+              subtitle: const Text(
+                'مُفعَّلة لهذه المنشأة من مالك النظام',
+                style: TextStyle(fontSize: 11),
+              ),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const SystemOwnerDashboard(),
+                  ),
+                );
+              },
+            ),
+            const Divider(),
+          ],
+
           // التبويبات الرئيسية المسموحة
           ...ModuleRegistry.allowedTabs(
             isGuest: session.isGuest,
@@ -647,6 +673,89 @@ class _HomeShellState extends State<HomeShell> {
       onTap: () {
         Navigator.pop(context);
         setState(() => _idx = index);
+      },
+    );
+  }
+}
+
+// ============================================================================
+// مؤشر المزامنة — يعرض حالة الاتصال وعدد العمليات المعلّقة (غير المُزامَنة)
+// ============================================================================
+class _SyncIndicator extends StatefulWidget {
+  final SessionProvider session;
+  const _SyncIndicator({required this.session});
+
+  @override
+  State<_SyncIndicator> createState() => _SyncIndicatorState();
+}
+
+class _SyncIndicatorState extends State<_SyncIndicator> {
+  @override
+  Widget build(BuildContext context) {
+    // الزائر محلي فقط ⇒ لا مؤشر مزامنة
+    if (widget.session.isGuest) return const SizedBox.shrink();
+
+    return StreamBuilder<int>(
+      stream: SyncQueue.pendingStream,
+      initialData: SyncQueue.pendingCount,
+      builder: (context, snap) {
+        final pending = snap.data ?? 0;
+        final online = SyncQueue.isOnline;
+
+        IconData icon;
+        Color color;
+        String tip;
+        if (pending > 0 && !online) {
+          icon = Icons.cloud_off;
+          color = AppColors.warning;
+          tip = 'غير متصل — $pending عملية بانتظار المزامنة';
+        } else if (pending > 0) {
+          icon = Icons.cloud_sync;
+          color = AppColors.info;
+          tip = 'جارٍ مزامنة $pending عملية...';
+        } else {
+          icon = Icons.cloud_done;
+          color = Colors.white;
+          tip = 'كل العمليات مُزامَنة';
+        }
+
+        return IconButton(
+          tooltip: tip,
+          onPressed: () async {
+            await SyncQueue.flush();
+            if (context.mounted) setState(() {});
+          },
+          icon: Stack(
+            children: [
+              Icon(icon, color: color),
+              if (pending > 0)
+                Positioned(
+                  right: 6,
+                  top: 4,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 4,
+                      vertical: 1,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.danger,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    constraints: const BoxConstraints(minWidth: 14),
+                    child: Text(
+                      pending > 99 ? '99+' : '$pending',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 8.5,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        );
       },
     );
   }

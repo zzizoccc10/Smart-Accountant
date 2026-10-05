@@ -71,21 +71,20 @@ class _VoucherFormState extends State<VoucherForm> {
     });
   }
 
-  double get _totalAllocated =>
-      _allocs.values.fold(0.0, (s, v) => s + v);
+  double get _totalAllocated => _allocs.values.fold(0.0, (s, v) => s + v);
 
   Future<void> _save() async {
     final amount = double.tryParse(_amount.text) ?? 0;
     if (amount <= 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('أدخل مبلغاً صحيحاً')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('أدخل مبلغاً صحيحاً')));
       return;
     }
     if (_contactId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('اختر الجهة')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('اختر الجهة')));
       return;
     }
     if (_totalAllocated > amount + 0.001) {
@@ -125,8 +124,11 @@ class _VoucherFormState extends State<VoucherForm> {
     final curr = prov.currency;
     // القائمة المفلترة حسب النوع
     final eligible = prov.contacts
-        .where((c) =>
-            isReceipt ? c.contactType != 'supplier' : c.contactType != 'customer')
+        .where(
+          (c) => isReceipt
+              ? c.contactType != 'supplier'
+              : c.contactType != 'customer',
+        )
         .toList();
 
     // ضمان أن القيمة المختارة موجودة ضمن العناصر (تجنّب اختفاء الشاشة
@@ -134,7 +136,9 @@ class _VoucherFormState extends State<VoucherForm> {
     final ids = eligible.map((c) => c.id).toSet();
     if (_contactId != null && !ids.contains(_contactId)) {
       // أضف الجهة الحالية إن وُجدت فعلاً، وإلا صفّر الاختيار
-      final current = prov.contacts.where((c) => c.id == _contactId).firstOrNull;
+      final current = prov.contacts
+          .where((c) => c.id == _contactId)
+          .firstOrNull;
       if (current != null && !eligible.any((c) => c.id == current.id)) {
         eligible.insert(0, current);
         ids.add(current.id);
@@ -166,8 +170,12 @@ class _VoucherFormState extends State<VoucherForm> {
                       prefixIcon: const Icon(Icons.person),
                     ),
                     items: contacts
-                        .map((c) =>
-                            DropdownMenuItem(value: c.id, child: Text(c.name)))
+                        .map(
+                          (c) => DropdownMenuItem(
+                            value: c.id,
+                            child: Text(c.name),
+                          ),
+                        )
                         .toList(),
                     onChanged: (v) => setState(() {
                       _contactId = v;
@@ -186,11 +194,14 @@ class _VoucherFormState extends State<VoucherForm> {
                       prefixIcon: Icon(Icons.account_balance_wallet),
                     ),
                     items: prov.cashboxes
-                        .map((c) => DropdownMenuItem(
-                              value: c.id,
-                              child: Text(
-                                  '${c.name} (${Fmt.money(c.currentBalance, curr)})'),
-                            ))
+                        .map(
+                          (c) => DropdownMenuItem(
+                            value: c.id,
+                            child: Text(
+                              '${c.name} (${Fmt.money(c.currentBalance, curr)})',
+                            ),
+                          ),
+                        )
                         .toList(),
                     onChanged: (v) => setState(() => _cashboxId = v),
                   ),
@@ -221,9 +232,10 @@ class _VoucherFormState extends State<VoucherForm> {
             const SizedBox(height: 16),
             Row(
               children: [
-                const Text('تخصيص على الفواتير الآجلة',
-                    style:
-                        TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                const Text(
+                  'تخصيص على الفواتير الآجلة',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                ),
                 const Spacer(),
                 TextButton.icon(
                   onPressed: () => _autoDistribute(unpaid),
@@ -236,10 +248,14 @@ class _VoucherFormState extends State<VoucherForm> {
               child: Column(
                 children: unpaid.map((inv) {
                   _allocCtrls.putIfAbsent(
-                      inv.id, () => TextEditingController());
+                    inv.id,
+                    () => TextEditingController(),
+                  );
                   return Padding(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 6),
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
                     child: Row(
                       children: [
                         Expanded(
@@ -247,14 +263,19 @@ class _VoucherFormState extends State<VoucherForm> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(inv.invoiceNumber,
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 13)),
+                              Text(
+                                inv.invoiceNumber,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 13,
+                                ),
+                              ),
                               Text(
                                 'متبقي: ${Fmt.money(inv.remaining, curr)}',
                                 style: TextStyle(
-                                    fontSize: 11, color: Colors.grey.shade600),
+                                  fontSize: 11,
+                                  color: Colors.grey.shade600,
+                                ),
                               ),
                             ],
                           ),

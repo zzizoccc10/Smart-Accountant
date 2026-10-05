@@ -34,18 +34,25 @@ class CashboxesScreen extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               child: Row(
                 children: [
-                  const Icon(Icons.account_balance_wallet,
-                      color: AppColors.success, size: 32),
+                  const Icon(
+                    Icons.account_balance_wallet,
+                    color: AppColors.success,
+                    size: 32,
+                  ),
                   const SizedBox(width: 12),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('إجمالي الأرصدة',
-                          style: TextStyle(color: Colors.grey)),
+                      const Text(
+                        'إجمالي الأرصدة',
+                        style: TextStyle(color: Colors.grey),
+                      ),
                       Text(
                         Fmt.money(prov.cashBalance, curr),
                         style: const TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold),
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ],
                   ),
@@ -62,14 +69,20 @@ class CashboxesScreen extends StatelessWidget {
                   backgroundColor: Color(0x1A2E7D32),
                   child: Icon(Icons.savings, color: AppColors.success),
                 ),
-                title: Text(c.name,
-                    style: const TextStyle(fontWeight: FontWeight.bold)),
-                subtitle: Text(c.accountName,
-                    style: const TextStyle(fontSize: 12)),
+                title: Text(
+                  c.name,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                subtitle: Text(
+                  c.accountName,
+                  style: const TextStyle(fontSize: 12),
+                ),
                 trailing: Text(
                   Fmt.money(c.currentBalance, curr),
                   style: const TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: 14),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
                 ),
               ),
             ),

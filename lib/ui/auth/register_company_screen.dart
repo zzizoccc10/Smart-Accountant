@@ -84,18 +84,29 @@ class _RegisterCompanyScreenState extends State<RegisterCompanyScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        const Icon(Icons.add_business,
-                            size: 48, color: AppColors.primary),
+                        const Icon(
+                          Icons.add_business,
+                          size: 48,
+                          color: AppColors.primary,
+                        ),
                         const SizedBox(height: 8),
-                        const Text('بيانات المنشأة',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold)),
+                        const Text(
+                          'بيانات المنشأة',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                         const SizedBox(height: 4),
-                        Text('أنشئ حساب منشأتك للبدء بالعمل',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                fontSize: 12, color: Colors.grey.shade600)),
+                        Text(
+                          'أنشئ حساب منشأتك للبدء بالعمل',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey.shade600,
+                          ),
+                        ),
                         const SizedBox(height: 18),
 
                         TextFormField(
@@ -132,14 +143,20 @@ class _RegisterCompanyScreenState extends State<RegisterCompanyScreen> {
                           padding: EdgeInsets.symmetric(vertical: 14),
                           child: Divider(),
                         ),
-                        const Text('بيانات الدخول الرئيسية',
-                            style: TextStyle(
-                                fontSize: 15, fontWeight: FontWeight.bold)),
+                        const Text(
+                          'بيانات الدخول الرئيسية',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                         const SizedBox(height: 4),
                         Text(
                           'تُستخدم هذه البيانات للدخول إلى التطبيق وإدارة مستخدمي منشأتك.',
                           style: TextStyle(
-                              fontSize: 11, color: Colors.grey.shade600),
+                            fontSize: 11,
+                            color: Colors.grey.shade600,
+                          ),
                         ),
                         const SizedBox(height: 12),
                         TextFormField(
@@ -160,7 +177,8 @@ class _RegisterCompanyScreenState extends State<RegisterCompanyScreen> {
                           controller: _email,
                           keyboardType: TextInputType.emailAddress,
                           decoration: const InputDecoration(
-                            labelText: 'البريد الإلكتروني (اختياري — للاستعادة)',
+                            labelText:
+                                'البريد الإلكتروني (اختياري — للاستعادة)',
                             prefixIcon: Icon(Icons.email_outlined),
                           ),
                           validator: (v) {
@@ -178,9 +196,11 @@ class _RegisterCompanyScreenState extends State<RegisterCompanyScreen> {
                             labelText: 'كلمة المرور',
                             prefixIcon: const Icon(Icons.lock_outline),
                             suffixIcon: IconButton(
-                              icon: Icon(_obscure
-                                  ? Icons.visibility_off
-                                  : Icons.visibility),
+                              icon: Icon(
+                                _obscure
+                                    ? Icons.visibility_off
+                                    : Icons.visibility,
+                              ),
                               onPressed: () =>
                                   setState(() => _obscure = !_obscure),
                             ),
@@ -210,14 +230,17 @@ class _RegisterCompanyScreenState extends State<RegisterCompanyScreen> {
                         SizedBox(
                           height: 52,
                           child: ElevatedButton.icon(
-                            onPressed:
-                                session.busy ? null : () => _submit(session),
+                            onPressed: session.busy
+                                ? null
+                                : () => _submit(session),
                             icon: session.busy
                                 ? const SizedBox(
                                     width: 18,
                                     height: 18,
                                     child: CircularProgressIndicator(
-                                        strokeWidth: 2, color: Colors.white),
+                                      strokeWidth: 2,
+                                      color: Colors.white,
+                                    ),
                                   )
                                 : const Icon(Icons.check_circle_outline),
                             label: const Text('إنشاء الحساب والدخول'),
@@ -228,7 +251,9 @@ class _RegisterCompanyScreenState extends State<RegisterCompanyScreen> {
                           'بإنشاء الحساب أنت توافق على استخدام التطبيق لأغراضك التجارية.',
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                              fontSize: 11, color: Colors.grey.shade600),
+                            fontSize: 11,
+                            color: Colors.grey.shade600,
+                          ),
                         ),
                       ],
                     ),

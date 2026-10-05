@@ -16,14 +16,16 @@ class TaxReportScreen extends StatelessWidget {
     final prov = context.watch<ERPProvider>();
     final curr = prov.currency;
 
-    final sales =
-        prov.invoices.where((i) => i.invoiceType == 'sale').toList();
-    final saleReturns =
-        prov.invoices.where((i) => i.invoiceType == 'sale_return').toList();
-    final purchases =
-        prov.invoices.where((i) => i.invoiceType == 'purchase').toList();
-    final purchaseReturns =
-        prov.invoices.where((i) => i.invoiceType == 'purchase_return').toList();
+    final sales = prov.invoices.where((i) => i.invoiceType == 'sale').toList();
+    final saleReturns = prov.invoices
+        .where((i) => i.invoiceType == 'sale_return')
+        .toList();
+    final purchases = prov.invoices
+        .where((i) => i.invoiceType == 'purchase')
+        .toList();
+    final purchaseReturns = prov.invoices
+        .where((i) => i.invoiceType == 'purchase_return')
+        .toList();
 
     double sumTax(List list) {
       double t = 0;
@@ -88,25 +90,29 @@ class TaxReportScreen extends StatelessWidget {
             childAspectRatio: 1.6,
             children: [
               StatCard(
-                  title: 'ض.ق.م المبيعات (مخرجات)',
-                  value: Fmt.money(outputVat, curr),
-                  icon: Icons.arrow_upward,
-                  color: AppColors.success),
+                title: 'ض.ق.م المبيعات (مخرجات)',
+                value: Fmt.money(outputVat, curr),
+                icon: Icons.arrow_upward,
+                color: AppColors.success,
+              ),
               StatCard(
-                  title: 'ض.ق.م المشتريات (مدخلات)',
-                  value: Fmt.money(inputVat, curr),
-                  icon: Icons.arrow_downward,
-                  color: AppColors.info),
+                title: 'ض.ق.م المشتريات (مدخلات)',
+                value: Fmt.money(inputVat, curr),
+                icon: Icons.arrow_downward,
+                color: AppColors.info,
+              ),
               StatCard(
-                  title: netVat >= 0 ? 'صافي مستحق للهيئة' : 'رصيد دائن لك',
-                  value: Fmt.money(netVat.abs(), curr),
-                  icon: Icons.account_balance,
-                  color: netVat >= 0 ? AppColors.danger : AppColors.teal),
+                title: netVat >= 0 ? 'صافي مستحق للهيئة' : 'رصيد دائن لك',
+                value: Fmt.money(netVat.abs(), curr),
+                icon: Icons.account_balance,
+                color: netVat >= 0 ? AppColors.danger : AppColors.teal,
+              ),
               StatCard(
-                  title: 'نسبة الضريبة',
-                  value: '${Fmt.num(prov.taxRate)}%',
-                  icon: Icons.percent,
-                  color: AppColors.purple),
+                title: 'نسبة الضريبة',
+                value: '${Fmt.num(prov.taxRate)}%',
+                icon: Icons.percent,
+                color: AppColors.purple,
+              ),
             ],
           ),
           const SizedBox(height: 16),
@@ -114,17 +120,27 @@ class TaxReportScreen extends StatelessWidget {
           Card(
             child: Column(
               children: [
-                _row('الوعاء الضريبي للمبيعات (بعد المرتجعات)',
-                    Fmt.money(salesBase, curr)),
+                _row(
+                  'الوعاء الضريبي للمبيعات (بعد المرتجعات)',
+                  Fmt.money(salesBase, curr),
+                ),
                 const Divider(height: 1),
-                _row('ض.ق.م على المبيعات', Fmt.money(outputVat, curr),
-                    color: AppColors.success),
+                _row(
+                  'ض.ق.م على المبيعات',
+                  Fmt.money(outputVat, curr),
+                  color: AppColors.success,
+                ),
                 const Divider(height: 1),
-                _row('الوعاء الضريبي للمشتريات (بعد المرتجعات)',
-                    Fmt.money(purchaseBase, curr)),
+                _row(
+                  'الوعاء الضريبي للمشتريات (بعد المرتجعات)',
+                  Fmt.money(purchaseBase, curr),
+                ),
                 const Divider(height: 1),
-                _row('ض.ق.م على المشتريات', Fmt.money(inputVat, curr),
-                    color: AppColors.info),
+                _row(
+                  'ض.ق.م على المشتريات',
+                  Fmt.money(inputVat, curr),
+                  color: AppColors.info,
+                ),
                 const Divider(height: 1),
                 _row(
                   'صافي الضريبة المستحقة',
@@ -161,17 +177,19 @@ class TaxReportScreen extends StatelessWidget {
     );
   }
 
-  Widget _row(String label, String value,
-      {Color? color, bool bold = false}) {
+  Widget _row(String label, String value, {Color? color, bool bold = false}) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       child: Row(
         children: [
           Expanded(
-            child: Text(label,
-                style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: bold ? FontWeight.bold : FontWeight.normal)),
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: bold ? FontWeight.bold : FontWeight.normal,
+              ),
+            ),
           ),
           Text(
             value,

@@ -6,7 +6,10 @@ import 'dart:typed_data';
 import 'dart:html' as html;
 
 Future<bool> shareBytesImpl(
-    Uint8List bytes, String filename, String mimeType) async {
+  Uint8List bytes,
+  String filename,
+  String mimeType,
+) async {
   try {
     final blob = html.Blob([bytes], mimeType);
     final url = html.Url.createObjectUrlFromBlob(blob);

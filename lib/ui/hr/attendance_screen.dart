@@ -36,7 +36,8 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
     final prov = context.read<ERPProvider>();
     try {
       return prov.attendance.firstWhere(
-          (a) => a.employeeId == employeeId && a.date == _date);
+        (a) => a.employeeId == employeeId && a.date == _date,
+      );
     } catch (_) {
       return null;
     }
@@ -95,11 +96,16 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
             padding: const EdgeInsets.all(12),
             child: Row(
               children: [
-                const Icon(Icons.calendar_today, size: 18,
-                    color: AppColors.primary),
+                const Icon(
+                  Icons.calendar_today,
+                  size: 18,
+                  color: AppColors.primary,
+                ),
                 const SizedBox(width: 8),
-                Text('تاريخ الحضور: $_date',
-                    style: const TextStyle(fontWeight: FontWeight.bold)),
+                Text(
+                  'تاريخ الحضور: $_date',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
               ],
             ),
           ),
@@ -128,32 +134,40 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                                     radius: 16,
                                     backgroundColor: AppColors.primary
                                         .withValues(alpha: 0.12),
-                                    child: const Icon(Icons.person,
-                                        size: 18, color: AppColors.primary),
+                                    child: const Icon(
+                                      Icons.person,
+                                      size: 18,
+                                      color: AppColors.primary,
+                                    ),
                                   ),
                                   const SizedBox(width: 10),
                                   Expanded(
-                                    child: Text(e.name,
-                                        style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 14)),
+                                    child: Text(
+                                      e.name,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                      ),
+                                    ),
                                   ),
-                                  if (rec != null)
-                                    _statusBadge(rec.status),
+                                  if (rec != null) _statusBadge(rec.status),
                                 ],
                               ),
                               const SizedBox(height: 10),
                               Wrap(
                                 spacing: 6,
                                 children: _statusOptions()
-                                    .map((s) => ChoiceChip(
-                                          label: Text(s['label']!,
-                                              style: const TextStyle(
-                                                  fontSize: 12)),
-                                          selected: rec?.status == s['key'],
-                                          onSelected: (_) =>
-                                              _setStatus(e, s['key']!),
-                                        ))
+                                    .map(
+                                      (s) => ChoiceChip(
+                                        label: Text(
+                                          s['label']!,
+                                          style: const TextStyle(fontSize: 12),
+                                        ),
+                                        selected: rec?.status == s['key'],
+                                        onSelected: (_) =>
+                                            _setStatus(e, s['key']!),
+                                      ),
+                                    )
                                     .toList(),
                               ),
                             ],
@@ -181,12 +195,12 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   }
 
   List<Map<String, String>> _statusOptions() => [
-        {'key': 'present', 'label': 'حاضر'},
-        {'key': 'absent', 'label': 'غائب'},
-        {'key': 'late', 'label': 'متأخر'},
-        {'key': 'leave', 'label': 'إجازة'},
-        {'key': 'holiday', 'label': 'عطلة'},
-      ];
+    {'key': 'present', 'label': 'حاضر'},
+    {'key': 'absent', 'label': 'غائب'},
+    {'key': 'late', 'label': 'متأخر'},
+    {'key': 'leave', 'label': 'إجازة'},
+    {'key': 'holiday', 'label': 'عطلة'},
+  ];
 
   String _statusLabel(String s) {
     return switch (s) {

@@ -435,13 +435,11 @@ class Invoice {
   }) : lines = lines ?? [],
        createdAt = createdAt ?? DateTime.now().toIso8601String();
 
-  double get subtotal =>
-      lines.fold(0.0, (s, l) => s + l.lineSubtotal);
+  double get subtotal => lines.fold(0.0, (s, l) => s + l.lineSubtotal);
   double get totalCost => lines.fold(0.0, (s, l) => s + l.costTotal);
   bool get isReturn =>
       invoiceType == 'sale_return' || invoiceType == 'purchase_return';
-  bool get isSale =>
-      invoiceType == 'sale' || invoiceType == 'sale_return';
+  bool get isSale => invoiceType == 'sale' || invoiceType == 'sale_return';
 
   Map<String, dynamic> toMap() => {
     'id': id,
@@ -599,15 +597,16 @@ class PaymentAllocation {
     'date': date,
   };
 
-  factory PaymentAllocation.fromMap(Map<String, dynamic> m) => PaymentAllocation(
-    id: m['id'] as String,
-    paymentId: m['paymentId'] as String? ?? '',
-    invoiceType: m['invoiceType'] as String? ?? 'sale',
-    invoiceId: m['invoiceId'] as String? ?? '',
-    invoiceNumber: m['invoiceNumber'] as String? ?? '',
-    amount: (m['amount'] as num?)?.toDouble() ?? 0.0,
-    date: m['date'] as String? ?? '',
-  );
+  factory PaymentAllocation.fromMap(Map<String, dynamic> m) =>
+      PaymentAllocation(
+        id: m['id'] as String,
+        paymentId: m['paymentId'] as String? ?? '',
+        invoiceType: m['invoiceType'] as String? ?? 'sale',
+        invoiceId: m['invoiceId'] as String? ?? '',
+        invoiceNumber: m['invoiceNumber'] as String? ?? '',
+        amount: (m['amount'] as num?)?.toDouble() ?? 0.0,
+        date: m['date'] as String? ?? '',
+      );
 }
 
 /// المصروف — expenses
@@ -694,7 +693,8 @@ class InventoryMovement {
   String itemName;
   String warehouseId;
   String date;
-  String movementType; // purchase/sale/return_in/return_out/transfer_in/transfer_out/adjustment/opening
+  String
+  movementType; // purchase/sale/return_in/return_out/transfer_in/transfer_out/adjustment/opening
   String referenceType;
   String? referenceId;
   double quantityIn;
@@ -740,22 +740,23 @@ class InventoryMovement {
     'createdAt': createdAt,
   };
 
-  factory InventoryMovement.fromMap(Map<String, dynamic> m) => InventoryMovement(
-    id: m['id'] as String,
-    itemId: m['itemId'] as String? ?? '',
-    itemName: m['itemName'] as String? ?? '',
-    warehouseId: m['warehouseId'] as String? ?? 'wh_main',
-    date: m['date'] as String? ?? '',
-    movementType: m['movementType'] as String? ?? 'adjustment',
-    referenceType: m['referenceType'] as String? ?? '',
-    referenceId: m['referenceId'] as String?,
-    quantityIn: (m['quantityIn'] as num?)?.toDouble() ?? 0.0,
-    quantityOut: (m['quantityOut'] as num?)?.toDouble() ?? 0.0,
-    unitCost: (m['unitCost'] as num?)?.toDouble() ?? 0.0,
-    balanceAfter: (m['balanceAfter'] as num?)?.toDouble() ?? 0.0,
-    notes: m['notes'] as String? ?? '',
-    createdAt: m['createdAt'] as String?,
-  );
+  factory InventoryMovement.fromMap(Map<String, dynamic> m) =>
+      InventoryMovement(
+        id: m['id'] as String,
+        itemId: m['itemId'] as String? ?? '',
+        itemName: m['itemName'] as String? ?? '',
+        warehouseId: m['warehouseId'] as String? ?? 'wh_main',
+        date: m['date'] as String? ?? '',
+        movementType: m['movementType'] as String? ?? 'adjustment',
+        referenceType: m['referenceType'] as String? ?? '',
+        referenceId: m['referenceId'] as String?,
+        quantityIn: (m['quantityIn'] as num?)?.toDouble() ?? 0.0,
+        quantityOut: (m['quantityOut'] as num?)?.toDouble() ?? 0.0,
+        unitCost: (m['unitCost'] as num?)?.toDouble() ?? 0.0,
+        balanceAfter: (m['balanceAfter'] as num?)?.toDouble() ?? 0.0,
+        notes: m['notes'] as String? ?? '',
+        createdAt: m['createdAt'] as String?,
+      );
 }
 
 /// الصندوق — cashboxes
@@ -1292,9 +1293,9 @@ class Branch {
     List<String>? warehouseIds,
     List<String>? cashboxIds,
     List<String>? userNames,
-  })  : warehouseIds = warehouseIds ?? [],
-        cashboxIds = cashboxIds ?? [],
-        userNames = userNames ?? [];
+  }) : warehouseIds = warehouseIds ?? [],
+       cashboxIds = cashboxIds ?? [],
+       userNames = userNames ?? [];
 
   Map<String, dynamic> toMap() => {
     'id': id,
@@ -1319,7 +1320,9 @@ class Branch {
     email: m['email'] as String? ?? '',
     isActive: m['isActive'] as bool? ?? true,
     isDeleted: m['isDeleted'] as bool? ?? false,
-    warehouseIds: (m['warehouseIds'] as List?)?.map((e) => e.toString()).toList(),
+    warehouseIds: (m['warehouseIds'] as List?)
+        ?.map((e) => e.toString())
+        .toList(),
     cashboxIds: (m['cashboxIds'] as List?)?.map((e) => e.toString()).toList(),
     userNames: (m['userNames'] as List?)?.map((e) => e.toString()).toList(),
   );
@@ -1595,7 +1598,8 @@ class OrderDoc {
     contactId: m['contactId'] as String?,
     contactName: m['contactName'] as String? ?? '',
     warehouseId: m['warehouseId'] as String? ?? '',
-    lines: (m['lines'] as List?)
+    lines:
+        (m['lines'] as List?)
             ?.map((e) => InvoiceLine.fromMap(Map<String, dynamic>.from(e)))
             .toList() ??
         [],

@@ -21,6 +21,7 @@ class DataEntity {
   final String title; // الاسم العربي
   final List<EntityField> fields;
   final List<List<String>> Function() exportRows;
+
   /// يستورد صفاً واحداً (خريطة: key -> value). يُرجع رسالة خطأ أو null.
   final Future<String?> Function(Map<String, String> row) importRow;
 
@@ -78,8 +79,8 @@ class DataRegistry {
         final typeRaw = _at(r, 'type');
         final type = typeRaw.contains('مورد') || typeRaw == 'supplier'
             ? (typeRaw.contains('كلاهما') || typeRaw.contains('both')
-                ? 'both'
-                : 'supplier')
+                  ? 'both'
+                  : 'supplier')
             : 'customer';
         final c = Contact(
           id: AppDatabase.newId(),
@@ -157,18 +158,19 @@ class DataRegistry {
         EntityField('location', 'الموقع'),
       ],
       exportRows: () => [
-        for (final w in AppDatabase.warehouses)
-          [w.code, w.name, w.location],
+        for (final w in AppDatabase.warehouses) [w.code, w.name, w.location],
       ],
       importRow: (r) async {
         final name = _at(r, 'name');
         if (name.isEmpty) return 'الاسم مطلوب';
-        await AppDatabase.saveWarehouse(Warehouse(
-          id: AppDatabase.newId(),
-          name: name,
-          code: _at(r, 'code'),
-          location: _at(r, 'location'),
-        ));
+        await AppDatabase.saveWarehouse(
+          Warehouse(
+            id: AppDatabase.newId(),
+            name: name,
+            code: _at(r, 'code'),
+            location: _at(r, 'location'),
+          ),
+        );
         return null;
       },
     ),
@@ -189,12 +191,14 @@ class DataRegistry {
       importRow: (r) async {
         final name = _at(r, 'name');
         if (name.isEmpty) return 'الاسم مطلوب';
-        await AppDatabase.saveCashbox(Cashbox(
-          id: AppDatabase.newId(),
-          name: name,
-          code: _at(r, 'code'),
-          openingBalance: _num(_at(r, 'opening')),
-        ));
+        await AppDatabase.saveCashbox(
+          Cashbox(
+            id: AppDatabase.newId(),
+            name: name,
+            code: _at(r, 'code'),
+            openingBalance: _num(_at(r, 'opening')),
+          ),
+        );
         return null;
       },
     ),
@@ -228,22 +232,25 @@ class DataRegistry {
         if (code.isEmpty) return 'الكود مطلوب';
         if (name.isEmpty) return 'الاسم مطلوب';
         final parentCode = _at(r, 'parent');
-        final parent =
-            parentCode.isEmpty ? null : AppDatabase.accountByCode(parentCode);
+        final parent = parentCode.isEmpty
+            ? null
+            : AppDatabase.accountByCode(parentCode);
         final typeRaw = _at(r, 'type');
         final type = _accTypeFromLabel(typeRaw);
         final nature = _at(r, 'nature').contains('دائن') ? 'credit' : 'debit';
-        await AppDatabase.saveAccount(Account(
-          id: AppDatabase.newId(),
-          code: code,
-          name: name,
-          accountType: type,
-          accountNature: nature,
-          parentId: parent?.id,
-          level: parent == null ? 1 : parent.level + 1,
-          isLeaf: true,
-          openingBalance: _num(_at(r, 'opening')),
-        ));
+        await AppDatabase.saveAccount(
+          Account(
+            id: AppDatabase.newId(),
+            code: code,
+            name: name,
+            accountType: type,
+            accountNature: nature,
+            parentId: parent?.id,
+            level: parent == null ? 1 : parent.level + 1,
+            isLeaf: true,
+            openingBalance: _num(_at(r, 'opening')),
+          ),
+        );
         return null;
       },
     ),
@@ -284,20 +291,22 @@ class DataRegistry {
       importRow: (r) async {
         final name = _at(r, 'name');
         if (name.isEmpty) return 'الاسم مطلوب';
-        await AppDatabase.saveEmployee(Employee(
-          id: AppDatabase.newId(),
-          code: _at(r, 'code'),
-          name: name,
-          jobTitle: _at(r, 'job'),
-          department: _at(r, 'department'),
-          phone: _at(r, 'phone'),
-          email: _at(r, 'email'),
-          nationalId: _at(r, 'national'),
-          hireDate: _at(r, 'hire'),
-          basicSalary: _num(_at(r, 'basic')),
-          allowances: _num(_at(r, 'allowances')),
-          deductions: _num(_at(r, 'deductions')),
-        ));
+        await AppDatabase.saveEmployee(
+          Employee(
+            id: AppDatabase.newId(),
+            code: _at(r, 'code'),
+            name: name,
+            jobTitle: _at(r, 'job'),
+            department: _at(r, 'department'),
+            phone: _at(r, 'phone'),
+            email: _at(r, 'email'),
+            nationalId: _at(r, 'national'),
+            hireDate: _at(r, 'hire'),
+            basicSalary: _num(_at(r, 'basic')),
+            allowances: _num(_at(r, 'allowances')),
+            deductions: _num(_at(r, 'deductions')),
+          ),
+        );
         return null;
       },
     ),
@@ -320,14 +329,16 @@ class DataRegistry {
       importRow: (r) async {
         final name = _at(r, 'name');
         if (name.isEmpty) return 'الاسم مطلوب';
-        await AppDatabase.saveBranch(Branch(
-          id: AppDatabase.newId(),
-          code: _at(r, 'code'),
-          name: name,
-          phone: _at(r, 'phone'),
-          email: _at(r, 'email'),
-          address: _at(r, 'address'),
-        ));
+        await AppDatabase.saveBranch(
+          Branch(
+            id: AppDatabase.newId(),
+            code: _at(r, 'code'),
+            name: name,
+            phone: _at(r, 'phone'),
+            email: _at(r, 'email'),
+            address: _at(r, 'address'),
+          ),
+        );
         return null;
       },
     ),
@@ -350,13 +361,15 @@ class DataRegistry {
         final name = _at(r, 'name');
         if (name.isEmpty) return 'الاسم مطلوب';
         final f = _num(_at(r, 'factor'));
-        await AppDatabase.saveUnit(Unit(
-          id: AppDatabase.newId(),
-          code: _at(r, 'code'),
-          name: name,
-          symbol: _at(r, 'symbol'),
-          conversionFactor: f == 0 ? 1.0 : f,
-        ));
+        await AppDatabase.saveUnit(
+          Unit(
+            id: AppDatabase.newId(),
+            code: _at(r, 'code'),
+            name: name,
+            symbol: _at(r, 'symbol'),
+            conversionFactor: f == 0 ? 1.0 : f,
+          ),
+        );
         return null;
       },
     ),
@@ -392,7 +405,9 @@ class DataRegistry {
 
   // ---------------------------- الاستيراد ----------------------------
   static Future<ImportResult> importFromRows(
-      String entityId, List<List<String>> rows) async {
+    String entityId,
+    List<List<String>> rows,
+  ) async {
     final e = byId(entityId);
     if (e == null) {
       return ImportResult(success: 0, failed: 0, errors: ['كيان غير معروف']);
@@ -419,9 +434,10 @@ class DataRegistry {
       }
     }
     return ImportResult(
-        success: ok,
-        failed: rows.length - 1 - ok,
-        errors: errors);
+      success: ok,
+      failed: rows.length - 1 - ok,
+      errors: errors,
+    );
   }
 
   // ---------------------------- أدوات مساعدة ----------------------------
@@ -433,18 +449,18 @@ class DataRegistry {
   }
 
   static String _contactTypeLabel(String t) => switch (t) {
-        'supplier' => 'مورد',
-        'both' => 'عميل ومورد',
-        _ => 'عميل',
-      };
+    'supplier' => 'مورد',
+    'both' => 'عميل ومورد',
+    _ => 'عميل',
+  };
 
   static String _accTypeLabel(String t) => switch (t) {
-        'asset' => 'أصول',
-        'liability' => 'خصوم',
-        'equity' => 'حقوق ملكية',
-        'revenue' => 'إيرادات',
-        _ => 'مصروفات',
-      };
+    'asset' => 'أصول',
+    'liability' => 'خصوم',
+    'equity' => 'حقوق ملكية',
+    'revenue' => 'إيرادات',
+    _ => 'مصروفات',
+  };
 
   static String _accTypeFromLabel(String label) {
     if (label.contains('خصوم')) return 'liability';

@@ -30,10 +30,12 @@ class _InventoryHomeState extends State<InventoryHome> {
     final prov = context.watch<ERPProvider>();
     final curr = prov.currency;
     final items = prov.items
-        .where((i) =>
-            _search.isEmpty ||
-            i.name.contains(_search) ||
-            i.barcode.contains(_search))
+        .where(
+          (i) =>
+              _search.isEmpty ||
+              i.name.contains(_search) ||
+              i.barcode.contains(_search),
+        )
         .toList();
 
     return Scaffold(
@@ -70,7 +72,8 @@ class _InventoryHomeState extends State<InventoryHome> {
                   () => Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (_) => const StockTransferScreen()),
+                      builder: (_) => const StockTransferScreen(),
+                    ),
                   ),
                 ),
                 _actionBtn(
@@ -97,8 +100,7 @@ class _InventoryHomeState extends State<InventoryHome> {
                   'المخازن',
                   () => Navigator.push(
                     context,
-                    MaterialPageRoute(
-                        builder: (_) => const WarehousesScreen()),
+                    MaterialPageRoute(builder: (_) => const WarehousesScreen()),
                   ),
                 ),
               ],
@@ -152,8 +154,7 @@ class _InventoryHomeState extends State<InventoryHome> {
                     } else if (v == 'center') {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
-                            builder: (_) => const ImportScreen()),
+                        MaterialPageRoute(builder: (_) => const ImportScreen()),
                       );
                     }
                   },
@@ -162,7 +163,10 @@ class _InventoryHomeState extends State<InventoryHome> {
                       value: 'excel',
                       child: ListTile(
                         dense: true,
-                        leading: Icon(Icons.table_view, color: AppColors.success),
+                        leading: Icon(
+                          Icons.table_view,
+                          color: AppColors.success,
+                        ),
                         title: Text('تصدير الأصناف Excel'),
                       ),
                     ),
@@ -204,20 +208,22 @@ class _InventoryHomeState extends State<InventoryHome> {
                           onTap: () => Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (_) => ItemForm(item: it)),
+                              builder: (_) => ItemForm(item: it),
+                            ),
                           ),
                           leading: CircleAvatar(
-                            backgroundColor: (low
-                                    ? AppColors.danger
-                                    : AppColors.primary)
-                                .withValues(alpha: 0.12),
+                            backgroundColor:
+                                (low ? AppColors.danger : AppColors.primary)
+                                    .withValues(alpha: 0.12),
                             child: Icon(
                               Icons.inventory_2,
                               color: low ? AppColors.danger : AppColors.primary,
                             ),
                           ),
-                          title: Text(it.name,
-                              style: const TextStyle(fontSize: 14)),
+                          title: Text(
+                            it.name,
+                            style: const TextStyle(fontSize: 14),
+                          ),
                           subtitle: Text(
                             'بيع: ${Fmt.money(it.salePrice, curr)} • شراء: ${Fmt.money(it.purchasePrice, curr)}',
                             style: const TextStyle(fontSize: 12),
@@ -240,7 +246,9 @@ class _InventoryHomeState extends State<InventoryHome> {
                                 const Text(
                                   '⚠ أقل من حد الطلب',
                                   style: TextStyle(
-                                      fontSize: 10, color: AppColors.danger),
+                                    fontSize: 10,
+                                    color: AppColors.danger,
+                                  ),
                                 ),
                             ],
                           ),
@@ -255,7 +263,11 @@ class _InventoryHomeState extends State<InventoryHome> {
   }
 
   Widget _actionBtn(
-      BuildContext context, IconData icon, String label, VoidCallback onTap) {
+    BuildContext context,
+    IconData icon,
+    String label,
+    VoidCallback onTap,
+  ) {
     return Expanded(
       child: InkWell(
         onTap: onTap,

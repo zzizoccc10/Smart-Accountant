@@ -76,7 +76,8 @@ Future<String?> saveBytesToPickedLocationImpl(
 }) async {
   final key = storageKey ?? 'default';
   final initialDir = await lastDirFor(key);
-  final supportsInitialDir = Platform.isLinux || Platform.isMacOS || Platform.isWindows;
+  final supportsInitialDir =
+      Platform.isLinux || Platform.isMacOS || Platform.isWindows;
 
   try {
     final path = await FilePicker.platform.saveFile(

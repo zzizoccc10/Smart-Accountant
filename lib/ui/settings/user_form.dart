@@ -84,17 +84,19 @@ class _UserFormState extends State<UserForm> {
         _snack('البريد مستخدم بالفعل', error: true);
         return;
       }
-      await UserService.create(AppUser(
-        id: UserService.newId(),
-        name: _name.text.trim(),
-        email: _email.text.trim(),
-        phone: _phone.text.trim(),
-        role: _role,
-        permissions: perms,
-        useRoleDefaults: isOwnerRole ? true : _useDefaults,
-        isActive: _isActive,
-        branchId: _branchId,
-      ));
+      await UserService.create(
+        AppUser(
+          id: UserService.newId(),
+          name: _name.text.trim(),
+          email: _email.text.trim(),
+          phone: _phone.text.trim(),
+          role: _role,
+          permissions: perms,
+          useRoleDefaults: isOwnerRole ? true : _useDefaults,
+          isActive: _isActive,
+          branchId: _branchId,
+        ),
+      );
     }
 
     if (session.currentUser != null) {
@@ -113,8 +115,9 @@ class _UserFormState extends State<UserForm> {
   Widget build(BuildContext context) {
     final session = context.read<SessionProvider>();
     final branches = AppDatabase.branches;
-    final effectivePerms =
-        _role == UserRole.owner ? Perm.all : Perm.defaultsForRole(_role);
+    final effectivePerms = _role == UserRole.owner
+        ? Perm.all
+        : Perm.defaultsForRole(_role);
 
     return Scaffold(
       appBar: AppBar(
@@ -173,10 +176,9 @@ class _UserFormState extends State<UserForm> {
                 border: OutlineInputBorder(),
               ),
               items: UserRole.values
-                  .map((r) => DropdownMenuItem(
-                        value: r,
-                        child: Text(r.labelAr),
-                      ))
+                  .map(
+                    (r) => DropdownMenuItem(value: r, child: Text(r.labelAr)),
+                  )
                   .toList(),
               onChanged: (r) {
                 if (r == null) return;
@@ -191,8 +193,9 @@ class _UserFormState extends State<UserForm> {
             // الفرع
             if (branches.isNotEmpty)
               DropdownButtonFormField<String?>(
-                initialValue:
-                    branches.any((b) => b.id == _branchId) ? _branchId : null,
+                initialValue: branches.any((b) => b.id == _branchId)
+                    ? _branchId
+                    : null,
                 decoration: const InputDecoration(
                   labelText: 'الفرع (اختياري)',
                   prefixIcon: Icon(Icons.store_outlined),
@@ -200,10 +203,9 @@ class _UserFormState extends State<UserForm> {
                 ),
                 items: [
                   const DropdownMenuItem(value: null, child: Text('بدون فرع')),
-                  ...branches.map((b) => DropdownMenuItem(
-                        value: b.id,
-                        child: Text(b.name),
-                      )),
+                  ...branches.map(
+                    (b) => DropdownMenuItem(value: b.id, child: Text(b.name)),
+                  ),
                 ],
                 onChanged: (v) => setState(() => _branchId = v),
               ),
@@ -217,8 +219,10 @@ class _UserFormState extends State<UserForm> {
             ),
 
             const Divider(height: 24),
-            const Text('الصلاحيات',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            const Text(
+              'الصلاحيات',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
             const SizedBox(height: 4),
 
             if (_role == UserRole.owner)
@@ -290,11 +294,32 @@ class _UserFormState extends State<UserForm> {
   /// أقسام الصلاحيات (مجمّعة)
   List<Widget> _permissionSections() {
     final groups = <String, List<String>>{
-      'المبيعات': [Perm.salesView, Perm.salesCreate, Perm.salesEdit, Perm.salesDelete],
-      'المشتريات': [Perm.purchasesView, Perm.purchasesCreate, Perm.purchasesEdit, Perm.purchasesDelete],
-      'المخزون': [Perm.inventoryView, Perm.inventoryManage, Perm.inventoryTransfer, Perm.inventoryCount],
+      'المبيعات': [
+        Perm.salesView,
+        Perm.salesCreate,
+        Perm.salesEdit,
+        Perm.salesDelete,
+      ],
+      'المشتريات': [
+        Perm.purchasesView,
+        Perm.purchasesCreate,
+        Perm.purchasesEdit,
+        Perm.purchasesDelete,
+      ],
+      'المخزون': [
+        Perm.inventoryView,
+        Perm.inventoryManage,
+        Perm.inventoryTransfer,
+        Perm.inventoryCount,
+      ],
       'جهات الاتصال': [Perm.contactsView, Perm.contactsManage],
-      'الحسابات والقيود': [Perm.accountsView, Perm.accountsManage, Perm.journalView, Perm.journalCreate, Perm.journalDelete],
+      'الحسابات والقيود': [
+        Perm.accountsView,
+        Perm.accountsManage,
+        Perm.journalView,
+        Perm.journalCreate,
+        Perm.journalDelete,
+      ],
       'الخزينة': [Perm.cashView, Perm.cashManage],
       'التقارير': [Perm.reportsView, Perm.reportsExport],
       'الموارد البشرية': [Perm.hrView, Perm.hrManage],
@@ -309,9 +334,10 @@ class _UserFormState extends State<UserForm> {
       return Card(
         margin: const EdgeInsets.only(bottom: 8),
         child: ExpansionTile(
-          title: Text(e.key,
-              style: const TextStyle(
-                  fontSize: 14, fontWeight: FontWeight.w600)),
+          title: Text(
+            e.key,
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+          ),
           trailing: Checkbox(
             value: allSelected,
             onChanged: (v) {
@@ -327,8 +353,10 @@ class _UserFormState extends State<UserForm> {
           children: e.value.map((p) {
             return CheckboxListTile(
               dense: true,
-              title: Text(Perm.labelsAr[p] ?? p,
-                  style: const TextStyle(fontSize: 13)),
+              title: Text(
+                Perm.labelsAr[p] ?? p,
+                style: const TextStyle(fontSize: 13),
+              ),
               value: _permissions.contains(p),
               activeColor: AppColors.primary,
               onChanged: (v) {
@@ -349,10 +377,7 @@ class _UserFormState extends State<UserForm> {
 
   void _snack(String msg, {bool error = false}) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(msg),
-        backgroundColor: error ? Colors.red : null,
-      ),
+      SnackBar(content: Text(msg), backgroundColor: error ? Colors.red : null),
     );
   }
 }

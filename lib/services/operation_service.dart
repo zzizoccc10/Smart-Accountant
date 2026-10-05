@@ -71,11 +71,12 @@ class OperationService {
   /// كل العمليات (الأحدث أولاً)
   static List<OperationLog> all() {
     try {
-      final list = _box.values
-          .whereType<Map>()
-          .map((m) => OperationLog.fromMap(Map<String, dynamic>.from(m)))
-          .toList()
-        ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      final list =
+          _box.values
+              .whereType<Map>()
+              .map((m) => OperationLog.fromMap(Map<String, dynamic>.from(m)))
+              .toList()
+            ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
       return list;
     } catch (_) {
       return [];
@@ -162,19 +163,16 @@ class OperationService {
     final db = _db;
     if (db == null) return;
     try {
-      await db.collection('operations').doc(op.id).set(
-        {
-          'id': op.id,
-          'companyId': op.companyId,
-          'userId': op.userId,
-          'userName': op.userName,
-          'action': op.action,
-          'details': op.details,
-          'createdAt': op.createdAt,
-          'serverAt': FieldValue.serverTimestamp(),
-        },
-        SetOptions(merge: true),
-      );
+      await db.collection('operations').doc(op.id).set({
+        'id': op.id,
+        'companyId': op.companyId,
+        'userId': op.userId,
+        'userName': op.userName,
+        'action': op.action,
+        'details': op.details,
+        'createdAt': op.createdAt,
+        'serverAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
     } catch (e) {
       if (kDebugMode) debugPrint('[OperationService] push fail: $e');
     }

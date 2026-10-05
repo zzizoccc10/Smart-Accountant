@@ -43,11 +43,16 @@ class AlertsScreen extends StatelessWidget {
                             dense: true,
                             leading: const CircleAvatar(
                               backgroundColor: Color(0x1AC62828),
-                              child: Icon(Icons.inventory_2,
-                                  color: AppColors.danger, size: 20),
+                              child: Icon(
+                                Icons.inventory_2,
+                                color: AppColors.danger,
+                                size: 20,
+                              ),
                             ),
-                            title: Text(it.name,
-                                style: const TextStyle(fontSize: 13)),
+                            title: Text(
+                              it.name,
+                              style: const TextStyle(fontSize: 13),
+                            ),
                             subtitle: Text(
                               'المتاح: ${Fmt.num(prov.stockQty(it.id))} • حد الطلب: ${Fmt.num(it.reorderLevel)}',
                               style: const TextStyle(fontSize: 11),
@@ -56,7 +61,8 @@ class AlertsScreen extends StatelessWidget {
                             onTap: () => Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (_) => ItemForm(item: it)),
+                                builder: (_) => ItemForm(item: it),
+                              ),
                             ),
                           ),
                       ],
@@ -77,8 +83,11 @@ class AlertsScreen extends StatelessWidget {
                             dense: true,
                             leading: const CircleAvatar(
                               backgroundColor: Color(0x1AF57C00),
-                              child: Icon(Icons.receipt_long,
-                                  color: AppColors.warning, size: 20),
+                              child: Icon(
+                                Icons.receipt_long,
+                                color: AppColors.warning,
+                                size: 20,
+                              ),
                             ),
                             title: Text(
                               inv.contactName.isEmpty
@@ -101,8 +110,9 @@ class AlertsScreen extends StatelessWidget {
                             onTap: () => Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (_) =>
-                                      InvoiceDetailsScreen(invoiceId: inv.id)),
+                                builder: (_) =>
+                                    InvoiceDetailsScreen(invoiceId: inv.id),
+                              ),
                             ),
                           ),
                       ],

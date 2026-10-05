@@ -47,7 +47,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
               'الهاتف',
               'البريد',
               'الرقم الضريبي',
-              'الرصيد'
+              'الرصيد',
             ],
             rows: [
               for (final c in list)
@@ -99,7 +99,8 @@ class _ContactsScreenState extends State<ContactsScreen> {
                     onAction: () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => const ContactForm(defaultType: 'customer'),
+                        builder: (_) =>
+                            const ContactForm(defaultType: 'customer'),
                       ),
                     ),
                   )
@@ -127,14 +128,19 @@ class _ContactsScreenState extends State<ContactsScreen> {
                               c.contactType == 'supplier'
                                   ? Icons.local_shipping
                                   : Icons.person,
-                              color:
-                                  bal >= 0 ? AppColors.info : AppColors.danger,
+                              color: bal >= 0
+                                  ? AppColors.info
+                                  : AppColors.danger,
                             ),
                           ),
-                          title: Text(c.name,
-                              style: const TextStyle(fontSize: 14)),
+                          title: Text(
+                            c.name,
+                            style: const TextStyle(fontSize: 14),
+                          ),
                           subtitle: Text(
-                            c.phone.isEmpty ? _typeLabel(c.contactType) : c.phone,
+                            c.phone.isEmpty
+                                ? _typeLabel(c.contactType)
+                                : c.phone,
                             style: const TextStyle(fontSize: 12),
                           ),
                           trailing: Column(

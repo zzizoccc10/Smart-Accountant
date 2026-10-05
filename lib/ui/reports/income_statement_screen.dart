@@ -108,8 +108,11 @@ class IncomeStatementScreen extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: (netProfit >= 0 ? AppColors.success : AppColors.danger)
-                          .withValues(alpha: 0.1),
+                      color:
+                          (netProfit >= 0
+                                  ? AppColors.success
+                                  : AppColors.danger)
+                              .withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(
@@ -117,7 +120,9 @@ class IncomeStatementScreen extends StatelessWidget {
                         Text(
                           netProfit >= 0 ? 'صافي الربح' : 'صافي الخسارة',
                           style: const TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.bold),
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                         const Spacer(),
                         Text(
@@ -189,9 +194,10 @@ class _Header extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 8),
-          Text(title,
-              style:
-                  const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+          Text(
+            title,
+            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+          ),
         ],
       ),
     );

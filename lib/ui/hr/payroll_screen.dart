@@ -33,8 +33,11 @@ class _PayrollScreenState extends State<PayrollScreen> {
     }
     // الموظفون الذين لم يُصرف لهم راتب هذا الشهر
     final pending = active
-        .where((e) => !prov.payrolls
-            .any((p) => p.employeeId == e.id && p.period == _period))
+        .where(
+          (e) => !prov.payrolls.any(
+            (p) => p.employeeId == e.id && p.period == _period,
+          ),
+        )
         .toList();
     if (pending.isEmpty) {
       _snack('تم صرف رواتب جميع الموظفين لهذا الشهر', AppColors.info);
@@ -62,17 +65,20 @@ class _PayrollScreenState extends State<PayrollScreen> {
   }
 
   void _snack(String msg, Color c) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(msg), backgroundColor: c),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(msg), backgroundColor: c));
   }
 
   @override
   Widget build(BuildContext context) {
     final prov = context.watch<ERPProvider>();
     final curr = prov.currency;
-    final list =
-        prov.payrolls.where((p) => p.period == _period).toList().reversed.toList();
+    final list = prov.payrolls
+        .where((p) => p.period == _period)
+        .toList()
+        .reversed
+        .toList();
     final total = list.fold(0.0, (s, p) => s + p.netPay);
 
     return Scaffold(
@@ -88,7 +94,7 @@ class _PayrollScreenState extends State<PayrollScreen> {
               'الأساسي',
               'البدلات',
               'الخصومات',
-              'الصافي'
+              'الصافي',
             ],
             rows: [
               for (final p in list)
@@ -122,19 +128,26 @@ class _PayrollScreenState extends State<PayrollScreen> {
                         initialDatePickerMode: DatePickerMode.year,
                       );
                       if (picked != null) {
-                        setState(() => _period =
-                            picked.toIso8601String().substring(0, 7));
+                        setState(
+                          () => _period = picked.toIso8601String().substring(
+                            0,
+                            7,
+                          ),
+                        );
                       }
                     },
                     child: Row(
                       children: [
                         const Icon(Icons.calendar_month, color: Colors.white),
                         const SizedBox(width: 8),
-                        Text('شهر: $_period',
-                            style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16)),
+                        Text(
+                          'شهر: $_period',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -191,11 +204,15 @@ class _PayrollScreenState extends State<PayrollScreen> {
                         child: ListTile(
                           leading: const CircleAvatar(
                             backgroundColor: Color(0x1A2E7D32),
-                            child: Icon(Icons.payments,
-                                color: AppColors.success),
+                            child: Icon(
+                              Icons.payments,
+                              color: AppColors.success,
+                            ),
                           ),
-                          title: Text(p.employeeName,
-                              style: const TextStyle(fontSize: 14)),
+                          title: Text(
+                            p.employeeName,
+                            style: const TextStyle(fontSize: 14),
+                          ),
                           subtitle: Text(
                             '${p.payrollNumber} • ${p.period}',
                             style: const TextStyle(fontSize: 12),

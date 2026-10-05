@@ -7,6 +7,8 @@
 //   3) زائر بدون حساب (Guest) → وضع تجريبي.
 // كما يدير: الصلاحيات، المزامنة، إلخ.
 // ============================================================================
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 
 import '../data/app_database.dart';
@@ -20,6 +22,7 @@ import '../services/firebase_config.dart';
 import '../services/operation_service.dart';
 import '../services/push_notifications.dart';
 import '../services/realtime_service.dart';
+import '../services/sync_queue.dart';
 import '../services/sync_service.dart';
 import '../services/user_service.dart';
 
@@ -52,6 +55,40 @@ class SessionProvider extends ChangeNotifier {
 
   bool get isOwner => _currentUser?.isOwner ?? false;
   bool get cloudEnabled => FirebaseConfig.isConfigured;
+
+  // --------------------------------------------------------------------------
+  // إتاحة/إظهار قسم «دخول مالك النظام» في الواجهة الرئيسية
+  // --------------------------------------------------------------------------
+  /// هل يوجد حساب مالك نظام مُنشأ؟
+  bool get hasSystemOwner => ControlService.hasSystemOwner;
+
+  /// هل جلسة مالك النظام فعّالة الآن؟ (تُخفي قسم الدخول عن الجميع)
+  bool get isOwnerSessionActive => ControlService.isOwnerSessionActive;
+
+  /// هل يُسمح لهذا الجهاز بإظهار قسم دخول المالك؟
+  ///   • إن لم يُنشأ مالك بعد ⇒ نعم (لعرض شاشة الإنشاء أول مرة).
+  ///   • إن كانت الجلسة فعّالة ⇒ لا (يختفي عن الجميع).
+  ///   • الجهاز الأول ⇒ نعم. غيره ⇒ فقط إن سمح المالك.
+  bool get canShowOwnerLogin {
+    if (!hasSystemOwner) return true; // أول مرة — لإتاحة الإنشاء
+    if (isOwnerSessionActive) return false; // الجلسة فعّالة ⇒ يختفي
+    return ControlService.canShowOwnerEntryOnDevice;
+  }
+
+  /// هل يمكن لهذا المستخدم فتح لوحة المالك من داخل التطبيق؟
+  /// (أول منشأة مرتبطة + إذن المالك).
+  bool get canOpenOwnerPanelFromCompany {
+    if (!hasSystemOwner) return false;
+    if (cloudOwnerSessionActive && !_ownsThisDevice) return false;
+    final cid = currentCompanyId;
+    if (cid.isEmpty) return false;
+    return ControlService.canCompanyOpenOwnerPanel(cid);
+  }
+
+  bool get cloudOwnerSessionActive => ControlService.isOwnerSessionActive;
+
+  bool get _ownsThisDevice =>
+      ControlService.ownerConfig.sessionDeviceId == DeviceService.deviceId;
 
   /// الصلاحيات الفعّالة للمستخدم الحالي (null = غير محدود/غير معروف)
   Set<String>? get permissions => _currentUser?.effectivePermissions;
@@ -200,10 +237,8 @@ class SessionProvider extends ChangeNotifier {
   // ============================ دخول مالك النظام ============================
   // ==========================================================================
 
-  /// هل يوجد حساب مالك نظام مُنشأ؟
-  bool get hasSystemOwner => ControlService.hasSystemOwner;
-
-  /// إنشاء حساب مالك النظام الأول
+  /// إنشاء حساب مالك النظام الأول — مرة واحدة فقط.
+  /// إن كان الحساب موجوداً مسبقاً، فلا يُعاد إنشاؤه (يكتفى بالأول).
   Future<bool> createSystemOwner({
     required String name,
     required String username,
@@ -214,6 +249,11 @@ class SessionProvider extends ChangeNotifier {
     _error = null;
     notifyListeners();
     try {
+      // لا يُسمح بإنشاء حساب مالك ثانٍ — نكتفي بالأول.
+      if (ControlService.hasSystemOwner) {
+        _error = 'حساب مالك النظام منشأ بالفعل — يمكنك تعديل بياناته من اللوحة';
+        return false;
+      }
       await ControlService.createSystemOwner(
         name: name,
         username: username,
@@ -223,6 +263,7 @@ class SessionProvider extends ChangeNotifier {
       _systemOwner = ControlService.systemOwner;
       _mode = AuthMode.systemOwner;
       await ControlService.touchSystemOwnerLogin();
+      await _enterOwnerSession();
       return true;
     } catch (e) {
       _error = '$e';
@@ -246,10 +287,12 @@ class SessionProvider extends ChangeNotifier {
       _mode = AuthMode.systemOwner;
       _systemOwner = ControlService.systemOwner;
       await ControlService.touchSystemOwnerLogin();
-      // زامن قائمة المنشآت من السحابة (لو متاحة)
+      await _enterOwnerSession();
+      // زامن قائمة المنشآت + إعدادات المالك من السحابة (لو متاحة)
       if (ControlService.isCloudAvailable) {
         // لا ننتظر
         ControlService.pullCompaniesFromCloud();
+        ControlService.pullOwnerConfigFromCloud();
       }
       return true;
     } catch (e) {
@@ -260,6 +303,26 @@ class SessionProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  /// تفعيل جلسة المالك (تُخفي قسم الدخول عن بقية الأجهزة) + بدء المراقبة.
+  Future<void> _enterOwnerSession() async {
+    // أوقف قنوات المنشأة إن كانت مفتوحة
+    await RealtimeService.stop();
+    await ControlService.activateOwnerSession();
+    // راقب إعدادات المالك سحابياً (لو متاحة)
+    RealtimeService.startOwnerConfigWatch().catchError((_) {});
+    _heartbeat();
+  }
+
+  /// نبضة دورية لجلسة المالك (تبقى فعّالة وتُخفى عن الأجهزة الأخرى).
+  void _heartbeat() {
+    _hbTimer?.cancel();
+    _hbTimer = Timer.periodic(const Duration(minutes: 3), (_) {
+      if (isSystemOwner) ControlService.heartbeatOwnerSession();
+    });
+  }
+
+  Timer? _hbTimer;
 
   // ==========================================================================
   // ============================ الدخول كزائر ============================
@@ -292,6 +355,9 @@ class SessionProvider extends ChangeNotifier {
 
     // سجّل الزائر في لوحة مالك النظام (قائمة الزوار)
     await DeviceService.recordGuestVisit();
+    // الزائر محلي فقط ⇒ أوقف المزامنة السحابية
+    SyncQueue.cloudEnabled = false;
+    await RealtimeService.stop();
     await OperationService.log(
       action: 'guest_login',
       companyId: 'guest_local',
@@ -483,6 +549,10 @@ class SessionProvider extends ChangeNotifier {
         await PushNotifications.subscribe('branch_${user.branchId}');
       }
     } catch (_) {}
+    // المزامنة الفورية: فعّل قائمة المزامنة وابدأ قنوات Firestore
+    SyncQueue.cloudEnabled = true;
+    SyncQueue.startAutoFlush();
+    unawaited(SyncQueue.flush());
     // ابدأ المزامنة الفورية (real-time) لكل المستخدمين المتصلين
     _startRealtime(user.companyId);
     notifyListeners();
@@ -518,12 +588,19 @@ class SessionProvider extends ChangeNotifier {
         action: 'logout',
       );
     }
+    // إن كان مالك النظام ⇒ أنهِ جلسته (تظهر إمكانية الدخول للأجهزة المصرّح لها)
+    if (_mode == AuthMode.systemOwner) {
+      await ControlService.endOwnerSession();
+      _hbTimer?.cancel();
+      _hbTimer = null;
+    }
     await _stopRealtime();
     await AuthService.signOut();
     _currentUser = null;
     _activeCompany = null;
     _systemOwner = null;
     _mode = AuthMode.companyUser;
+    SyncQueue.cloudEnabled = true;
     notifyListeners();
   }
 

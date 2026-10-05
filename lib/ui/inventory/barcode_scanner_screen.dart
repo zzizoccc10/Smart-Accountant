@@ -143,13 +143,20 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.no_photography, size: 60, color: AppColors.warning),
+            const Icon(
+              Icons.no_photography,
+              size: 60,
+              color: AppColors.warning,
+            ),
             const SizedBox(height: 16),
-            const Text('لا يمكن الوصول للكاميرا',
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold)),
+            const Text(
+              'لا يمكن الوصول للكاميرا',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             const SizedBox(height: 8),
             const Text(
               'يرجى منح صلاحية الكاميرا لمسح الباركود.',
@@ -166,8 +173,10 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
             TextButton.icon(
               onPressed: () => PermissionService.openSettings(),
               icon: const Icon(Icons.settings, color: Colors.white),
-              label: const Text('فتح الإعدادات',
-                  style: TextStyle(color: Colors.white)),
+              label: const Text(
+                'فتح الإعدادات',
+                style: TextStyle(color: Colors.white),
+              ),
             ),
           ],
         ),

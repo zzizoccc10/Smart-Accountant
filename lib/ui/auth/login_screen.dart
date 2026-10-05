@@ -113,6 +113,15 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     final session = context.watch<SessionProvider>();
 
+    // إن تعذّر إظهار قسم دخول المالك على هذا الجهاز (ليس الجهاز الأول،
+    // أو الجلسة فعّالة) ⇒ نجبر النموذج على وضع المنشأة/المستخدم.
+    final showOwner = session.canShowOwnerLogin;
+    if (!showOwner && _tab == 'owner') {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) setState(() => _tab = 'company');
+      });
+    }
+
     return Scaffold(
       backgroundColor: AppColors.primary,
       body: SafeArea(
@@ -133,8 +142,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       // ---------- الشعار ----------
-                      const Icon(Icons.account_balance_wallet_rounded,
-                          size: 52, color: AppColors.primary),
+                      const Icon(
+                        Icons.account_balance_wallet_rounded,
+                        size: 52,
+                        color: AppColors.primary,
+                      ),
                       const SizedBox(height: 8),
                       const Text(
                         'المحاسب السهل',
@@ -147,11 +159,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(height: 16),
 
                       // ---------- الزرّان العلويان ----------
-                      _modeToggle(),
+                      _modeToggle(showOwner: showOwner),
                       const SizedBox(height: 20),
 
                       // ---------- نموذج الدخول ----------
-                      if (_tab == 'company')
+                      if (_tab == 'company' || !showOwner)
                         _companyForm(session)
                       else
                         _ownerForm(session),
@@ -236,13 +248,18 @@ class _LoginScreenState extends State<LoginScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.cloud_off,
-                                size: 14, color: Colors.grey.shade500),
+                            Icon(
+                              Icons.cloud_off,
+                              size: 14,
+                              color: Colors.grey.shade500,
+                            ),
                             const SizedBox(width: 6),
                             Text(
                               'الوضع المحلي — السحابة غير مُفعّلة',
                               style: TextStyle(
-                                  fontSize: 11, color: Colors.grey.shade500),
+                                fontSize: 11,
+                                color: Colors.grey.shade500,
+                              ),
                             ),
                           ],
                         ),
@@ -261,7 +278,7 @@ class _LoginScreenState extends State<LoginScreen> {
   // --------------------------------------------------------------------------
   // الزرّان العلويان (Toggle)
   // --------------------------------------------------------------------------
-  Widget _modeToggle() {
+  Widget _modeToggle({required bool showOwner}) {
     Widget btn({
       required String id,
       required IconData icon,
@@ -283,8 +300,11 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             child: Column(
               children: [
-                Icon(icon,
-                    size: 22, color: active ? Colors.white : Colors.grey.shade700),
+                Icon(
+                  icon,
+                  size: 22,
+                  color: active ? Colors.white : Colors.grey.shade700,
+                ),
                 const SizedBox(height: 4),
                 Text(
                   label,
@@ -309,12 +329,14 @@ class _LoginScreenState extends State<LoginScreen> {
           icon: Icons.storefront_rounded,
           label: 'منشأة / مستخدم',
         ),
-        const SizedBox(width: 10),
-        btn(
-          id: 'owner',
-          icon: Icons.admin_panel_settings_rounded,
-          label: 'مالك النظام',
-        ),
+        if (showOwner) ...[
+          const SizedBox(width: 10),
+          btn(
+            id: 'owner',
+            icon: Icons.admin_panel_settings_rounded,
+            label: 'مالك النظام',
+          ),
+        ],
       ],
     );
   }
@@ -364,7 +386,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       width: 18,
                       height: 18,
                       child: CircularProgressIndicator(
-                          strokeWidth: 2, color: Colors.white),
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
                     )
                   : const Icon(Icons.login),
               label: const Text('دخول'),
@@ -391,8 +415,11 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             child: Row(
               children: [
-                const Icon(Icons.admin_panel_settings,
-                    color: AppColors.purple, size: 20),
+                const Icon(
+                  Icons.admin_panel_settings,
+                  color: AppColors.purple,
+                  size: 20,
+                ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
@@ -425,7 +452,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 prefixIcon: const Icon(Icons.lock_outline),
                 suffixIcon: IconButton(
                   icon: Icon(
-                      _obscureOwner ? Icons.visibility_off : Icons.visibility),
+                    _obscureOwner ? Icons.visibility_off : Icons.visibility,
+                  ),
                   onPressed: () =>
                       setState(() => _obscureOwner = !_obscureOwner),
                 ),
@@ -445,12 +473,16 @@ class _LoginScreenState extends State<LoginScreen> {
                       width: 18,
                       height: 18,
                       child: CircularProgressIndicator(
-                          strokeWidth: 2, color: Colors.white),
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
                     )
                   : const Icon(Icons.login),
-              label: Text(session.hasSystemOwner
-                  ? 'دخول لوحة التحكم'
-                  : 'إنشاء مالك النظام'),
+              label: Text(
+                session.hasSystemOwner
+                    ? 'دخول لوحة التحكم'
+                    : 'إنشاء مالك النظام',
+              ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.purple,
                 foregroundColor: Colors.white,

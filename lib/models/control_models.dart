@@ -58,21 +58,25 @@ extension CompanyPlanX on CompanyPlan {
   }
 
   static CompanyPlan fromKey(String? k) => CompanyPlan.values.firstWhere(
-        (p) => p.name == k,
-        orElse: () => CompanyPlan.free,
-      );
+    (p) => p.name == k,
+    orElse: () => CompanyPlan.free,
+  );
 }
 
 /// صلاحيات/امتيازات ممنوحة للمنشأة من مالك النظام
 class CompanyPrivileges {
   /// مفاتيح الامتيازات الممنوحة
   final Set<String> granted;
+
   /// حدّ أقصى لعدد المستخدمين المسموح بإنشائهم (0 = غير محدود)
   final int maxUsers;
+
   /// هل يُسمح بالتصدير/الطباعة
   final bool allowExport;
+
   /// هل يُسمح بالمزامنة السحابية
   final bool allowCloud;
+
   /// هل يُسمح بالدعم الفني المتقدم
   final bool allowSupport;
 
@@ -110,12 +114,12 @@ class CompanyPrivileges {
   bool has(String key) => granted.isEmpty || granted.contains(key);
 
   Map<String, dynamic> toMap() => {
-        'granted': granted.toList(),
-        'maxUsers': maxUsers,
-        'allowExport': allowExport,
-        'allowCloud': allowCloud,
-        'allowSupport': allowSupport,
-      };
+    'granted': granted.toList(),
+    'maxUsers': maxUsers,
+    'allowExport': allowExport,
+    'allowCloud': allowCloud,
+    'allowSupport': allowSupport,
+  };
 
   factory CompanyPrivileges.fromMap(Map<String, dynamic>? m) {
     if (m == null) return const CompanyPrivileges();
@@ -136,14 +140,13 @@ class CompanyPrivileges {
     bool? allowExport,
     bool? allowCloud,
     bool? allowSupport,
-  }) =>
-      CompanyPrivileges(
-        granted: granted ?? this.granted,
-        maxUsers: maxUsers ?? this.maxUsers,
-        allowExport: allowExport ?? this.allowExport,
-        allowCloud: allowCloud ?? this.allowCloud,
-        allowSupport: allowSupport ?? this.allowSupport,
-      );
+  }) => CompanyPrivileges(
+    granted: granted ?? this.granted,
+    maxUsers: maxUsers ?? this.maxUsers,
+    allowExport: allowExport ?? this.allowExport,
+    allowCloud: allowCloud ?? this.allowCloud,
+    allowSupport: allowSupport ?? this.allowSupport,
+  );
 }
 
 /// حساب منشأة (مستأجر) — العنصر الأساسي في لوحة تحكم مالك النظام
@@ -190,9 +193,9 @@ class CompanyAccount {
     this.appVersion = '',
     this.createdVia = 'email',
     this.synced = false,
-  })  : privileges = privileges ?? const CompanyPrivileges(),
-        createdAt = createdAt ?? DateTime.now().toIso8601String(),
-        updatedAt = updatedAt ?? DateTime.now().toIso8601String();
+  }) : privileges = privileges ?? const CompanyPrivileges(),
+       createdAt = createdAt ?? DateTime.now().toIso8601String(),
+       updatedAt = updatedAt ?? DateTime.now().toIso8601String();
 
   String get initials {
     final t = companyName.trim();
@@ -201,50 +204,50 @@ class CompanyAccount {
   }
 
   Map<String, dynamic> toMap() => {
-        'id': id,
-        'companyName': companyName,
-        'ownerName': ownerName,
-        'username': username,
-        'email': email,
-        'passwordHash': passwordHash,
-        'passwordSalt': passwordSalt,
-        'phone': phone,
-        'isActive': isActive,
-        'plan': plan.name,
-        'privileges': privileges.toMap(),
-        'createdAt': createdAt,
-        'updatedAt': updatedAt,
-        'lastLoginAt': lastLoginAt,
-        'deviceId': deviceId,
-        'appVersion': appVersion,
-        'createdVia': createdVia,
-        'synced': synced,
-      };
+    'id': id,
+    'companyName': companyName,
+    'ownerName': ownerName,
+    'username': username,
+    'email': email,
+    'passwordHash': passwordHash,
+    'passwordSalt': passwordSalt,
+    'phone': phone,
+    'isActive': isActive,
+    'plan': plan.name,
+    'privileges': privileges.toMap(),
+    'createdAt': createdAt,
+    'updatedAt': updatedAt,
+    'lastLoginAt': lastLoginAt,
+    'deviceId': deviceId,
+    'appVersion': appVersion,
+    'createdVia': createdVia,
+    'synced': synced,
+  };
 
   factory CompanyAccount.fromMap(Map<String, dynamic> m) => CompanyAccount(
-        id: m['id'].toString(),
-        companyName: m['companyName'] as String? ?? '',
-        ownerName: m['ownerName'] as String? ?? '',
-        username: m['username'] as String? ?? '',
-        email: m['email'] as String? ?? '',
-        passwordHash: m['passwordHash'] as String? ?? '',
-        passwordSalt: m['passwordSalt'] as String? ?? '',
-        phone: m['phone'] as String? ?? '',
-        isActive: m['isActive'] as bool? ?? true,
-        plan: CompanyPlanX.fromKey(m['plan'] as String?),
-        privileges: CompanyPrivileges.fromMap(
-          m['privileges'] is Map
-              ? Map<String, dynamic>.from(m['privileges'] as Map)
-              : null,
-        ),
-        createdAt: m['createdAt'] as String?,
-        updatedAt: m['updatedAt'] as String?,
-        lastLoginAt: m['lastLoginAt'] as String? ?? '',
-        deviceId: m['deviceId'] as String? ?? '',
-        appVersion: m['appVersion'] as String? ?? '',
-        createdVia: m['createdVia'] as String? ?? 'email',
-        synced: m['synced'] as bool? ?? false,
-      );
+    id: m['id'].toString(),
+    companyName: m['companyName'] as String? ?? '',
+    ownerName: m['ownerName'] as String? ?? '',
+    username: m['username'] as String? ?? '',
+    email: m['email'] as String? ?? '',
+    passwordHash: m['passwordHash'] as String? ?? '',
+    passwordSalt: m['passwordSalt'] as String? ?? '',
+    phone: m['phone'] as String? ?? '',
+    isActive: m['isActive'] as bool? ?? true,
+    plan: CompanyPlanX.fromKey(m['plan'] as String?),
+    privileges: CompanyPrivileges.fromMap(
+      m['privileges'] is Map
+          ? Map<String, dynamic>.from(m['privileges'] as Map)
+          : null,
+    ),
+    createdAt: m['createdAt'] as String?,
+    updatedAt: m['updatedAt'] as String?,
+    lastLoginAt: m['lastLoginAt'] as String? ?? '',
+    deviceId: m['deviceId'] as String? ?? '',
+    appVersion: m['appVersion'] as String? ?? '',
+    createdVia: m['createdVia'] as String? ?? 'email',
+    synced: m['synced'] as bool? ?? false,
+  );
 
   CompanyAccount copyWith({
     String? companyName,
@@ -263,27 +266,26 @@ class CompanyAccount {
     String? appVersion,
     String? createdVia,
     bool? synced,
-  }) =>
-      CompanyAccount(
-        id: id,
-        companyName: companyName ?? this.companyName,
-        ownerName: ownerName ?? this.ownerName,
-        username: username ?? this.username,
-        email: email ?? this.email,
-        passwordHash: passwordHash ?? this.passwordHash,
-        passwordSalt: passwordSalt ?? this.passwordSalt,
-        phone: phone ?? this.phone,
-        isActive: isActive ?? this.isActive,
-        plan: plan ?? this.plan,
-        privileges: privileges ?? this.privileges,
-        createdAt: createdAt,
-        updatedAt: updatedAt ?? DateTime.now().toIso8601String(),
-        lastLoginAt: lastLoginAt ?? this.lastLoginAt,
-        deviceId: deviceId ?? this.deviceId,
-        appVersion: appVersion ?? this.appVersion,
-        createdVia: createdVia ?? this.createdVia,
-        synced: synced ?? this.synced,
-      );
+  }) => CompanyAccount(
+    id: id,
+    companyName: companyName ?? this.companyName,
+    ownerName: ownerName ?? this.ownerName,
+    username: username ?? this.username,
+    email: email ?? this.email,
+    passwordHash: passwordHash ?? this.passwordHash,
+    passwordSalt: passwordSalt ?? this.passwordSalt,
+    phone: phone ?? this.phone,
+    isActive: isActive ?? this.isActive,
+    plan: plan ?? this.plan,
+    privileges: privileges ?? this.privileges,
+    createdAt: createdAt,
+    updatedAt: updatedAt ?? DateTime.now().toIso8601String(),
+    lastLoginAt: lastLoginAt ?? this.lastLoginAt,
+    deviceId: deviceId ?? this.deviceId,
+    appVersion: appVersion ?? this.appVersion,
+    createdVia: createdVia ?? this.createdVia,
+    synced: synced ?? this.synced,
+  );
 }
 
 /// مالك النظام (المشرف الأعلى) — حساب واحد فقط في التطبيق
@@ -309,26 +311,125 @@ class SystemOwner {
   }) : createdAt = createdAt ?? DateTime.now().toIso8601String();
 
   Map<String, dynamic> toMap() => {
-        'name': name,
-        'username': username,
-        'email': email,
-        'passwordHash': passwordHash,
-        'passwordSalt': passwordSalt,
-        'mustChangePassword': mustChangePassword,
-        'createdAt': createdAt,
-        'lastLoginAt': lastLoginAt,
-      };
+    'name': name,
+    'username': username,
+    'email': email,
+    'passwordHash': passwordHash,
+    'passwordSalt': passwordSalt,
+    'mustChangePassword': mustChangePassword,
+    'createdAt': createdAt,
+    'lastLoginAt': lastLoginAt,
+  };
 
   factory SystemOwner.fromMap(Map<String, dynamic> m) => SystemOwner(
-        name: m['name'] as String? ?? 'مالك النظام',
-        username: m['username'] as String? ?? 'admin',
-        email: m['email'] as String? ?? '',
-        passwordHash: m['passwordHash'] as String? ?? '',
-        passwordSalt: m['passwordSalt'] as String? ?? '',
-        mustChangePassword: m['mustChangePassword'] as bool? ?? false,
-        createdAt: m['createdAt'] as String?,
-        lastLoginAt: m['lastLoginAt'] as String? ?? '',
-      );
+    name: m['name'] as String? ?? 'مالك النظام',
+    username: m['username'] as String? ?? 'admin',
+    email: m['email'] as String? ?? '',
+    passwordHash: m['passwordHash'] as String? ?? '',
+    passwordSalt: m['passwordSalt'] as String? ?? '',
+    mustChangePassword: m['mustChangePassword'] as bool? ?? false,
+    createdAt: m['createdAt'] as String?,
+    lastLoginAt: m['lastLoginAt'] as String? ?? '',
+  );
+}
+
+/// إعدادات/صلاحيات الوصول إلى «لوحة مالك النظام».
+/// ----------------------------------------------------------------------------
+/// تُخزَّن محلياً + تُبَثّ سحابياً حتى تتّفق كل الأجهزة على:
+///   • الجهاز الذي أُنشئ عليه حساب المالك (الجهاز الأول) — لا يظهر غيره
+///     قسم الدخول إلى لوحة المالك إلا بموافقة صريحة من المالك.
+///   • هل جلسة المالك فعّالة الآن؟ (تُخفي قسم الدخول عن الجميع أثناء فعاليتها).
+///   • ربط «أول منشأة» لتتمكّن من تفعيل لوحة المالك.
+class OwnerConfig {
+  /// معرّف الجهاز الذي أنشأ حساب المالك أول مرة (الجهاز المصرّح له أصلاً).
+  String ownerDeviceId;
+
+  /// هل جلسة المالك فعّالة الآن؟ (تُخفي قسم الدخول للجميع أثناء فعاليتها).
+  bool sessionActive;
+
+  /// معرّف الجهاز الذي يحمل جلسة المالك الفعّالة (للعرض).
+  String sessionDeviceId;
+
+  /// وقت آخر نشاط لجلسة المالك (ISO) — يُستخدم لتجاهل الجلسات الميتة.
+  String lastActiveAt;
+
+  /// إظهار قسم دخول المالك على الأجهزة الأخرى (غير الجهاز الأول) — بموافقة المالك.
+  bool allowDeviceEntry;
+
+  /// السماح لأول منشأة مرتبطة بفتح لوحة المالك من داخل التطبيق.
+  bool allowCompanyEntry;
+
+  /// معرّف «أول منشأة» المرتبطة بلوحة المالك.
+  String linkedCompanyId;
+
+  String updatedAt;
+  bool synced;
+
+  OwnerConfig({
+    this.ownerDeviceId = '',
+    this.sessionActive = false,
+    this.sessionDeviceId = '',
+    this.lastActiveAt = '',
+    this.allowDeviceEntry = false,
+    this.allowCompanyEntry = false,
+    this.linkedCompanyId = '',
+    String? updatedAt,
+    this.synced = false,
+  }) : updatedAt = updatedAt ?? DateTime.now().toIso8601String();
+
+  /// هل جلستة المالك «حديثة» (لم تصبح قديمة)؟
+  /// الجلسة تُعتبر فعّالة إن كانت مفعّلة وحدّثت نشاطها خلال 12 ساعة.
+  bool get isSessionFresh {
+    if (!sessionActive) return false;
+    final d = DateTime.tryParse(lastActiveAt);
+    if (d == null) return true;
+    return DateTime.now().difference(d).inHours < 12;
+  }
+
+  Map<String, dynamic> toMap() => {
+    'ownerDeviceId': ownerDeviceId,
+    'sessionActive': sessionActive,
+    'sessionDeviceId': sessionDeviceId,
+    'lastActiveAt': lastActiveAt,
+    'allowDeviceEntry': allowDeviceEntry,
+    'allowCompanyEntry': allowCompanyEntry,
+    'linkedCompanyId': linkedCompanyId,
+    'updatedAt': updatedAt,
+    'synced': synced,
+  };
+
+  factory OwnerConfig.fromMap(Map<String, dynamic> m) => OwnerConfig(
+    ownerDeviceId: m['ownerDeviceId'] as String? ?? '',
+    sessionActive: m['sessionActive'] as bool? ?? false,
+    sessionDeviceId: m['sessionDeviceId'] as String? ?? '',
+    lastActiveAt: m['lastActiveAt'] as String? ?? '',
+    allowDeviceEntry: m['allowDeviceEntry'] as bool? ?? false,
+    allowCompanyEntry: m['allowCompanyEntry'] as bool? ?? false,
+    linkedCompanyId: m['linkedCompanyId'] as String? ?? '',
+    updatedAt: m['updatedAt'] as String?,
+    synced: m['synced'] as bool? ?? false,
+  );
+
+  OwnerConfig copyWith({
+    String? ownerDeviceId,
+    bool? sessionActive,
+    String? sessionDeviceId,
+    String? lastActiveAt,
+    bool? allowDeviceEntry,
+    bool? allowCompanyEntry,
+    String? linkedCompanyId,
+    bool? synced,
+  }) => OwnerConfig(
+    ownerDeviceId: ownerDeviceId ?? this.ownerDeviceId,
+    sessionActive: sessionActive ?? this.sessionActive,
+    sessionDeviceId: sessionDeviceId ?? this.sessionDeviceId,
+    lastActiveAt: lastActiveAt ?? this.lastActiveAt,
+    allowDeviceEntry: allowDeviceEntry ?? this.allowDeviceEntry,
+    allowCompanyEntry: allowCompanyEntry ?? this.allowCompanyEntry,
+    linkedCompanyId: linkedCompanyId ?? this.linkedCompanyId,
+    updatedAt: DateTime.now().toIso8601String(),
+    synced: synced ?? false,
+  );
 }
 
 /// سجل جهاز/تنزيل — لتتبّع من حمّل التطبيق ومن أنشأ حساباً
@@ -371,8 +472,8 @@ class DeviceRegistry {
     this.userName = '',
     this.accountCreated = false,
     this.synced = false,
-  })  : firstSeenAt = firstSeenAt ?? DateTime.now().toIso8601String(),
-        lastSeenAt = lastSeenAt ?? DateTime.now().toIso8601String();
+  }) : firstSeenAt = firstSeenAt ?? DateTime.now().toIso8601String(),
+       lastSeenAt = lastSeenAt ?? DateTime.now().toIso8601String();
 
   /// وصف مختصر للجهاز (الشركة + الطراز)
   String get deviceLabel {
@@ -383,42 +484,42 @@ class DeviceRegistry {
   }
 
   Map<String, dynamic> toMap() => {
-        'deviceId': deviceId,
-        'platform': platform,
-        'appVersion': appVersion,
-        'model': model,
-        'brand': brand,
-        'osVersion': osVersion,
-        'country': country,
-        'countryCode': countryCode,
-        'firstSeenAt': firstSeenAt,
-        'lastSeenAt': lastSeenAt,
-        'launchCount': launchCount,
-        'companyId': companyId,
-        'userId': userId,
-        'userName': userName,
-        'accountCreated': accountCreated,
-        'synced': synced,
-      };
+    'deviceId': deviceId,
+    'platform': platform,
+    'appVersion': appVersion,
+    'model': model,
+    'brand': brand,
+    'osVersion': osVersion,
+    'country': country,
+    'countryCode': countryCode,
+    'firstSeenAt': firstSeenAt,
+    'lastSeenAt': lastSeenAt,
+    'launchCount': launchCount,
+    'companyId': companyId,
+    'userId': userId,
+    'userName': userName,
+    'accountCreated': accountCreated,
+    'synced': synced,
+  };
 
   factory DeviceRegistry.fromMap(Map<String, dynamic> m) => DeviceRegistry(
-        deviceId: m['deviceId'].toString(),
-        platform: m['platform'] as String? ?? '',
-        appVersion: m['appVersion'] as String? ?? '',
-        model: m['model'] as String? ?? '',
-        brand: m['brand'] as String? ?? '',
-        osVersion: m['osVersion'] as String? ?? '',
-        country: m['country'] as String? ?? '',
-        countryCode: m['countryCode'] as String? ?? '',
-        firstSeenAt: m['firstSeenAt'] as String?,
-        lastSeenAt: m['lastSeenAt'] as String?,
-        launchCount: (m['launchCount'] as num?)?.toInt() ?? 1,
-        companyId: m['companyId'] as String? ?? '',
-        userId: m['userId'] as String? ?? '',
-        userName: m['userName'] as String? ?? '',
-        accountCreated: m['accountCreated'] as bool? ?? false,
-        synced: m['synced'] as bool? ?? false,
-      );
+    deviceId: m['deviceId'].toString(),
+    platform: m['platform'] as String? ?? '',
+    appVersion: m['appVersion'] as String? ?? '',
+    model: m['model'] as String? ?? '',
+    brand: m['brand'] as String? ?? '',
+    osVersion: m['osVersion'] as String? ?? '',
+    country: m['country'] as String? ?? '',
+    countryCode: m['countryCode'] as String? ?? '',
+    firstSeenAt: m['firstSeenAt'] as String?,
+    lastSeenAt: m['lastSeenAt'] as String?,
+    launchCount: (m['launchCount'] as num?)?.toInt() ?? 1,
+    companyId: m['companyId'] as String? ?? '',
+    userId: m['userId'] as String? ?? '',
+    userName: m['userName'] as String? ?? '',
+    accountCreated: m['accountCreated'] as bool? ?? false,
+    synced: m['synced'] as bool? ?? false,
+  );
 
   DeviceRegistry copyWith({
     String? platform,
@@ -435,25 +536,24 @@ class DeviceRegistry {
     String? userName,
     bool? accountCreated,
     bool? synced,
-  }) =>
-      DeviceRegistry(
-        deviceId: deviceId,
-        platform: platform ?? this.platform,
-        appVersion: appVersion ?? this.appVersion,
-        model: model ?? this.model,
-        brand: brand ?? this.brand,
-        osVersion: osVersion ?? this.osVersion,
-        country: country ?? this.country,
-        countryCode: countryCode ?? this.countryCode,
-        firstSeenAt: firstSeenAt,
-        lastSeenAt: lastSeenAt ?? DateTime.now().toIso8601String(),
-        launchCount: launchCount ?? this.launchCount,
-        companyId: companyId ?? this.companyId,
-        userId: userId ?? this.userId,
-        userName: userName ?? this.userName,
-        accountCreated: accountCreated ?? this.accountCreated,
-        synced: synced ?? this.synced,
-      );
+  }) => DeviceRegistry(
+    deviceId: deviceId,
+    platform: platform ?? this.platform,
+    appVersion: appVersion ?? this.appVersion,
+    model: model ?? this.model,
+    brand: brand ?? this.brand,
+    osVersion: osVersion ?? this.osVersion,
+    country: country ?? this.country,
+    countryCode: countryCode ?? this.countryCode,
+    firstSeenAt: firstSeenAt,
+    lastSeenAt: lastSeenAt ?? DateTime.now().toIso8601String(),
+    launchCount: launchCount ?? this.launchCount,
+    companyId: companyId ?? this.companyId,
+    userId: userId ?? this.userId,
+    userName: userName ?? this.userName,
+    accountCreated: accountCreated ?? this.accountCreated,
+    synced: synced ?? this.synced,
+  );
 }
 
 /// سجل عملية (نشاط) — يُستخدم لعدّادات العمليات لكل منشأة/مستخدم
@@ -501,24 +601,24 @@ class OperationLog {
   }
 
   Map<String, dynamic> toMap() => {
-        'id': id,
-        'companyId': companyId,
-        'userId': userId,
-        'userName': userName,
-        'action': action,
-        'details': details,
-        'createdAt': createdAt,
-      };
+    'id': id,
+    'companyId': companyId,
+    'userId': userId,
+    'userName': userName,
+    'action': action,
+    'details': details,
+    'createdAt': createdAt,
+  };
 
   factory OperationLog.fromMap(Map<String, dynamic> m) => OperationLog(
-        id: m['id'].toString(),
-        companyId: m['companyId'] as String? ?? '',
-        userId: m['userId'] as String? ?? '',
-        userName: m['userName'] as String? ?? '',
-        action: m['action'] as String? ?? '',
-        details: m['details'] as String? ?? '',
-        createdAt: m['createdAt'] as String?,
-      );
+    id: m['id'].toString(),
+    companyId: m['companyId'] as String? ?? '',
+    userId: m['userId'] as String? ?? '',
+    userName: m['userName'] as String? ?? '',
+    action: m['action'] as String? ?? '',
+    details: m['details'] as String? ?? '',
+    createdAt: m['createdAt'] as String?,
+  );
 }
 
 /// حساب زائر (دخول بدون حساب) — يُسجَّل في قائمة منفصلة لدى مالك النظام
@@ -549,38 +649,38 @@ class GuestAccount {
     this.converted = false,
     this.convertedToCompanyId = '',
     this.synced = false,
-  })  : firstSeenAt = firstSeenAt ?? DateTime.now().toIso8601String(),
-        lastSeenAt = lastSeenAt ?? DateTime.now().toIso8601String();
+  }) : firstSeenAt = firstSeenAt ?? DateTime.now().toIso8601String(),
+       lastSeenAt = lastSeenAt ?? DateTime.now().toIso8601String();
 
   Map<String, dynamic> toMap() => {
-        'id': id,
-        'deviceId': deviceId,
-        'platform': platform,
-        'model': model,
-        'country': country,
-        'countryCode': countryCode,
-        'firstSeenAt': firstSeenAt,
-        'lastSeenAt': lastSeenAt,
-        'visits': visits,
-        'converted': converted,
-        'convertedToCompanyId': convertedToCompanyId,
-        'synced': synced,
-      };
+    'id': id,
+    'deviceId': deviceId,
+    'platform': platform,
+    'model': model,
+    'country': country,
+    'countryCode': countryCode,
+    'firstSeenAt': firstSeenAt,
+    'lastSeenAt': lastSeenAt,
+    'visits': visits,
+    'converted': converted,
+    'convertedToCompanyId': convertedToCompanyId,
+    'synced': synced,
+  };
 
   factory GuestAccount.fromMap(Map<String, dynamic> m) => GuestAccount(
-        id: m['id'].toString(),
-        deviceId: m['deviceId'] as String? ?? '',
-        platform: m['platform'] as String? ?? '',
-        model: m['model'] as String? ?? '',
-        country: m['country'] as String? ?? '',
-        countryCode: m['countryCode'] as String? ?? '',
-        firstSeenAt: m['firstSeenAt'] as String?,
-        lastSeenAt: m['lastSeenAt'] as String?,
-        visits: (m['visits'] as num?)?.toInt() ?? 1,
-        converted: m['converted'] as bool? ?? false,
-        convertedToCompanyId: m['convertedToCompanyId'] as String? ?? '',
-        synced: m['synced'] as bool? ?? false,
-      );
+    id: m['id'].toString(),
+    deviceId: m['deviceId'] as String? ?? '',
+    platform: m['platform'] as String? ?? '',
+    model: m['model'] as String? ?? '',
+    country: m['country'] as String? ?? '',
+    countryCode: m['countryCode'] as String? ?? '',
+    firstSeenAt: m['firstSeenAt'] as String?,
+    lastSeenAt: m['lastSeenAt'] as String?,
+    visits: (m['visits'] as num?)?.toInt() ?? 1,
+    converted: m['converted'] as bool? ?? false,
+    convertedToCompanyId: m['convertedToCompanyId'] as String? ?? '',
+    synced: m['synced'] as bool? ?? false,
+  );
 
   GuestAccount copyWith({
     String? platform,
@@ -592,21 +692,20 @@ class GuestAccount {
     bool? converted,
     String? convertedToCompanyId,
     bool? synced,
-  }) =>
-      GuestAccount(
-        id: id,
-        deviceId: deviceId,
-        platform: platform ?? this.platform,
-        model: model ?? this.model,
-        country: country ?? this.country,
-        countryCode: countryCode ?? this.countryCode,
-        firstSeenAt: firstSeenAt,
-        lastSeenAt: lastSeenAt ?? DateTime.now().toIso8601String(),
-        visits: visits ?? this.visits,
-        converted: converted ?? this.converted,
-        convertedToCompanyId: convertedToCompanyId ?? this.convertedToCompanyId,
-        synced: synced ?? this.synced,
-      );
+  }) => GuestAccount(
+    id: id,
+    deviceId: deviceId,
+    platform: platform ?? this.platform,
+    model: model ?? this.model,
+    country: country ?? this.country,
+    countryCode: countryCode ?? this.countryCode,
+    firstSeenAt: firstSeenAt,
+    lastSeenAt: lastSeenAt ?? DateTime.now().toIso8601String(),
+    visits: visits ?? this.visits,
+    converted: converted ?? this.converted,
+    convertedToCompanyId: convertedToCompanyId ?? this.convertedToCompanyId,
+    synced: synced ?? this.synced,
+  );
 }
 
 /// حساب دخول عبر Google — يُسجَّل في قائمة منفصلة لدى مالك النظام
@@ -641,42 +740,42 @@ class GoogleAccount {
     this.loginCount = 1,
     this.companyId = '',
     this.synced = false,
-  })  : firstSeenAt = firstSeenAt ?? DateTime.now().toIso8601String(),
-        lastSeenAt = lastSeenAt ?? DateTime.now().toIso8601String();
+  }) : firstSeenAt = firstSeenAt ?? DateTime.now().toIso8601String(),
+       lastSeenAt = lastSeenAt ?? DateTime.now().toIso8601String();
 
   Map<String, dynamic> toMap() => {
-        'id': id,
-        'email': email,
-        'displayName': displayName,
-        'photoUrl': photoUrl,
-        'deviceId': deviceId,
-        'platform': platform,
-        'model': model,
-        'country': country,
-        'countryCode': countryCode,
-        'firstSeenAt': firstSeenAt,
-        'lastSeenAt': lastSeenAt,
-        'loginCount': loginCount,
-        'companyId': companyId,
-        'synced': synced,
-      };
+    'id': id,
+    'email': email,
+    'displayName': displayName,
+    'photoUrl': photoUrl,
+    'deviceId': deviceId,
+    'platform': platform,
+    'model': model,
+    'country': country,
+    'countryCode': countryCode,
+    'firstSeenAt': firstSeenAt,
+    'lastSeenAt': lastSeenAt,
+    'loginCount': loginCount,
+    'companyId': companyId,
+    'synced': synced,
+  };
 
   factory GoogleAccount.fromMap(Map<String, dynamic> m) => GoogleAccount(
-        id: m['id'].toString(),
-        email: m['email'] as String? ?? '',
-        displayName: m['displayName'] as String? ?? '',
-        photoUrl: m['photoUrl'] as String? ?? '',
-        deviceId: m['deviceId'] as String? ?? '',
-        platform: m['platform'] as String? ?? '',
-        model: m['model'] as String? ?? '',
-        country: m['country'] as String? ?? '',
-        countryCode: m['countryCode'] as String? ?? '',
-        firstSeenAt: m['firstSeenAt'] as String?,
-        lastSeenAt: m['lastSeenAt'] as String?,
-        loginCount: (m['loginCount'] as num?)?.toInt() ?? 1,
-        companyId: m['companyId'] as String? ?? '',
-        synced: m['synced'] as bool? ?? false,
-      );
+    id: m['id'].toString(),
+    email: m['email'] as String? ?? '',
+    displayName: m['displayName'] as String? ?? '',
+    photoUrl: m['photoUrl'] as String? ?? '',
+    deviceId: m['deviceId'] as String? ?? '',
+    platform: m['platform'] as String? ?? '',
+    model: m['model'] as String? ?? '',
+    country: m['country'] as String? ?? '',
+    countryCode: m['countryCode'] as String? ?? '',
+    firstSeenAt: m['firstSeenAt'] as String?,
+    lastSeenAt: m['lastSeenAt'] as String?,
+    loginCount: (m['loginCount'] as num?)?.toInt() ?? 1,
+    companyId: m['companyId'] as String? ?? '',
+    synced: m['synced'] as bool? ?? false,
+  );
 
   GoogleAccount copyWith({
     String? displayName,
@@ -690,21 +789,20 @@ class GoogleAccount {
     int? loginCount,
     String? companyId,
     bool? synced,
-  }) =>
-      GoogleAccount(
-        id: id,
-        email: email,
-        displayName: displayName ?? this.displayName,
-        photoUrl: photoUrl ?? this.photoUrl,
-        deviceId: deviceId ?? this.deviceId,
-        platform: platform ?? this.platform,
-        model: model ?? this.model,
-        country: country ?? this.country,
-        countryCode: countryCode ?? this.countryCode,
-        firstSeenAt: firstSeenAt,
-        lastSeenAt: lastSeenAt ?? DateTime.now().toIso8601String(),
-        loginCount: loginCount ?? this.loginCount,
-        companyId: companyId ?? this.companyId,
-        synced: synced ?? this.synced,
-      );
+  }) => GoogleAccount(
+    id: id,
+    email: email,
+    displayName: displayName ?? this.displayName,
+    photoUrl: photoUrl ?? this.photoUrl,
+    deviceId: deviceId ?? this.deviceId,
+    platform: platform ?? this.platform,
+    model: model ?? this.model,
+    country: country ?? this.country,
+    countryCode: countryCode ?? this.countryCode,
+    firstSeenAt: firstSeenAt,
+    lastSeenAt: lastSeenAt ?? DateTime.now().toIso8601String(),
+    loginCount: loginCount ?? this.loginCount,
+    companyId: companyId ?? this.companyId,
+    synced: synced ?? this.synced,
+  );
 }

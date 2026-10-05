@@ -78,8 +78,11 @@ class _InvoiceFormState extends State<InvoiceForm> {
     final prov = context.watch<ERPProvider>();
     final curr = prov.currency;
     final customers = prov.contacts
-        .where((c) =>
-            isSale ? c.contactType != 'supplier' : c.contactType != 'customer')
+        .where(
+          (c) => isSale
+              ? c.contactType != 'supplier'
+              : c.contactType != 'customer',
+        )
         .toList();
 
     // قيم آمنة للقوائم المنسدلة (تجنّب اختفاء المحتوى عند عدم تطابق القيمة)
@@ -89,8 +92,7 @@ class _InvoiceFormState extends State<InvoiceForm> {
         : null;
 
     final whIds = prov.warehouses.map((w) => w.id).toSet();
-    final safeWarehouse =
-        whIds.contains(_warehouseId) ? _warehouseId : null;
+    final safeWarehouse = whIds.contains(_warehouseId) ? _warehouseId : null;
 
     final cbIds = prov.cashboxes.map((c) => c.id).toSet();
     final safeCashbox = cbIds.contains(_cashboxId) ? _cashboxId : null;
@@ -99,8 +101,8 @@ class _InvoiceFormState extends State<InvoiceForm> {
         .where((i) => i.invoiceType == (isSale ? 'sale' : 'purchase'))
         .map((i) => i.id)
         .toSet();
-    final safeOrigInv = (_originalInvoiceId != null &&
-            origInvIds.contains(_originalInvoiceId))
+    final safeOrigInv =
+        (_originalInvoiceId != null && origInvIds.contains(_originalInvoiceId))
         ? _originalInvoiceId
         : null;
 
@@ -130,10 +132,12 @@ class _InvoiceFormState extends State<InvoiceForm> {
                               value: null,
                               child: Text(isSale ? 'عميل نقدي' : 'مورد نقدي'),
                             ),
-                            ...customers.map((c) => DropdownMenuItem(
-                                  value: c.id,
-                                  child: Text(c.name),
-                                )),
+                            ...customers.map(
+                              (c) => DropdownMenuItem(
+                                value: c.id,
+                                child: Text(c.name),
+                              ),
+                            ),
                           ],
                           onChanged: (v) => setState(() => _contactId = v),
                         ),
@@ -168,16 +172,20 @@ class _InvoiceFormState extends State<InvoiceForm> {
                         prefixIcon: Icon(Icons.receipt_long),
                       ),
                       items: prov.invoices
-                          .where((i) =>
-                              i.invoiceType == (isSale ? 'sale' : 'purchase'))
-                          .map((i) => DropdownMenuItem(
-                                value: i.id,
-                                child: Text(
-                                    '${i.invoiceNumber} — ${i.contactName} — ${Fmt.money(i.total, curr)}'),
-                              ))
+                          .where(
+                            (i) =>
+                                i.invoiceType == (isSale ? 'sale' : 'purchase'),
+                          )
+                          .map(
+                            (i) => DropdownMenuItem(
+                              value: i.id,
+                              child: Text(
+                                '${i.invoiceNumber} — ${i.contactName} — ${Fmt.money(i.total, curr)}',
+                              ),
+                            ),
+                          )
                           .toList(),
-                      onChanged: (v) =>
-                          setState(() => _originalInvoiceId = v),
+                      onChanged: (v) => setState(() => _originalInvoiceId = v),
                     ),
                   ],
                   const SizedBox(height: 12),
@@ -205,10 +213,12 @@ class _InvoiceFormState extends State<InvoiceForm> {
                             prefixIcon: Icon(Icons.warehouse),
                           ),
                           items: prov.warehouses
-                              .map((w) => DropdownMenuItem(
-                                    value: w.id,
-                                    child: Text(w.name),
-                                  ))
+                              .map(
+                                (w) => DropdownMenuItem(
+                                  value: w.id,
+                                  child: Text(w.name),
+                                ),
+                              )
                               .toList(),
                           onChanged: (v) =>
                               setState(() => _warehouseId = v ?? 'wh_main'),
@@ -286,12 +296,14 @@ class _InvoiceFormState extends State<InvoiceForm> {
                         prefixIcon: Icon(Icons.account_balance_wallet),
                       ),
                       items: prov.cashboxes
-                          .map((c) => DropdownMenuItem(
-                                value: c.id,
-                                child: Text(
-                                  '${c.name} (${Fmt.money(c.currentBalance, curr)})',
-                                ),
-                              ))
+                          .map(
+                            (c) => DropdownMenuItem(
+                              value: c.id,
+                              child: Text(
+                                '${c.name} (${Fmt.money(c.currentBalance, curr)})',
+                              ),
+                            ),
+                          )
                           .toList(),
                       onChanged: (v) => setState(() => _cashboxId = v),
                     ),
@@ -335,7 +347,8 @@ class _InvoiceFormState extends State<InvoiceForm> {
                             hintText: '0',
                           ),
                           onChanged: (v) => setState(
-                              () => _discountAmount = double.tryParse(v) ?? 0),
+                            () => _discountAmount = double.tryParse(v) ?? 0,
+                          ),
                         ),
                       ),
                     ],
@@ -357,7 +370,8 @@ class _InvoiceFormState extends State<InvoiceForm> {
                               hintText: '0',
                             ),
                             onChanged: (v) => setState(
-                                () => _shipping = double.tryParse(v) ?? 0),
+                              () => _shipping = double.tryParse(v) ?? 0,
+                            ),
                           ),
                         ),
                       ],
@@ -447,10 +461,7 @@ class _InvoiceFormState extends State<InvoiceForm> {
         const Spacer(),
         Text(
           value,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: color,
-          ),
+          style: TextStyle(fontWeight: FontWeight.bold, color: color),
         ),
       ],
     );
@@ -516,10 +527,8 @@ class _InvoiceFormState extends State<InvoiceForm> {
     final result = await showModalBottomSheet<InvoiceLine>(
       context: context,
       isScrollControlled: true,
-      builder: (_) => _ItemPickerSheet(
-        isSale: isSale,
-        defaultTaxRate: prov.taxRate,
-      ),
+      builder: (_) =>
+          _ItemPickerSheet(isSale: isSale, defaultTaxRate: prov.taxRate),
     );
     if (result != null) {
       setState(() => _lines.add(result));
@@ -619,10 +628,7 @@ class _ItemPickerSheet extends StatefulWidget {
   final bool isSale;
   final double defaultTaxRate;
 
-  const _ItemPickerSheet({
-    required this.isSale,
-    required this.defaultTaxRate,
-  });
+  const _ItemPickerSheet({required this.isSale, required this.defaultTaxRate});
 
   @override
   State<_ItemPickerSheet> createState() => _ItemPickerSheetState();
@@ -689,20 +695,23 @@ class _ItemPickerSheetState extends State<_ItemPickerSheet> {
               prefixIcon: Icon(Icons.inventory_2),
             ),
             items: prov.items
-                .map((it) => DropdownMenuItem(
-                      value: it,
-                      child: Text(
-                        '${it.name} (متاح: ${Fmt.num(prov.stockQty(it.id))})',
-                      ),
-                    ))
+                .map(
+                  (it) => DropdownMenuItem(
+                    value: it,
+                    child: Text(
+                      '${it.name} (متاح: ${Fmt.num(prov.stockQty(it.id))})',
+                    ),
+                  ),
+                )
                 .toList(),
             onChanged: (v) {
               setState(() {
                 _item = v;
-                _price.text = (widget.isSale
-                        ? (v?.salePrice ?? 0)
-                        : (v?.purchasePrice ?? 0))
-                    .toString();
+                _price.text =
+                    (widget.isSale
+                            ? (v?.salePrice ?? 0)
+                            : (v?.purchasePrice ?? 0))
+                        .toString();
               });
             },
           ),

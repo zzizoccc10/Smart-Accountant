@@ -198,7 +198,8 @@ class AuthService {
       // المنصّات الأصلية تتطلّب google_sign_in + تهيئة OAuth في Console.
       return const AuthResult(
         success: false,
-        error: 'الدخول عبر Google على الجوال يحتاج تهيئة OAuth في Firebase Console',
+        error:
+            'الدخول عبر Google على الجوال يحتاج تهيئة OAuth في Firebase Console',
       );
     } on fb.FirebaseAuthException catch (e) {
       if (e.code == 'operation-not-allowed') {

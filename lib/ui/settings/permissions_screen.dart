@@ -57,8 +57,9 @@ class _PermissionsScreenState extends State<PermissionsScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('تم منح $granted من ${result.length} صلاحيات'),
-        backgroundColor:
-            granted == result.length ? AppColors.success : AppColors.warning,
+        backgroundColor: granted == result.length
+            ? AppColors.success
+            : AppColors.warning,
       ),
     );
   }
@@ -81,8 +82,7 @@ class _PermissionsScreenState extends State<PermissionsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final granted =
-        _statuses.values.where((s) => s.isGranted).length;
+    final granted = _statuses.values.where((s) => s.isGranted).length;
     final total = _statuses.length;
 
     return Scaffold(
@@ -119,13 +119,17 @@ class _PermissionsScreenState extends State<PermissionsScreen> {
                         Text(
                           '$granted / $total صلاحية مُمنوحة',
                           style: const TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.bold),
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           'يمنح التطبيق ميزات التواصل والاستيراد والحفظ',
                           style: TextStyle(
-                              color: Colors.grey.shade600, fontSize: 12),
+                            color: Colors.grey.shade600,
+                            fontSize: 12,
+                          ),
                         ),
                         const SizedBox(height: 12),
                         SizedBox(
@@ -151,14 +155,19 @@ class _PermissionsScreenState extends State<PermissionsScreen> {
                         backgroundColor: _color(st).withValues(alpha: 0.14),
                         child: Icon(_icon(p), color: _color(st), size: 20),
                       ),
-                      title: Text(PermissionService.label(p),
-                          style: const TextStyle(
-                              fontSize: 14, fontWeight: FontWeight.bold)),
-                      subtitle: Text(PermissionService.usage(p),
-                          style: const TextStyle(fontSize: 11)),
+                      title: Text(
+                        PermissionService.label(p),
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      subtitle: Text(
+                        PermissionService.usage(p),
+                        style: const TextStyle(fontSize: 11),
+                      ),
                       trailing: st.isGranted
-                          ? Icon(Icons.check_circle,
-                              color: AppColors.success)
+                          ? Icon(Icons.check_circle, color: AppColors.success)
                           : TextButton(
                               onPressed: () => _requestOne(p),
                               child: Text(

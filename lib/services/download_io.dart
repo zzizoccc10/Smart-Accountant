@@ -5,7 +5,10 @@ import 'dart:io';
 import 'dart:typed_data';
 
 Future<String?> downloadBytesImpl(
-    Uint8List bytes, String filename, String mimeType) async {
+  Uint8List bytes,
+  String filename,
+  String mimeType,
+) async {
   try {
     final dir = Directory.systemTemp.createTempSync('ea_dl_');
     final file = File('${dir.path}/$filename');

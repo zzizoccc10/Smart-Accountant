@@ -49,7 +49,9 @@ Future<bool> ensurePermission(
   } else {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('يجب منح صلاحية «${PermissionService.label(p)}» لإتمام العملية'),
+        content: Text(
+          'يجب منح صلاحية «${PermissionService.label(p)}» لإتمام العملية',
+        ),
         backgroundColor: AppColors.warning,
       ),
     );

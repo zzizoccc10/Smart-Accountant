@@ -26,9 +26,10 @@ class _CoaScreenState extends State<CoaScreen> {
     final filtered = _search.isEmpty
         ? all
         : all
-            .where((a) =>
-                a.name.contains(_search) || a.code.contains(_search))
-            .toList();
+              .where(
+                (a) => a.name.contains(_search) || a.code.contains(_search),
+              )
+              .toList();
 
     // بناء الشجرة: نعرض حسب المستوى
     final roots = filtered.where((a) => a.parentId == null).toList()
@@ -46,11 +47,12 @@ class _CoaScreenState extends State<CoaScreen> {
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(n > 0
-                        ? 'تمت المزامنة — تم تحديث $n عنصر'
-                        : 'الدليل متزامن بالفعل'),
-                    backgroundColor:
-                        n > 0 ? AppColors.success : AppColors.info,
+                    content: Text(
+                      n > 0
+                          ? 'تمت المزامنة — تم تحديث $n عنصر'
+                          : 'الدليل متزامن بالفعل',
+                    ),
+                    backgroundColor: n > 0 ? AppColors.success : AppColors.info,
                   ),
                 );
               }
@@ -96,7 +98,11 @@ class _CoaScreenState extends State<CoaScreen> {
   }
 
   Widget _buildNode(
-      Account acc, List<Account> all, int depth, ERPProvider prov) {
+    Account acc,
+    List<Account> all,
+    int depth,
+    ERPProvider prov,
+  ) {
     final children = all.where((a) => a.parentId == acc.id).toList()
       ..sort((a, b) => a.code.compareTo(b.code));
     final balance = prov.accountBalance(acc.id);
@@ -110,10 +116,11 @@ class _CoaScreenState extends State<CoaScreen> {
             dense: true,
             onTap: acc.isLeaf
                 ? () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (_) => AccountForm(account: acc)),
-                    )
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => AccountForm(account: acc),
+                    ),
+                  )
                 : null,
             leading: Container(
               width: 6,
@@ -138,7 +145,9 @@ class _CoaScreenState extends State<CoaScreen> {
                 ? Text(
                     Fmt.money(balance.abs(), prov.currency),
                     style: const TextStyle(
-                        fontSize: 12, fontWeight: FontWeight.bold),
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
                   )
                 : null,
           ),

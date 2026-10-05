@@ -104,8 +104,7 @@ class _ContactsImportScreenState extends State<ContactsImportScreen> {
     if (_q.isEmpty) return _contacts;
     final q = _q.toLowerCase();
     return _contacts
-        .where((c) =>
-            c.name.toLowerCase().contains(q) || c.phone.contains(q))
+        .where((c) => c.name.toLowerCase().contains(q) || c.phone.contains(q))
         .toList();
   }
 
@@ -121,23 +120,21 @@ class _ContactsImportScreenState extends State<ContactsImportScreen> {
   Future<void> _import() async {
     final chosen = _contacts.where((c) => c.selected).toList();
     if (chosen.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('لم تختر أي جهة اتصال')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('لم تختر أي جهة اتصال')));
       return;
     }
     final prov = context.read<ERPProvider>();
-    final existingNames =
-        prov.contacts.map((e) => e.name.trim().toLowerCase()).toSet();
+    final existingNames = prov.contacts
+        .map((e) => e.name.trim().toLowerCase())
+        .toSet();
     var added = 0;
     for (final c in chosen) {
       if (existingNames.contains(c.name.trim().toLowerCase())) continue;
-      await prov.addContact(Contact(
-        id: '',
-        name: c.name,
-        contactType: _type,
-        phone: c.phone,
-      ));
+      await prov.addContact(
+        Contact(id: '', name: c.name, contactType: _type, phone: c.phone),
+      );
       added++;
     }
     if (!mounted) return;
@@ -167,8 +164,8 @@ class _ContactsImportScreenState extends State<ContactsImportScreen> {
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : _denied
-              ? _deniedView()
-              : _listView(),
+          ? _deniedView()
+          : _listView(),
       bottomNavigationBar: (!_loading && !_denied && _contacts.isNotEmpty)
           ? SafeArea(
               child: Padding(
@@ -191,11 +188,16 @@ class _ContactsImportScreenState extends State<ContactsImportScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.contacts_outlined,
-                size: 60, color: AppColors.warning),
+            const Icon(
+              Icons.contacts_outlined,
+              size: 60,
+              color: AppColors.warning,
+            ),
             const SizedBox(height: 16),
-            const Text('لا يمكن الوصول لجهات الاتصال',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            const Text(
+              'لا يمكن الوصول لجهات الاتصال',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 8),
             Text(
               kIsWeb
@@ -233,8 +235,7 @@ class _ContactsImportScreenState extends State<ContactsImportScreen> {
         icon: Icons.contacts_outlined,
       );
     }
-    final allSelected =
-        items.isNotEmpty && items.every((c) => c.selected);
+    final allSelected = items.isNotEmpty && items.every((c) => c.selected);
     return Column(
       children: [
         Padding(
@@ -254,10 +255,8 @@ class _ContactsImportScreenState extends State<ContactsImportScreen> {
                   Expanded(
                     child: SegmentedButton<String>(
                       segments: const [
-                        ButtonSegment(
-                            value: 'customer', label: Text('عملاء')),
-                        ButtonSegment(
-                            value: 'supplier', label: Text('موردون')),
+                        ButtonSegment(value: 'customer', label: Text('عملاء')),
+                        ButtonSegment(value: 'supplier', label: Text('موردون')),
                       ],
                       selected: {_type},
                       onSelectionChanged: (s) =>
@@ -267,9 +266,7 @@ class _ContactsImportScreenState extends State<ContactsImportScreen> {
                   const SizedBox(width: 8),
                   TextButton.icon(
                     onPressed: () => _toggleAll(!allSelected),
-                    icon: Icon(allSelected
-                        ? Icons.deselect
-                        : Icons.select_all),
+                    icon: Icon(allSelected ? Icons.deselect : Icons.select_all),
                     label: Text(allSelected ? 'إلغاء' : 'الكل'),
                   ),
                 ],
@@ -287,8 +284,7 @@ class _ContactsImportScreenState extends State<ContactsImportScreen> {
                 value: c.selected,
                 onChanged: (v) => setState(() => c.selected = v ?? false),
                 title: Text(c.name, style: const TextStyle(fontSize: 13)),
-                subtitle: Text(c.phone,
-                    style: const TextStyle(fontSize: 11)),
+                subtitle: Text(c.phone, style: const TextStyle(fontSize: 11)),
                 secondary: const Icon(Icons.person_outline),
               );
             },

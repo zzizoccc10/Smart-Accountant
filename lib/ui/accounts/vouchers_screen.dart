@@ -41,10 +41,12 @@ class _VouchersScreenState extends State<VouchersScreen>
     if (_q.isEmpty) return src;
     final q = _q.toLowerCase();
     return src
-        .where((p) =>
-            p.paymentNumber.toLowerCase().contains(q) ||
-            p.contactName.toLowerCase().contains(q) ||
-            p.description.toLowerCase().contains(q))
+        .where(
+          (p) =>
+              p.paymentNumber.toLowerCase().contains(q) ||
+              p.contactName.toLowerCase().contains(q) ||
+              p.description.toLowerCase().contains(q),
+        )
         .toList();
   }
 
@@ -52,8 +54,12 @@ class _VouchersScreenState extends State<VouchersScreen>
   Widget build(BuildContext context) {
     final prov = context.watch<ERPProvider>();
     final all = prov.payments;
-    final receipts = _filter(all.where((p) => p.paymentType == 'receipt').toList());
-    final payments = _filter(all.where((p) => p.paymentType == 'payment').toList());
+    final receipts = _filter(
+      all.where((p) => p.paymentType == 'receipt').toList(),
+    );
+    final payments = _filter(
+      all.where((p) => p.paymentType == 'payment').toList(),
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -118,11 +124,16 @@ class _VouchersScreenState extends State<VouchersScreen>
       child: ListTile(
         leading: CircleAvatar(
           backgroundColor: color.withValues(alpha: 0.14),
-          child: Icon(isReceipt ? Icons.call_received : Icons.call_made,
-              color: color, size: 20),
+          child: Icon(
+            isReceipt ? Icons.call_received : Icons.call_made,
+            color: color,
+            size: 20,
+          ),
         ),
-        title: Text('${isReceipt ? 'سند قبض' : 'سند صرف'} • ${p.paymentNumber}',
-            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+        title: Text(
+          '${isReceipt ? 'سند قبض' : 'سند صرف'} • ${p.paymentNumber}',
+          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+        ),
         subtitle: Text(
           '${p.contactName.isEmpty ? '—' : p.contactName} • ${p.date}',
           style: const TextStyle(fontSize: 11),
@@ -131,9 +142,14 @@ class _VouchersScreenState extends State<VouchersScreen>
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Text(Fmt.money(p.amount, prov.currency),
-                style: TextStyle(
-                    fontSize: 13, fontWeight: FontWeight.bold, color: color)),
+            Text(
+              Fmt.money(p.amount, prov.currency),
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+                color: color,
+              ),
+            ),
             const Icon(Icons.more_horiz, size: 16),
           ],
         ),
@@ -190,15 +206,20 @@ class _VouchersScreenState extends State<VouchersScreen>
   }
 
   Future<void> _print(
-      BuildContext context, ERPProvider prov, Payment p, bool share) async {
+    BuildContext context,
+    ERPProvider prov,
+    Payment p,
+    bool share,
+  ) async {
     try {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('جارٍ تجهيز PDF...')),
-      );
-      final cashbox = prov.cashboxes
-          .where((c) => c.id == p.cashboxId)
-          .map((c) => c.name)
-          .firstOrNull ??
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('جارٍ تجهيز PDF...')));
+      final cashbox =
+          prov.cashboxes
+              .where((c) => c.id == p.cashboxId)
+              .map((c) => c.name)
+              .firstOrNull ??
           '';
       if (share) {
         await PrintService.shareVoucher(
@@ -240,10 +261,12 @@ class _VouchersScreenState extends State<VouchersScreen>
   }
 
   Future<void> _shareText(
-      BuildContext context, ERPProvider prov, Payment p, String via) async {
-    final contact = prov.contacts
-        .where((c) => c.id == p.contactId)
-        .firstOrNull;
+    BuildContext context,
+    ERPProvider prov,
+    Payment p,
+    String via,
+  ) async {
+    final contact = prov.contacts.where((c) => c.id == p.contactId).firstOrNull;
     final phone = contact?.phone ?? '';
     final isReceipt = p.paymentType == 'receipt';
 

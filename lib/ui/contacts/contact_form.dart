@@ -38,9 +38,11 @@ class _ContactFormState extends State<ContactForm> {
     _address = TextEditingController(text: c?.address ?? '');
     _tax = TextEditingController(text: c?.taxNumber ?? '');
     _creditLimit = TextEditingController(
-        text: (c?.creditLimit ?? 0) == 0 ? '' : c!.creditLimit.toString());
+      text: (c?.creditLimit ?? 0) == 0 ? '' : c!.creditLimit.toString(),
+    );
     _opening = TextEditingController(
-        text: (c?.openingBalance ?? 0) == 0 ? '' : c!.openingBalance.toString());
+      text: (c?.openingBalance ?? 0) == 0 ? '' : c!.openingBalance.toString(),
+    );
     _type = c?.contactType ?? widget.defaultType;
   }
 
@@ -84,7 +86,9 @@ class _ContactFormState extends State<ContactForm> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.contact == null ? 'جهة اتصال جديدة' : 'تعديل جهة الاتصال'),
+        title: Text(
+          widget.contact == null ? 'جهة اتصال جديدة' : 'تعديل جهة الاتصال',
+        ),
       ),
       body: Form(
         key: _formKey,

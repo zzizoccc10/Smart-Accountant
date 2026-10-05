@@ -80,10 +80,7 @@ class SyncService {
   };
 
   static CollectionReference<Map<String, dynamic>> _col(String box) {
-    return _db!
-        .collection('companies')
-        .doc(companyId)
-        .collection(box);
+    return _db!.collection('companies').doc(companyId).collection(box);
   }
 
   /// آخر وقت مزامنة (يُخزَّن محلياً)

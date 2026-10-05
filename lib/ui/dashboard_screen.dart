@@ -346,8 +346,7 @@ class _AlertsCard extends StatelessWidget {
     final curr = prov.currency;
     final low = prov.lowStockItems;
     final overdue = prov.overdueInvoices;
-    final overdueAmount =
-        overdue.fold<double>(0.0, (s, i) => s + i.remaining);
+    final overdueAmount = overdue.fold<double>(0.0, (s, i) => s + i.remaining);
 
     return InkWell(
       onTap: () => Navigator.push(
@@ -369,12 +368,16 @@ class _AlertsCard extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  const Icon(Icons.notifications_active,
-                      color: AppColors.warning, size: 20),
+                  const Icon(
+                    Icons.notifications_active,
+                    color: AppColors.warning,
+                    size: 20,
+                  ),
                   const SizedBox(width: 8),
-                  const Text('التنبيهات',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 15)),
+                  const Text(
+                    'التنبيهات',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                  ),
                   const Spacer(),
                   const Icon(Icons.chevron_left, color: Colors.grey),
                 ],
@@ -385,8 +388,11 @@ class _AlertsCard extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 3),
                   child: Row(
                     children: [
-                      const Icon(Icons.inventory_2,
-                          size: 16, color: AppColors.danger),
+                      const Icon(
+                        Icons.inventory_2,
+                        size: 16,
+                        color: AppColors.danger,
+                      ),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
@@ -402,8 +408,11 @@ class _AlertsCard extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 3),
                   child: Row(
                     children: [
-                      const Icon(Icons.schedule,
-                          size: 16, color: AppColors.warning),
+                      const Icon(
+                        Icons.schedule,
+                        size: 16,
+                        color: AppColors.warning,
+                      ),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
@@ -463,15 +472,7 @@ class _SalesChart extends StatelessWidget {
                 final i = value.toInt();
                 if (i < 0 || i >= data.length) return const SizedBox();
                 final d = data[i]['day'] as DateTime;
-                const days = [
-                  'اثن',
-                  'ثلا',
-                  'أرب',
-                  'خمي',
-                  'جمع',
-                  'سبت',
-                  'أحد',
-                ];
+                const days = ['اثن', 'ثلا', 'أرب', 'خمي', 'جمع', 'سبت', 'أحد'];
                 return Padding(
                   padding: const EdgeInsets.only(top: 6),
                   child: Text(

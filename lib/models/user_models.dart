@@ -105,18 +105,39 @@ class Perm {
 
   /// كل الصلاحيات المتاحة في النظام
   static const all = <String>[
-    salesView, salesCreate, salesEdit, salesDelete,
-    purchasesView, purchasesCreate, purchasesEdit, purchasesDelete,
-    inventoryView, inventoryManage, inventoryTransfer, inventoryCount,
-    contactsView, contactsManage,
-    accountsView, accountsManage, journalView, journalCreate, journalDelete,
-    cashView, cashManage,
-    reportsView, reportsExport,
-    hrView, hrManage,
-    assetsView, assetsManage,
-    settingsView, settingsManage,
-    usersView, usersManage,
-    syncManage, backupManage,
+    salesView,
+    salesCreate,
+    salesEdit,
+    salesDelete,
+    purchasesView,
+    purchasesCreate,
+    purchasesEdit,
+    purchasesDelete,
+    inventoryView,
+    inventoryManage,
+    inventoryTransfer,
+    inventoryCount,
+    contactsView,
+    contactsManage,
+    accountsView,
+    accountsManage,
+    journalView,
+    journalCreate,
+    journalDelete,
+    cashView,
+    cashManage,
+    reportsView,
+    reportsExport,
+    hrView,
+    hrManage,
+    assetsView,
+    assetsManage,
+    settingsView,
+    settingsManage,
+    usersView,
+    usersManage,
+    syncManage,
+    backupManage,
   ];
 
   /// الاسم العربي لكل صلاحية (للعرض في واجهة الإدارة)
@@ -166,25 +187,52 @@ class Perm {
         return {...all}..remove(usersManage);
       case UserRole.accountant:
         return {
-          accountsView, accountsManage, journalView, journalCreate,
-          journalDelete, reportsView, reportsExport, cashView, cashManage,
-          salesView, purchasesView, contactsView, contactsManage,
-          inventoryView, assetsView, settingsView,
+          accountsView,
+          accountsManage,
+          journalView,
+          journalCreate,
+          journalDelete,
+          reportsView,
+          reportsExport,
+          cashView,
+          cashManage,
+          salesView,
+          purchasesView,
+          contactsView,
+          contactsManage,
+          inventoryView,
+          assetsView,
+          settingsView,
         };
       case UserRole.sales:
         return {
-          salesView, salesCreate, salesEdit, contactsView, contactsManage,
-          inventoryView, reportsView, cashView,
+          salesView,
+          salesCreate,
+          salesEdit,
+          contactsView,
+          contactsManage,
+          inventoryView,
+          reportsView,
+          cashView,
         };
       case UserRole.warehouse:
         return {
-          inventoryView, inventoryManage, inventoryTransfer, inventoryCount,
-          purchasesView, purchasesCreate, reportsView,
+          inventoryView,
+          inventoryManage,
+          inventoryTransfer,
+          inventoryCount,
+          purchasesView,
+          purchasesCreate,
+          reportsView,
         };
       case UserRole.viewer:
         return {
-          salesView, purchasesView, inventoryView, contactsView,
-          accountsView, reportsView,
+          salesView,
+          purchasesView,
+          inventoryView,
+          contactsView,
+          accountsView,
+          reportsView,
         };
     }
   }
@@ -232,9 +280,9 @@ class AppUser {
     String? createdAt,
     String? updatedAt,
     this.synced = false,
-  })  : permissions = permissions ?? {},
-        createdAt = createdAt ?? DateTime.now().toIso8601String(),
-        updatedAt = updatedAt ?? DateTime.now().toIso8601String();
+  }) : permissions = permissions ?? {},
+       createdAt = createdAt ?? DateTime.now().toIso8601String(),
+       updatedAt = updatedAt ?? DateTime.now().toIso8601String();
 
   /// هل لهذا المستخدم بيانات دخول محلية (اسم مستخدم + كلمة مرور)؟
   bool get hasCredentials =>
@@ -246,8 +294,7 @@ class AppUser {
 
   bool can(String permission) => effectivePermissions.contains(permission);
 
-  bool canAny(List<String> permissions) =>
-      permissions.any((p) => can(p));
+  bool canAny(List<String> permissions) => permissions.any((p) => can(p));
 
   bool get isOwner => role == UserRole.owner;
 
@@ -261,50 +308,50 @@ class AppUser {
   }
 
   Map<String, dynamic> toMap() => {
-        'id': id,
-        'name': name,
-        'email': email,
-        'username': username,
-        'passwordHash': passwordHash,
-        'passwordSalt': passwordSalt,
-        'phone': phone,
-        'role': role.name,
-        'permissions': permissions.toList(),
-        'useRoleDefaults': useRoleDefaults,
-        'isActive': isActive,
-        'branchId': branchId,
-        'photoUrl': photoUrl,
-        'fcmToken': fcmToken,
-        'companyId': companyId,
-        'createdBy': createdBy,
-        'createdAt': createdAt,
-        'updatedAt': updatedAt,
-        'synced': synced,
-      };
+    'id': id,
+    'name': name,
+    'email': email,
+    'username': username,
+    'passwordHash': passwordHash,
+    'passwordSalt': passwordSalt,
+    'phone': phone,
+    'role': role.name,
+    'permissions': permissions.toList(),
+    'useRoleDefaults': useRoleDefaults,
+    'isActive': isActive,
+    'branchId': branchId,
+    'photoUrl': photoUrl,
+    'fcmToken': fcmToken,
+    'companyId': companyId,
+    'createdBy': createdBy,
+    'createdAt': createdAt,
+    'updatedAt': updatedAt,
+    'synced': synced,
+  };
 
   factory AppUser.fromMap(Map<String, dynamic> m) => AppUser(
-        id: m['id'] as String,
-        name: m['name'] as String? ?? '',
-        email: m['email'] as String? ?? '',
-        username: m['username'] as String? ?? '',
-        passwordHash: m['passwordHash'] as String? ?? '',
-        passwordSalt: m['passwordSalt'] as String? ?? '',
-        phone: m['phone'] as String? ?? '',
-        role: UserRoleX.fromKey(m['role'] as String?),
-        permissions: ((m['permissions'] as List?) ?? const [])
-            .map((e) => e.toString())
-            .toSet(),
-        useRoleDefaults: m['useRoleDefaults'] as bool? ?? true,
-        isActive: m['isActive'] as bool? ?? true,
-        branchId: m['branchId'] as String?,
-        photoUrl: m['photoUrl'] as String?,
-        fcmToken: m['fcmToken'] as String?,
-        companyId: m['companyId'] as String? ?? '',
-        createdBy: m['createdBy'] as String? ?? '',
-        createdAt: m['createdAt'] as String?,
-        updatedAt: m['updatedAt'] as String?,
-        synced: m['synced'] as bool? ?? false,
-      );
+    id: m['id'] as String,
+    name: m['name'] as String? ?? '',
+    email: m['email'] as String? ?? '',
+    username: m['username'] as String? ?? '',
+    passwordHash: m['passwordHash'] as String? ?? '',
+    passwordSalt: m['passwordSalt'] as String? ?? '',
+    phone: m['phone'] as String? ?? '',
+    role: UserRoleX.fromKey(m['role'] as String?),
+    permissions: ((m['permissions'] as List?) ?? const [])
+        .map((e) => e.toString())
+        .toSet(),
+    useRoleDefaults: m['useRoleDefaults'] as bool? ?? true,
+    isActive: m['isActive'] as bool? ?? true,
+    branchId: m['branchId'] as String?,
+    photoUrl: m['photoUrl'] as String?,
+    fcmToken: m['fcmToken'] as String?,
+    companyId: m['companyId'] as String? ?? '',
+    createdBy: m['createdBy'] as String? ?? '',
+    createdAt: m['createdAt'] as String?,
+    updatedAt: m['updatedAt'] as String?,
+    synced: m['synced'] as bool? ?? false,
+  );
 
   AppUser copyWith({
     String? name,
@@ -323,28 +370,27 @@ class AppUser {
     String? companyId,
     String? createdBy,
     bool? synced,
-  }) =>
-      AppUser(
-        id: id,
-        name: name ?? this.name,
-        email: email ?? this.email,
-        username: username ?? this.username,
-        passwordHash: passwordHash ?? this.passwordHash,
-        passwordSalt: passwordSalt ?? this.passwordSalt,
-        phone: phone ?? this.phone,
-        role: role ?? this.role,
-        permissions: permissions ?? this.permissions,
-        useRoleDefaults: useRoleDefaults ?? this.useRoleDefaults,
-        isActive: isActive ?? this.isActive,
-        branchId: branchId ?? this.branchId,
-        photoUrl: photoUrl ?? this.photoUrl,
-        fcmToken: fcmToken ?? this.fcmToken,
-        companyId: companyId ?? this.companyId,
-        createdBy: createdBy ?? this.createdBy,
-        createdAt: createdAt,
-        updatedAt: DateTime.now().toIso8601String(),
-        synced: synced ?? this.synced,
-      );
+  }) => AppUser(
+    id: id,
+    name: name ?? this.name,
+    email: email ?? this.email,
+    username: username ?? this.username,
+    passwordHash: passwordHash ?? this.passwordHash,
+    passwordSalt: passwordSalt ?? this.passwordSalt,
+    phone: phone ?? this.phone,
+    role: role ?? this.role,
+    permissions: permissions ?? this.permissions,
+    useRoleDefaults: useRoleDefaults ?? this.useRoleDefaults,
+    isActive: isActive ?? this.isActive,
+    branchId: branchId ?? this.branchId,
+    photoUrl: photoUrl ?? this.photoUrl,
+    fcmToken: fcmToken ?? this.fcmToken,
+    companyId: companyId ?? this.companyId,
+    createdBy: createdBy ?? this.createdBy,
+    createdAt: createdAt,
+    updatedAt: DateTime.now().toIso8601String(),
+    synced: synced ?? this.synced,
+  );
 }
 
 /// سجل نشاط المستخدمين (Audit للأحداث الحساسة)
@@ -366,20 +412,20 @@ class UserActivity {
   }) : createdAt = createdAt ?? DateTime.now().toIso8601String();
 
   Map<String, dynamic> toMap() => {
-        'id': id,
-        'userId': userId,
-        'userName': userName,
-        'action': action,
-        'details': details,
-        'createdAt': createdAt,
-      };
+    'id': id,
+    'userId': userId,
+    'userName': userName,
+    'action': action,
+    'details': details,
+    'createdAt': createdAt,
+  };
 
   factory UserActivity.fromMap(Map<String, dynamic> m) => UserActivity(
-        id: m['id'] as String,
-        userId: m['userId'] as String? ?? '',
-        userName: m['userName'] as String? ?? '',
-        action: m['action'] as String? ?? '',
-        details: m['details'] as String? ?? '',
-        createdAt: m['createdAt'] as String?,
-      );
+    id: m['id'] as String,
+    userId: m['userId'] as String? ?? '',
+    userName: m['userName'] as String? ?? '',
+    action: m['action'] as String? ?? '',
+    details: m['details'] as String? ?? '',
+    createdAt: m['createdAt'] as String?,
+  );
 }

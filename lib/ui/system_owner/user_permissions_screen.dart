@@ -47,20 +47,21 @@ class _UserPermissionsScreenState extends State<UserPermissionsScreen> {
     } else {
       set.add(key);
     }
-    await UserService.update(u.copyWith(
-      permissions: set,
-      useRoleDefaults: false,
-    ));
+    await UserService.update(
+      u.copyWith(permissions: set, useRoleDefaults: false),
+    );
     _reload();
   }
 
   Future<void> _setAll(bool grant) async {
     final u = _user;
     if (u == null) return;
-    await UserService.update(u.copyWith(
-      permissions: grant ? Perm.all.toSet() : <String>{},
-      useRoleDefaults: false,
-    ));
+    await UserService.update(
+      u.copyWith(
+        permissions: grant ? Perm.all.toSet() : <String>{},
+        useRoleDefaults: false,
+      ),
+    );
     _reload();
   }
 
@@ -94,8 +95,9 @@ class _UserPermissionsScreenState extends State<UserPermissionsScreen> {
         ),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(dlgCtx, false),
-              child: const Text('إلغاء')),
+            onPressed: () => Navigator.pop(dlgCtx, false),
+            child: const Text('إلغاء'),
+          ),
           ElevatedButton(
             onPressed: () {
               if (ctrl.text.length < 6) return;
@@ -129,11 +131,11 @@ class _UserPermissionsScreenState extends State<UserPermissionsScreen> {
         content: Text('هل تريد حذف «${u.name}» نهائياً؟'),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(dlgCtx, false),
-              child: const Text('إلغاء')),
+            onPressed: () => Navigator.pop(dlgCtx, false),
+            child: const Text('إلغاء'),
+          ),
           ElevatedButton(
-            style:
-                ElevatedButton.styleFrom(backgroundColor: AppColors.danger),
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.danger),
             onPressed: () => Navigator.pop(dlgCtx, true),
             child: const Text('حذف'),
           ),
@@ -158,7 +160,8 @@ class _UserPermissionsScreenState extends State<UserPermissionsScreen> {
     }
 
     final company = ControlService.companyById(u.companyId);
-    final device = ControlService.lastDeviceOfUser(u.id) ??
+    final device =
+        ControlService.lastDeviceOfUser(u.id) ??
         (company != null
             ? ControlService.lastDeviceOfCompany(company.id)
             : null);
@@ -194,30 +197,40 @@ class _UserPermissionsScreenState extends State<UserPermissionsScreen> {
                         backgroundColor: u.isActive
                             ? AppColors.teal
                             : Colors.grey.shade400,
-                        child: Text(u.initials,
-                            style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 19,
-                                fontWeight: FontWeight.bold)),
+                        child: Text(
+                          u.initials,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 19,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(u.name,
-                                style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold)),
+                            Text(
+                              u.name,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                             Text(
                               '${u.role.labelAr}'
                               '${u.username.isNotEmpty ? " • @${u.username}" : ""}',
                               style: TextStyle(
-                                  fontSize: 12, color: Colors.grey.shade600),
+                                fontSize: 12,
+                                color: Colors.grey.shade600,
+                              ),
                             ),
                             if (company != null)
-                              Text('المنشأة: ${company.companyName}',
-                                  style: const TextStyle(fontSize: 11.5)),
+                              Text(
+                                'المنشأة: ${company.companyName}',
+                                style: const TextStyle(fontSize: 11.5),
+                              ),
                           ],
                         ),
                       ),
@@ -228,28 +241,41 @@ class _UserPermissionsScreenState extends State<UserPermissionsScreen> {
                     spacing: 6,
                     runSpacing: 6,
                     children: [
-                      BadgeChip(u.isActive ? 'نشط' : 'معطّل',
-                          u.isActive ? AppColors.success : Colors.grey,
-                          icon: u.isActive
-                              ? Icons.check_circle_outline
-                              : Icons.block),
-                      BadgeChip('$opsCount عملية', AppColors.indigo,
-                          icon: Icons.sync_alt),
+                      BadgeChip(
+                        u.isActive ? 'نشط' : 'معطّل',
+                        u.isActive ? AppColors.success : Colors.grey,
+                        icon: u.isActive
+                            ? Icons.check_circle_outline
+                            : Icons.block,
+                      ),
+                      BadgeChip(
+                        '$opsCount عملية',
+                        AppColors.indigo,
+                        icon: Icons.sync_alt,
+                      ),
                       if (u.isOwner)
-                        const BadgeChip('المستخدم الرئيسي', AppColors.purple,
-                            icon: Icons.star),
+                        const BadgeChip(
+                          'المستخدم الرئيسي',
+                          AppColors.purple,
+                          icon: Icons.star,
+                        ),
                       if (u.createdBy.isNotEmpty)
-                        const BadgeChip('مستخدم فرعي', AppColors.info,
-                            icon: Icons.subdirectory_arrow_right),
+                        const BadgeChip(
+                          'مستخدم فرعي',
+                          AppColors.info,
+                          icon: Icons.subdirectory_arrow_right,
+                        ),
                     ],
                   ),
                   const SizedBox(height: 12),
                   SwitchListTile(
                     contentPadding: EdgeInsets.zero,
                     title: const Text('المستخدم مُفعّل'),
-                    subtitle: Text(u.isActive
-                        ? 'يمكنه الدخول واستخدام التطبيق'
-                        : 'الدخول موقوف'),
+                    subtitle: Text(
+                      u.isActive
+                          ? 'يمكنه الدخول واستخدام التطبيق'
+                          : 'الدخول موقوف',
+                    ),
                     value: u.isActive,
                     activeThumbColor: AppColors.success,
                     onChanged: (v) async {
@@ -269,28 +295,45 @@ class _UserPermissionsScreenState extends State<UserPermissionsScreen> {
             child: Padding(
               padding: const EdgeInsets.all(14),
               child: device == null
-                  ? const Text('لا توجد بيانات جهاز مسجّلة لهذا المستخدم',
-                      style: TextStyle(fontSize: 12.5))
+                  ? const Text(
+                      'لا توجد بيانات جهاز مسجّلة لهذا المستخدم',
+                      style: TextStyle(fontSize: 12.5),
+                    )
                   : Column(
                       children: [
-                        KvRow('نوع الهاتف',
-                            device.deviceLabel.isEmpty
-                                ? platformLabel(device.platform)
-                                : device.deviceLabel,
-                            icon: platformIcon(device.platform)),
-                        KvRow('النظام', device.osVersion,
-                            icon: Icons.memory),
-                        KvRow('المنصّة', platformLabel(device.platform),
-                            icon: Icons.devices),
-                        KvRow('الدولة',
-                            device.country.isEmpty ? 'غير معروف' : device.country,
-                            icon: Icons.public),
-                        KvRow('رمز الدولة', device.countryCode,
-                            icon: Icons.flag),
-                        KvRow('آخر ظهور', timeAgo(device.lastSeenAt),
-                            icon: Icons.schedule),
-                        KvRow('عدد فتحات التطبيق', '${device.launchCount}',
-                            icon: Icons.launch),
+                        KvRow(
+                          'نوع الهاتف',
+                          device.deviceLabel.isEmpty
+                              ? platformLabel(device.platform)
+                              : device.deviceLabel,
+                          icon: platformIcon(device.platform),
+                        ),
+                        KvRow('النظام', device.osVersion, icon: Icons.memory),
+                        KvRow(
+                          'المنصّة',
+                          platformLabel(device.platform),
+                          icon: Icons.devices,
+                        ),
+                        KvRow(
+                          'الدولة',
+                          device.country.isEmpty ? 'غير معروف' : device.country,
+                          icon: Icons.public,
+                        ),
+                        KvRow(
+                          'رمز الدولة',
+                          device.countryCode,
+                          icon: Icons.flag,
+                        ),
+                        KvRow(
+                          'آخر ظهور',
+                          timeAgo(device.lastSeenAt),
+                          icon: Icons.schedule,
+                        ),
+                        KvRow(
+                          'عدد فتحات التطبيق',
+                          '${device.launchCount}',
+                          icon: Icons.launch,
+                        ),
                       ],
                     ),
             ),
@@ -307,8 +350,10 @@ class _UserPermissionsScreenState extends State<UserPermissionsScreen> {
                   KvRow('اسم المستخدم', u.username),
                   KvRow('البريد', u.email),
                   KvRow('الهاتف', u.phone),
-                  KvRow('له كلمة مرور',
-                      u.hasCredentials ? 'نعم' : 'لا (حساب قديم)'),
+                  KvRow(
+                    'له كلمة مرور',
+                    u.hasCredentials ? 'نعم' : 'لا (حساب قديم)',
+                  ),
                   KvRow('أُنشئ في', fmtDate(u.createdAt)),
                 ],
               ),
@@ -319,26 +364,31 @@ class _UserPermissionsScreenState extends State<UserPermissionsScreen> {
             child: Column(
               children: [
                 ListTile(
-                  leading: const Icon(Icons.password,
-                      color: AppColors.warning),
+                  leading: const Icon(Icons.password, color: AppColors.warning),
                   title: const Text('إعادة تعيين كلمة المرور'),
                   trailing: const Icon(Icons.chevron_left),
                   onTap: _resetPassword,
                 ),
                 const Divider(height: 1),
                 ListTile(
-                  leading: const Icon(Icons.badge_outlined,
-                      color: AppColors.info),
+                  leading: const Icon(
+                    Icons.badge_outlined,
+                    color: AppColors.info,
+                  ),
                   title: const Text('تغيير الدور'),
                   trailing: DropdownButton<UserRole>(
                     value: u.role,
                     underline: const SizedBox.shrink(),
                     items: UserRole.values
-                        .map((r) => DropdownMenuItem(
-                              value: r,
-                              child: Text(r.labelAr,
-                                  style: const TextStyle(fontSize: 13)),
-                            ))
+                        .map(
+                          (r) => DropdownMenuItem(
+                            value: r,
+                            child: Text(
+                              r.labelAr,
+                              style: const TextStyle(fontSize: 13),
+                            ),
+                          ),
+                        )
                         .toList(),
                     onChanged: (r) {
                       if (r != null) _changeRole(r);
@@ -362,8 +412,9 @@ class _UserPermissionsScreenState extends State<UserPermissionsScreen> {
                   dense: true,
                   title: const Text('استخدام صلاحيات الدور الافتراضية'),
                   subtitle: const Text(
-                      'عند الإيقاف تُطبَّق الصلاحيات المخصّصة أدناه فقط',
-                      style: TextStyle(fontSize: 11)),
+                    'عند الإيقاف تُطبَّق الصلاحيات المخصّصة أدناه فقط',
+                    style: TextStyle(fontSize: 11),
+                  ),
                   value: u.useRoleDefaults,
                   activeThumbColor: AppColors.primary,
                   onChanged: _useRoleDefaults,
@@ -371,22 +422,34 @@ class _UserPermissionsScreenState extends State<UserPermissionsScreen> {
                 const Divider(height: 1),
                 Padding(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 8, vertical: 6),
+                    horizontal: 8,
+                    vertical: 6,
+                  ),
                   child: Row(
                     children: [
                       TextButton.icon(
                         onPressed: () => _setAll(true),
-                        icon: const Icon(Icons.done_all,
-                            size: 16, color: AppColors.success),
-                        label: const Text('منح الكل',
-                            style: TextStyle(fontSize: 12)),
+                        icon: const Icon(
+                          Icons.done_all,
+                          size: 16,
+                          color: AppColors.success,
+                        ),
+                        label: const Text(
+                          'منح الكل',
+                          style: TextStyle(fontSize: 12),
+                        ),
                       ),
                       TextButton.icon(
                         onPressed: () => _setAll(false),
-                        icon: const Icon(Icons.remove_done,
-                            size: 16, color: AppColors.danger),
-                        label: const Text('سحب الكل',
-                            style: TextStyle(fontSize: 12)),
+                        icon: const Icon(
+                          Icons.remove_done,
+                          size: 16,
+                          color: AppColors.danger,
+                        ),
+                        label: const Text(
+                          'سحب الكل',
+                          style: TextStyle(fontSize: 12),
+                        ),
                       ),
                     ],
                   ),
@@ -407,20 +470,30 @@ class _UserPermissionsScreenState extends State<UserPermissionsScreen> {
   List<Widget> _permissionGroups(Set<String> effective, AppUser u) {
     final groups = <String, List<String>>{
       'المبيعات': [
-        Perm.salesView, Perm.salesCreate, Perm.salesEdit, Perm.salesDelete,
+        Perm.salesView,
+        Perm.salesCreate,
+        Perm.salesEdit,
+        Perm.salesDelete,
       ],
       'المشتريات': [
-        Perm.purchasesView, Perm.purchasesCreate, Perm.purchasesEdit,
+        Perm.purchasesView,
+        Perm.purchasesCreate,
+        Perm.purchasesEdit,
         Perm.purchasesDelete,
       ],
       'المخزون': [
-        Perm.inventoryView, Perm.inventoryManage, Perm.inventoryTransfer,
+        Perm.inventoryView,
+        Perm.inventoryManage,
+        Perm.inventoryTransfer,
         Perm.inventoryCount,
       ],
       'جهات الاتصال': [Perm.contactsView, Perm.contactsManage],
       'المحاسبة والقيود': [
-        Perm.accountsView, Perm.accountsManage, Perm.journalView,
-        Perm.journalCreate, Perm.journalDelete,
+        Perm.accountsView,
+        Perm.accountsManage,
+        Perm.journalView,
+        Perm.journalCreate,
+        Perm.journalDelete,
       ],
       'الخزينة والبنوك': [Perm.cashView, Perm.cashManage],
       'التقارير': [Perm.reportsView, Perm.reportsExport],
@@ -434,39 +507,51 @@ class _UserPermissionsScreenState extends State<UserPermissionsScreen> {
     final widgets = <Widget>[];
     groups.forEach((title, keys) {
       final granted = keys.where(effective.contains).length;
-      widgets.add(Padding(
-        padding: const EdgeInsets.only(top: 6, bottom: 4),
-        child: Row(
-          children: [
-            Text(title,
+      widgets.add(
+        Padding(
+          padding: const EdgeInsets.only(top: 6, bottom: 4),
+          child: Row(
+            children: [
+              Text(
+                title,
                 style: const TextStyle(
-                    fontSize: 13.5, fontWeight: FontWeight.bold)),
-            const SizedBox(width: 6),
-            BadgeChip('$granted/${keys.length}',
+                  fontSize: 13.5,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(width: 6),
+              BadgeChip(
+                '$granted/${keys.length}',
                 granted == keys.length
                     ? AppColors.success
                     : granted == 0
-                        ? Colors.grey
-                        : AppColors.warning),
-          ],
+                    ? Colors.grey
+                    : AppColors.warning,
+              ),
+            ],
+          ),
         ),
-      ));
-      widgets.add(Card(
-        margin: const EdgeInsets.only(bottom: 10),
-        child: Column(
-          children: keys.map((k) {
-            final on = effective.contains(k);
-            return SwitchListTile(
-              dense: true,
-              title: Text(Perm.labelsAr[k] ?? k,
-                  style: const TextStyle(fontSize: 13)),
-              value: on,
-              activeThumbColor: AppColors.primary,
-              onChanged: (_) => _togglePermission(k),
-            );
-          }).toList(),
+      );
+      widgets.add(
+        Card(
+          margin: const EdgeInsets.only(bottom: 10),
+          child: Column(
+            children: keys.map((k) {
+              final on = effective.contains(k);
+              return SwitchListTile(
+                dense: true,
+                title: Text(
+                  Perm.labelsAr[k] ?? k,
+                  style: const TextStyle(fontSize: 13),
+                ),
+                value: on,
+                activeThumbColor: AppColors.primary,
+                onChanged: (_) => _togglePermission(k),
+              );
+            }).toList(),
+          ),
         ),
-      ));
+      );
     });
     return widgets;
   }

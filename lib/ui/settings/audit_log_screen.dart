@@ -38,9 +38,11 @@ class _AuditLogScreenState extends State<AuditLogScreen> {
     }
     if (_search.isNotEmpty) {
       logs = logs
-          .where((l) =>
-              l.description.contains(_search) ||
-              l.actionLabel.contains(_search))
+          .where(
+            (l) =>
+                l.description.contains(_search) ||
+                l.actionLabel.contains(_search),
+          )
           .toList();
     }
 
@@ -52,7 +54,13 @@ class _AuditLogScreenState extends State<AuditLogScreen> {
             title: 'سجل المراجعة',
             companyName: prov.companyName,
             filename: 'audit_log',
-            headers: const ['التاريخ', 'الإجراء', 'النوع', 'التفاصيل', 'المستخدم'],
+            headers: const [
+              'التاريخ',
+              'الإجراء',
+              'النوع',
+              'التفاصيل',
+              'المستخدم',
+            ],
             rows: [
               for (final l in logs)
                 [
@@ -107,8 +115,7 @@ class _AuditLogScreenState extends State<AuditLogScreen> {
                     child: ChoiceChip(
                       label: Text(e.value),
                       selected: _filterEntity == e.key,
-                      onSelected: (_) =>
-                          setState(() => _filterEntity = e.key),
+                      onSelected: (_) => setState(() => _filterEntity = e.key),
                     ),
                   ),
               ],
@@ -118,7 +125,9 @@ class _AuditLogScreenState extends State<AuditLogScreen> {
           Expanded(
             child: logs.isEmpty
                 ? const EmptyState(
-                    message: 'لا توجد سجلات', icon: Icons.history)
+                    message: 'لا توجد سجلات',
+                    icon: Icons.history,
+                  )
                 : ListView.builder(
                     padding: const EdgeInsets.all(12),
                     itemCount: logs.length,
@@ -145,8 +154,10 @@ class _AuditLogScreenState extends State<AuditLogScreen> {
           backgroundColor: color.withValues(alpha: 0.12),
           child: Icon(icon, size: 18, color: color),
         ),
-        title: Text(l.description.isEmpty ? l.entityLabel : l.description,
-            style: const TextStyle(fontSize: 13)),
+        title: Text(
+          l.description.isEmpty ? l.entityLabel : l.description,
+          style: const TextStyle(fontSize: 13),
+        ),
         subtitle: Text(
           '${l.date.replaceAll('T', ' ').split('.').first} • ${l.actionLabel}',
           style: TextStyle(fontSize: 11, color: Colors.grey.shade600),

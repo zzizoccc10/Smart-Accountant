@@ -13,8 +13,7 @@ class CashboxStatementScreen extends StatefulWidget {
   const CashboxStatementScreen({super.key});
 
   @override
-  State<CashboxStatementScreen> createState() =>
-      _CashboxStatementScreenState();
+  State<CashboxStatementScreen> createState() => _CashboxStatementScreenState();
 }
 
 class _CashboxStatementScreenState extends State<CashboxStatementScreen> {
@@ -52,7 +51,8 @@ class _CashboxStatementScreenState extends State<CashboxStatementScreen> {
       if (!isSale && isReturn) inAmt = inv.total;
       raw.add({
         'date': inv.date,
-        'desc': '${inv.invoiceNumber} — ${inv.contactName.isEmpty ? 'عميل نقدي' : inv.contactName}',
+        'desc':
+            '${inv.invoiceNumber} — ${inv.contactName.isEmpty ? 'عميل نقدي' : inv.contactName}',
         'in': inAmt,
         'out': outAmt,
       });
@@ -61,7 +61,8 @@ class _CashboxStatementScreenState extends State<CashboxStatementScreen> {
       if (p.cashboxId != _cashboxId || p.isDeleted) continue;
       raw.add({
         'date': p.date,
-        'desc': '${p.paymentType == 'receipt' ? 'سند قبض' : 'سند صرف'} ${p.paymentNumber}',
+        'desc':
+            '${p.paymentType == 'receipt' ? 'سند قبض' : 'سند صرف'} ${p.paymentNumber}',
         'in': p.paymentType == 'receipt' ? p.amount : 0,
         'out': p.paymentType == 'payment' ? p.amount : 0,
       });
@@ -103,9 +104,7 @@ class _CashboxStatementScreenState extends State<CashboxStatementScreen> {
                     e['date'] as String,
                     e['desc'] as String,
                     (e['in'] as double) > 0 ? Fmt.num(e['in'] as double) : '',
-                    (e['out'] as double) > 0
-                        ? Fmt.num(e['out'] as double)
-                        : '',
+                    (e['out'] as double) > 0 ? Fmt.num(e['out'] as double) : '',
                     Fmt.num(e['balance'] as double),
                   ],
               ],
@@ -131,7 +130,9 @@ class _CashboxStatementScreenState extends State<CashboxStatementScreen> {
                 prefixIcon: Icon(Icons.savings),
               ),
               items: prov.cashboxes
-                  .map((c) => DropdownMenuItem(value: c.id, child: Text(c.name)))
+                  .map(
+                    (c) => DropdownMenuItem(value: c.id, child: Text(c.name)),
+                  )
                   .toList(),
               onChanged: (v) => setState(() => _cashboxId = v),
             ),
@@ -141,13 +142,21 @@ class _CashboxStatementScreenState extends State<CashboxStatementScreen> {
             child: Row(
               children: [
                 Expanded(
-                  child: _stat('الرصيد الافتتاحي', Fmt.money(opening, curr),
-                      Icons.flag, AppColors.info),
+                  child: _stat(
+                    'الرصيد الافتتاحي',
+                    Fmt.money(opening, curr),
+                    Icons.flag,
+                    AppColors.info,
+                  ),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: _stat('الرصيد الحالي', Fmt.money(running, curr),
-                      Icons.account_balance_wallet, AppColors.success),
+                  child: _stat(
+                    'الرصيد الحالي',
+                    Fmt.money(running, curr),
+                    Icons.account_balance_wallet,
+                    AppColors.success,
+                  ),
                 ),
               ],
             ),
@@ -169,10 +178,9 @@ class _CashboxStatementScreenState extends State<CashboxStatementScreen> {
                         margin: const EdgeInsets.only(bottom: 8),
                         child: ListTile(
                           leading: CircleAvatar(
-                            backgroundColor: (isIn
-                                    ? AppColors.success
-                                    : AppColors.danger)
-                                .withValues(alpha: 0.12),
+                            backgroundColor:
+                                (isIn ? AppColors.success : AppColors.danger)
+                                    .withValues(alpha: 0.12),
                             child: Icon(
                               isIn ? Icons.south_west : Icons.north_east,
                               size: 18,
@@ -181,11 +189,17 @@ class _CashboxStatementScreenState extends State<CashboxStatementScreen> {
                                   : AppColors.danger,
                             ),
                           ),
-                          title: Text(e['desc'] as String,
-                              style: const TextStyle(fontSize: 13)),
-                          subtitle: Text(e['date'] as String,
-                              style: TextStyle(
-                                  fontSize: 11, color: Colors.grey.shade600)),
+                          title: Text(
+                            e['desc'] as String,
+                            style: const TextStyle(fontSize: 13),
+                          ),
+                          subtitle: Text(
+                            e['date'] as String,
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: Colors.grey.shade600,
+                            ),
+                          ),
                           trailing: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.end,
@@ -202,8 +216,10 @@ class _CashboxStatementScreenState extends State<CashboxStatementScreen> {
                                       : AppColors.danger,
                                 ),
                               ),
-                              Text('رصيد: ${Fmt.num(e['balance'] as double)}',
-                                  style: const TextStyle(fontSize: 10)),
+                              Text(
+                                'رصيد: ${Fmt.num(e['balance'] as double)}',
+                                style: const TextStyle(fontSize: 10),
+                              ),
                             ],
                           ),
                         ),
@@ -228,11 +244,17 @@ class _CashboxStatementScreenState extends State<CashboxStatementScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title,
-                      style: const TextStyle(fontSize: 10, color: Colors.grey)),
-                  Text(value,
-                      style: const TextStyle(
-                          fontSize: 13, fontWeight: FontWeight.bold)),
+                  Text(
+                    title,
+                    style: const TextStyle(fontSize: 10, color: Colors.grey),
+                  ),
+                  Text(
+                    value,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ],
               ),
             ),

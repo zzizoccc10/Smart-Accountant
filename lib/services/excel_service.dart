@@ -21,16 +21,12 @@ class ExcelService {
     final sheet = excel[sheetName];
 
     // صف العناوين (منسّق)
-    final headerRow = <CellValue?>[
-      for (final h in headers) TextCellValue(h),
-    ];
+    final headerRow = <CellValue?>[for (final h in headers) TextCellValue(h)];
     sheet.appendRow(headerRow);
 
     // الصفوف
     for (final r in rows) {
-      sheet.appendRow([
-        for (final c in r) _cell(c),
-      ]);
+      sheet.appendRow([for (final c in r) _cell(c)]);
     }
     final bytes = excel.encode();
     return Uint8List.fromList(bytes ?? []);

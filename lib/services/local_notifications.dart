@@ -18,8 +18,7 @@ class LocalNotifications {
   static Future<void> init() async {
     if (kIsWeb || _inited) return;
     try {
-      const androidInit =
-          AndroidInitializationSettings('@mipmap/ic_launcher');
+      const androidInit = AndroidInitializationSettings('@mipmap/ic_launcher');
       const darwinInit = DarwinInitializationSettings(
         requestAlertPermission: false,
         requestBadgePermission: false,
@@ -36,9 +35,10 @@ class LocalNotifications {
         onDidReceiveNotificationResponse: (_) {},
       );
 
-      final androidImpl =
-          _plugin.resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin>();
+      final androidImpl = _plugin
+          .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin
+          >();
       await androidImpl?.createNotificationChannel(
         const AndroidNotificationChannel(
           _channelId,
@@ -60,17 +60,16 @@ class LocalNotifications {
     if (kIsWeb || _permRequested) return;
     _permRequested = true;
     try {
-      final androidImpl =
-          _plugin.resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin>();
+      final androidImpl = _plugin
+          .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin
+          >();
       await androidImpl?.requestNotificationsPermission();
-      final iosImpl = _plugin.resolvePlatformSpecificImplementation<
-          IOSFlutterLocalNotificationsPlugin>();
-      await iosImpl?.requestPermissions(
-        alert: true,
-        badge: true,
-        sound: true,
-      );
+      final iosImpl = _plugin
+          .resolvePlatformSpecificImplementation<
+            IOSFlutterLocalNotificationsPlugin
+          >();
+      await iosImpl?.requestPermissions(alert: true, badge: true, sound: true);
     } catch (_) {}
   }
 
@@ -121,22 +120,27 @@ class LocalNotifications {
       );
 
   /// تنبيه فاتورة مستحقة
-  static Future<void> invoiceDue(String invoiceNumber, String contact,
-          double remaining, String currency) =>
-      show(
-        1002,
-        'فاتورة مستحقة السداد',
-        'الفاتورة $invoiceNumber للعميل "$contact" — المتبقي: $remaining $currency',
-      );
+  static Future<void> invoiceDue(
+    String invoiceNumber,
+    String contact,
+    double remaining,
+    String currency,
+  ) => show(
+    1002,
+    'فاتورة مستحقة السداد',
+    'الفاتورة $invoiceNumber للعميل "$contact" — المتبقي: $remaining $currency',
+  );
 
   /// تنبيه مديونية تجاوزت حد الائتمان
   static Future<void> creditLimitExceeded(
-          String contact, double balance, double limit) =>
-      show(
-        1003,
-        'تجاوز حد الائتمان',
-        'العميل "$contact" تجاوز حد الائتمان (الرصيد: $balance، الحد: $limit)',
-      );
+    String contact,
+    double balance,
+    double limit,
+  ) => show(
+    1003,
+    'تجاوز حد الائتمان',
+    'العميل "$contact" تجاوز حد الائتمان (الرصيد: $balance، الحد: $limit)',
+  );
 
   /// تنبيه نجاح النسخ الاحتياطي
   static Future<void> backupDone(String message) =>

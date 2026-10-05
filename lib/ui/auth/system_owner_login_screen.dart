@@ -88,20 +88,29 @@ class _SystemOwnerLoginScreenState extends State<SystemOwnerLoginScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        const Icon(Icons.admin_panel_settings,
-                            size: 52, color: AppColors.purple),
+                        const Icon(
+                          Icons.admin_panel_settings,
+                          size: 52,
+                          color: AppColors.purple,
+                        ),
                         const SizedBox(height: 10),
-                        const Text('إنشاء حساب مالك النظام',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold)),
+                        const Text(
+                          'إنشاء حساب مالك النظام',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                         const SizedBox(height: 6),
                         Text(
                           'مالك النظام هو المشرف الأعلى الذي يدير كل المنشآت '
                           'ويتحكّم بالتفعيل والصلاحيات.',
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                              fontSize: 12, color: Colors.grey.shade600),
+                            fontSize: 12,
+                            color: Colors.grey.shade600,
+                          ),
                         ),
                         const SizedBox(height: 18),
                         TextFormField(
@@ -143,9 +152,11 @@ class _SystemOwnerLoginScreenState extends State<SystemOwnerLoginScreen> {
                             labelText: 'كلمة المرور',
                             prefixIcon: const Icon(Icons.lock_outline),
                             suffixIcon: IconButton(
-                              icon: Icon(_obscure
-                                  ? Icons.visibility_off
-                                  : Icons.visibility),
+                              icon: Icon(
+                                _obscure
+                                    ? Icons.visibility_off
+                                    : Icons.visibility,
+                              ),
                               onPressed: () =>
                                   setState(() => _obscure = !_obscure),
                             ),
@@ -172,14 +183,17 @@ class _SystemOwnerLoginScreenState extends State<SystemOwnerLoginScreen> {
                         SizedBox(
                           height: 52,
                           child: ElevatedButton.icon(
-                            onPressed:
-                                session.busy ? null : () => _create(session),
+                            onPressed: session.busy
+                                ? null
+                                : () => _create(session),
                             icon: session.busy
                                 ? const SizedBox(
                                     width: 18,
                                     height: 18,
                                     child: CircularProgressIndicator(
-                                        strokeWidth: 2, color: Colors.white),
+                                      strokeWidth: 2,
+                                      color: Colors.white,
+                                    ),
                                   )
                                 : const Icon(Icons.verified_user),
                             label: const Text('إنشاء ودخول لوحة التحكم'),
@@ -194,7 +208,9 @@ class _SystemOwnerLoginScreenState extends State<SystemOwnerLoginScreen> {
                           'احفظ بيانات الدخول في مكان آمن — فهي تمنح تحكّماً كاملاً بالنظام.',
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                              fontSize: 11, color: Colors.grey.shade600),
+                            fontSize: 11,
+                            color: Colors.grey.shade600,
+                          ),
                         ),
                       ],
                     ),

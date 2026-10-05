@@ -41,9 +41,7 @@ class ImportService {
       shouldParseNumbers: false,
       eol: '\n',
     ).convert(content.replaceAll('\r\n', '\n'));
-    return rows
-        .map((r) => r.map((c) => c.toString().trim()).toList())
-        .toList();
+    return rows.map((r) => r.map((c) => c.toString().trim()).toList()).toList();
   }
 
   static List<List<String>> _parseExcel(Uint8List bytes) {
@@ -105,7 +103,10 @@ class ImportService {
       }
     }
     return ImportResult(
-        success: ok, failed: rows.length - 1 - ok, errors: errors);
+      success: ok,
+      failed: rows.length - 1 - ok,
+      errors: errors,
+    );
   }
 
   // ---------------------------- استيراد جهات الاتصال ----------------------------
@@ -142,21 +143,31 @@ class ImportService {
       }
     }
     return ImportResult(
-        success: ok, failed: rows.length - 1 - ok, errors: errors);
+      success: ok,
+      failed: rows.length - 1 - ok,
+      errors: errors,
+    );
   }
 
   // ---------------------------- قوالب CSV للتنزيل ----------------------------
   static String itemsTemplateCsv() => const ListToCsvConverter().convert([
-        ['الكود', 'الاسم', 'الباركود', 'سعر الشراء', 'سعر البيع', 'حد الطلب'],
-        ['IT-001', 'قميص قطني', '1234567890', '40', '70', '10'],
-        ['IT-002', 'حذاء رياضي', '1234567891', '120', '200', '5'],
-      ]);
+    ['الكود', 'الاسم', 'الباركود', 'سعر الشراء', 'سعر البيع', 'حد الطلب'],
+    ['IT-001', 'قميص قطني', '1234567890', '40', '70', '10'],
+    ['IT-002', 'حذاء رياضي', '1234567891', '120', '200', '5'],
+  ]);
 
   static String contactsTemplateCsv() => const ListToCsvConverter().convert([
-        ['الكود', 'الاسم', 'النوع', 'الهاتف', 'البريد', 'الرقم الضريبي'],
-        ['C-001', 'أحمد علي', 'عميل', '0500000000', 'a@mail.com', '300000000000003'],
-        ['S-001', 'شركة التوريدات', 'مورد', '0511111111', 'b@mail.com', ''],
-      ]);
+    ['الكود', 'الاسم', 'النوع', 'الهاتف', 'البريد', 'الرقم الضريبي'],
+    [
+      'C-001',
+      'أحمد علي',
+      'عميل',
+      '0500000000',
+      'a@mail.com',
+      '300000000000003',
+    ],
+    ['S-001', 'شركة التوريدات', 'مورد', '0511111111', 'b@mail.com', ''],
+  ]);
 
   // ---------------------------- أدوات مساعدة ----------------------------
   static String _at(List<String> r, int i) => i < r.length ? r[i].trim() : '';

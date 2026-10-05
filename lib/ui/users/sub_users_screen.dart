@@ -79,13 +79,18 @@ class _SubUsersScreenState extends State<SubUsersScreen> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.group_add_outlined,
-                            size: 56, color: Colors.grey),
+                        Icon(
+                          Icons.group_add_outlined,
+                          size: 56,
+                          color: Colors.grey,
+                        ),
                         SizedBox(height: 12),
                         Text('لا يوجد مستخدمون بعد'),
                         SizedBox(height: 6),
-                        Text('اضغط + لإضافة أول مستخدم',
-                            style: TextStyle(fontSize: 12, color: Colors.grey)),
+                        Text(
+                          'اضغط + لإضافة أول مستخدم',
+                          style: TextStyle(fontSize: 12, color: Colors.grey),
+                        ),
                       ],
                     ),
                   )
@@ -98,10 +103,13 @@ class _SubUsersScreenState extends State<SubUsersScreen> {
                         margin: const EdgeInsets.only(bottom: 10),
                         child: ListTile(
                           leading: CircleAvatar(
-                            backgroundColor:
-                                u.isActive ? AppColors.primary : Colors.grey,
-                            child: Text(u.initials,
-                                style: const TextStyle(color: Colors.white)),
+                            backgroundColor: u.isActive
+                                ? AppColors.primary
+                                : Colors.grey,
+                            child: Text(
+                              u.initials,
+                              style: const TextStyle(color: Colors.white),
+                            ),
                           ),
                           title: Text(u.name),
                           subtitle: Column(
@@ -115,11 +123,15 @@ class _SubUsersScreenState extends State<SubUsersScreen> {
                               const SizedBox(height: 2),
                               Row(
                                 children: [
-                                  _chip(u.isActive ? 'نشط' : 'معطّل',
-                                      u.isActive ? Colors.green : Colors.red),
+                                  _chip(
+                                    u.isActive ? 'نشط' : 'معطّل',
+                                    u.isActive ? Colors.green : Colors.red,
+                                  ),
                                   const SizedBox(width: 6),
-                                  _chip('${u.effectivePermissions.length} صلاحية',
-                                      Colors.blueGrey),
+                                  _chip(
+                                    '${u.effectivePermissions.length} صلاحية',
+                                    Colors.blueGrey,
+                                  ),
                                   if (u.hasCredentials) ...[
                                     const SizedBox(width: 6),
                                     _chip('له دخول', AppColors.info),
@@ -134,18 +146,22 @@ class _SubUsersScreenState extends State<SubUsersScreen> {
                                 final res = await Navigator.push<bool>(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (_) => SubUserForm(user: u)),
+                                    builder: (_) => SubUserForm(user: u),
+                                  ),
                                 );
                                 if (res == true) setState(() {});
                               } else if (v == 'toggle') {
                                 await UserService.update(
-                                    u.copyWith(isActive: !u.isActive));
+                                  u.copyWith(isActive: !u.isActive),
+                                );
                                 setState(() {});
                               } else if (v == 'password') {
                                 await _resetPassword(u);
                               } else if (v == 'delete') {
                                 final ok = await _confirm(
-                                    'حذف المستخدم', 'هل تريد حذف "${u.name}"؟');
+                                  'حذف المستخدم',
+                                  'هل تريد حذف "${u.name}"؟',
+                                );
                                 if (ok) {
                                   await UserService.delete(u.id);
                                   setState(() {});
@@ -154,41 +170,52 @@ class _SubUsersScreenState extends State<SubUsersScreen> {
                             },
                             itemBuilder: (_) => [
                               const PopupMenuItem(
-                                  value: 'edit',
-                                  child: ListTile(
-                                      leading: Icon(Icons.edit),
-                                      title: Text('تعديل'),
-                                      dense: true)),
+                                value: 'edit',
+                                child: ListTile(
+                                  leading: Icon(Icons.edit),
+                                  title: Text('تعديل'),
+                                  dense: true,
+                                ),
+                              ),
                               const PopupMenuItem(
-                                  value: 'password',
-                                  child: ListTile(
-                                      leading: Icon(Icons.password),
-                                      title: Text('تغيير كلمة المرور'),
-                                      dense: true)),
+                                value: 'password',
+                                child: ListTile(
+                                  leading: Icon(Icons.password),
+                                  title: Text('تغيير كلمة المرور'),
+                                  dense: true,
+                                ),
+                              ),
                               PopupMenuItem(
                                 value: 'toggle',
                                 child: ListTile(
-                                  leading: Icon(u.isActive
-                                      ? Icons.block
-                                      : Icons.check_circle_outline),
+                                  leading: Icon(
+                                    u.isActive
+                                        ? Icons.block
+                                        : Icons.check_circle_outline,
+                                  ),
                                   title: Text(u.isActive ? 'تعطيل' : 'تفعيل'),
                                   dense: true,
                                 ),
                               ),
                               const PopupMenuItem(
-                                  value: 'delete',
-                                  child: ListTile(
-                                      leading:
-                                          Icon(Icons.delete, color: Colors.red),
-                                      title: Text('حذف'),
-                                      dense: true)),
+                                value: 'delete',
+                                child: ListTile(
+                                  leading: Icon(
+                                    Icons.delete,
+                                    color: Colors.red,
+                                  ),
+                                  title: Text('حذف'),
+                                  dense: true,
+                                ),
+                              ),
                             ],
                           ),
                           onTap: () async {
                             final res = await Navigator.push<bool>(
                               context,
                               MaterialPageRoute(
-                                  builder: (_) => SubUserForm(user: u)),
+                                builder: (_) => SubUserForm(user: u),
+                              ),
                             );
                             if (res == true) setState(() {});
                           },
@@ -218,8 +245,9 @@ class _SubUsersScreenState extends State<SubUsersScreen> {
         ),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(dlgCtx, false),
-              child: const Text('إلغاء')),
+            onPressed: () => Navigator.pop(dlgCtx, false),
+            child: const Text('إلغاء'),
+          ),
           ElevatedButton(
             onPressed: () {
               if (ctrl.text.length >= 6) Navigator.pop(dlgCtx, true);
@@ -242,13 +270,13 @@ class _SubUsersScreenState extends State<SubUsersScreen> {
   }
 
   Widget _chip(String text, Color color) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.12),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Text(text, style: TextStyle(fontSize: 10, color: color)),
-      );
+    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+    decoration: BoxDecoration(
+      color: color.withValues(alpha: 0.12),
+      borderRadius: BorderRadius.circular(8),
+    ),
+    child: Text(text, style: TextStyle(fontSize: 10, color: color)),
+  );
 
   Future<bool> _confirm(String title, String body) async {
     final r = await showDialog<bool>(
@@ -258,11 +286,13 @@ class _SubUsersScreenState extends State<SubUsersScreen> {
         content: Text(body),
         actions: [
           TextButton(
-              onPressed: () => Navigator.of(dlgCtx).pop(false),
-              child: const Text('إلغاء')),
+            onPressed: () => Navigator.of(dlgCtx).pop(false),
+            child: const Text('إلغاء'),
+          ),
           ElevatedButton(
-              onPressed: () => Navigator.of(dlgCtx).pop(true),
-              child: const Text('تأكيد')),
+            onPressed: () => Navigator.of(dlgCtx).pop(true),
+            child: const Text('تأكيد'),
+          ),
         ],
       ),
     );

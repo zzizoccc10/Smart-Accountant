@@ -72,10 +72,7 @@ class _UsersScreenState extends State<UsersScreen>
       ),
       body: TabBarView(
         controller: _tabs,
-        children: [
-          _usersTab(session, canManage),
-          _activityTab(),
-        ],
+        children: [_usersTab(session, canManage), _activityTab()],
       ),
     );
   }
@@ -95,8 +92,7 @@ class _UsersScreenState extends State<UsersScreen>
           margin: const EdgeInsets.only(bottom: 10),
           child: ListTile(
             leading: CircleAvatar(
-              backgroundColor:
-                  u.isActive ? AppColors.primary : Colors.grey,
+              backgroundColor: u.isActive ? AppColors.primary : Colors.grey,
               child: Text(
                 u.initials,
                 style: const TextStyle(color: Colors.white),
@@ -137,9 +133,7 @@ class _UsersScreenState extends State<UsersScreen>
                       if (v == 'edit') {
                         final res = await Navigator.push<bool>(
                           context,
-                          MaterialPageRoute(
-                            builder: (_) => UserForm(user: u),
-                          ),
+                          MaterialPageRoute(builder: (_) => UserForm(user: u)),
                         );
                         if (res == true) setState(() {});
                       } else if (v == 'toggle') {
@@ -157,7 +151,9 @@ class _UsersScreenState extends State<UsersScreen>
                           return;
                         }
                         final ok = await _confirm(
-                            'حذف المستخدم', 'هل تريد حذف "${u.name}"؟');
+                          'حذف المستخدم',
+                          'هل تريد حذف "${u.name}"؟',
+                        );
                         if (ok) {
                           await UserService.delete(u.id);
                           setState(() {});
@@ -166,29 +162,33 @@ class _UsersScreenState extends State<UsersScreen>
                     },
                     itemBuilder: (_) => [
                       const PopupMenuItem(
-                          value: 'edit',
-                          child: ListTile(
-                            leading: Icon(Icons.edit),
-                            title: Text('تعديل'),
-                            dense: true,
-                          )),
+                        value: 'edit',
+                        child: ListTile(
+                          leading: Icon(Icons.edit),
+                          title: Text('تعديل'),
+                          dense: true,
+                        ),
+                      ),
                       PopupMenuItem(
                         value: 'toggle',
                         child: ListTile(
-                          leading: Icon(u.isActive
-                              ? Icons.block
-                              : Icons.check_circle_outline),
+                          leading: Icon(
+                            u.isActive
+                                ? Icons.block
+                                : Icons.check_circle_outline,
+                          ),
                           title: Text(u.isActive ? 'تعطيل' : 'تفعيل'),
                           dense: true,
                         ),
                       ),
                       const PopupMenuItem(
-                          value: 'delete',
-                          child: ListTile(
-                            leading: Icon(Icons.delete, color: Colors.red),
-                            title: Text('حذف'),
-                            dense: true,
-                          )),
+                        value: 'delete',
+                        child: ListTile(
+                          leading: Icon(Icons.delete, color: Colors.red),
+                          title: Text('حذف'),
+                          dense: true,
+                        ),
+                      ),
                     ],
                   )
                 : null,
@@ -220,8 +220,11 @@ class _UsersScreenState extends State<UsersScreen>
         final a = acts[i];
         return ListTile(
           dense: true,
-          leading: const Icon(Icons.fiber_manual_record,
-              size: 10, color: Colors.blueGrey),
+          leading: const Icon(
+            Icons.fiber_manual_record,
+            size: 10,
+            color: Colors.blueGrey,
+          ),
           title: Text('${a.userName} — ${_actionLabel(a.action)}'),
           subtitle: Text(
             '${_fmt(a.createdAt)}${a.details.isNotEmpty ? ' • ${a.details}' : ''}',
@@ -252,17 +255,16 @@ class _UsersScreenState extends State<UsersScreen>
   }
 
   Widget _chip(String text, Color color) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.12),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Text(text, style: TextStyle(fontSize: 10, color: color)),
-      );
+    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+    decoration: BoxDecoration(
+      color: color.withValues(alpha: 0.12),
+      borderRadius: BorderRadius.circular(8),
+    ),
+    child: Text(text, style: TextStyle(fontSize: 10, color: color)),
+  );
 
   void _snack(String msg) {
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(msg)));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
   }
 
   Future<bool> _confirm(String title, String body) async {
@@ -273,11 +275,13 @@ class _UsersScreenState extends State<UsersScreen>
         content: Text(body),
         actions: [
           TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('إلغاء')),
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('إلغاء'),
+          ),
           ElevatedButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              child: const Text('تأكيد')),
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('تأكيد'),
+          ),
         ],
       ),
     );

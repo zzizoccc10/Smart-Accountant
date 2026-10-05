@@ -123,13 +123,18 @@ class BalanceSheetScreen extends StatelessWidget {
                 children: [
                   _row('إجمالي الأصول', totalAssets, curr, bold: true),
                   const SizedBox(height: 6),
-                  _row('إجمالي الخصوم + حقوق الملكية',
-                      totalLiab + totalEquity, curr, bold: true),
+                  _row(
+                    'إجمالي الخصوم + حقوق الملكية',
+                    totalLiab + totalEquity,
+                    curr,
+                    bold: true,
+                  ),
                   const SizedBox(height: 10),
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: (totalAssets - (totalLiab + totalEquity)).abs() < 0.5
+                      color:
+                          (totalAssets - (totalLiab + totalEquity)).abs() < 0.5
                           ? AppColors.success.withValues(alpha: 0.1)
                           : AppColors.warning.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(10),
@@ -140,7 +145,8 @@ class BalanceSheetScreen extends StatelessWidget {
                           (totalAssets - (totalLiab + totalEquity)).abs() < 0.5
                               ? Icons.check_circle
                               : Icons.info,
-                          color: (totalAssets - (totalLiab + totalEquity)).abs() <
+                          color:
+                              (totalAssets - (totalLiab + totalEquity)).abs() <
                                   0.5
                               ? AppColors.success
                               : AppColors.warning,
@@ -149,7 +155,8 @@ class BalanceSheetScreen extends StatelessWidget {
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            (totalAssets - (totalLiab + totalEquity)).abs() < 0.5
+                            (totalAssets - (totalLiab + totalEquity)).abs() <
+                                    0.5
                                 ? 'الميزانية متوازنة ✓'
                                 : 'فرق: ${Fmt.money((totalAssets - (totalLiab + totalEquity)).abs(), curr)}',
                             style: const TextStyle(fontSize: 13),
@@ -167,8 +174,13 @@ class BalanceSheetScreen extends StatelessWidget {
     );
   }
 
-  Widget _section(String title, Color color, List<Map<String, dynamic>> rows,
-      double total, String curr) {
+  Widget _section(
+    String title,
+    Color color,
+    List<Map<String, dynamic>> rows,
+    double total,
+    String curr,
+  ) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -178,7 +190,10 @@ class BalanceSheetScreen extends StatelessWidget {
             if (rows.isEmpty)
               const Padding(
                 padding: EdgeInsets.all(8),
-                child: Text('لا توجد أرصدة', style: TextStyle(color: Colors.grey)),
+                child: Text(
+                  'لا توجد أرصدة',
+                  style: TextStyle(color: Colors.grey),
+                ),
               ),
             for (final r in rows)
               _row(r['name'] as String, r['amount'] as double, curr),
@@ -204,9 +219,10 @@ class BalanceSheetScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 8),
-          Text(title,
-              style:
-                  const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+          Text(
+            title,
+            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+          ),
         ],
       ),
     );
@@ -218,16 +234,20 @@ class BalanceSheetScreen extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: Text(label,
-                style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: bold ? FontWeight.bold : FontWeight.normal)),
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: bold ? FontWeight.bold : FontWeight.normal,
+              ),
+            ),
           ),
           Text(
             Fmt.money(amount, curr),
             style: TextStyle(
-                fontSize: 13,
-                fontWeight: bold ? FontWeight.bold : FontWeight.w600),
+              fontSize: 13,
+              fontWeight: bold ? FontWeight.bold : FontWeight.w600,
+            ),
           ),
         ],
       ),

@@ -31,8 +31,9 @@ class SalesReportScreen extends StatelessWidget {
     final prov = context.watch<ERPProvider>();
     final curr = prov.currency;
     final sales = prov.invoices.where((i) => i.invoiceType == 'sale').toList();
-    final returns =
-        prov.invoices.where((i) => i.invoiceType == 'sale_return').toList();
+    final returns = prov.invoices
+        .where((i) => i.invoiceType == 'sale_return')
+        .toList();
 
     final grossSales = sales.fold(0.0, (s, i) => s + i.total);
     final totalReturns = returns.fold(0.0, (s, i) => s + i.total);
@@ -82,31 +83,38 @@ class SalesReportScreen extends StatelessWidget {
             childAspectRatio: 1.6,
             children: [
               StatCard(
-                  title: 'إجمالي المبيعات',
-                  value: Fmt.money(grossSales, curr),
-                  icon: Icons.point_of_sale,
-                  color: AppColors.success),
+                title: 'إجمالي المبيعات',
+                value: Fmt.money(grossSales, curr),
+                icon: Icons.point_of_sale,
+                color: AppColors.success,
+              ),
               StatCard(
-                  title: 'المرتجعات',
-                  value: Fmt.money(totalReturns, curr),
-                  icon: Icons.assignment_return,
-                  color: AppColors.danger),
+                title: 'المرتجعات',
+                value: Fmt.money(totalReturns, curr),
+                icon: Icons.assignment_return,
+                color: AppColors.danger,
+              ),
               StatCard(
-                  title: 'صافي المبيعات',
-                  value: Fmt.money(netSales, curr),
-                  icon: Icons.trending_up,
-                  color: AppColors.primary),
+                title: 'صافي المبيعات',
+                value: Fmt.money(netSales, curr),
+                icon: Icons.trending_up,
+                color: AppColors.primary,
+              ),
               StatCard(
-                  title: 'الربح التقديري',
-                  value: Fmt.money(profit, curr),
-                  icon: Icons.savings,
-                  color: AppColors.teal),
+                title: 'الربح التقديري',
+                value: Fmt.money(profit, curr),
+                icon: Icons.savings,
+                color: AppColors.teal,
+              ),
             ],
           ),
           const SizedBox(height: 16),
           const SectionTitle('الأصناف الأكثر مبيعاً', icon: Icons.star),
           if (topItems.isEmpty)
-            const EmptyState(message: 'لا توجد مبيعات', icon: Icons.point_of_sale)
+            const EmptyState(
+              message: 'لا توجد مبيعات',
+              icon: Icons.point_of_sale,
+            )
           else
             Card(
               child: Column(
@@ -115,20 +123,31 @@ class SalesReportScreen extends StatelessWidget {
                     ListTile(
                       dense: true,
                       leading: CircleAvatar(
-                        backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-                        child: Text('${i + 1}',
-                            style: const TextStyle(
-                                color: AppColors.primary,
-                                fontWeight: FontWeight.bold)),
+                        backgroundColor: AppColors.primary.withValues(
+                          alpha: 0.1,
+                        ),
+                        child: Text(
+                          '${i + 1}',
+                          style: const TextStyle(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
-                      title: Text(topItems[i].key,
-                          style: const TextStyle(fontSize: 13)),
-                      subtitle: Text('الكمية: ${Fmt.num(itemQty[topItems[i].key] ?? 0)}',
-                          style: const TextStyle(fontSize: 11)),
+                      title: Text(
+                        topItems[i].key,
+                        style: const TextStyle(fontSize: 13),
+                      ),
+                      subtitle: Text(
+                        'الكمية: ${Fmt.num(itemQty[topItems[i].key] ?? 0)}',
+                        style: const TextStyle(fontSize: 11),
+                      ),
                       trailing: Text(
                         Fmt.money(topItems[i].value, curr),
                         style: const TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 12),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
                       ),
                     ),
                 ],
@@ -145,15 +164,21 @@ class SalesReportScreen extends StatelessWidget {
                   for (final inv in sales.reversed.take(20))
                     ListTile(
                       dense: true,
-                      title: Text(inv.contactName.isEmpty
-                          ? 'عميل نقدي'
-                          : inv.contactName,
-                          style: const TextStyle(fontSize: 13)),
-                      subtitle: Text('${inv.invoiceNumber} • ${inv.date}',
-                          style: const TextStyle(fontSize: 11)),
-                      trailing: Text(Fmt.money(inv.total, curr),
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 12)),
+                      title: Text(
+                        inv.contactName.isEmpty ? 'عميل نقدي' : inv.contactName,
+                        style: const TextStyle(fontSize: 13),
+                      ),
+                      subtitle: Text(
+                        '${inv.invoiceNumber} • ${inv.date}',
+                        style: const TextStyle(fontSize: 11),
+                      ),
+                      trailing: Text(
+                        Fmt.money(inv.total, curr),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
+                      ),
                     ),
                 ],
               ),

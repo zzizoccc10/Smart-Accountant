@@ -46,8 +46,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     final session = context.watch<SessionProvider>();
     final companyId = session.currentCompanyId;
     final userId = session.currentUser?.id ?? '';
-    final adminItems = AdminNotificationService.forCompany(companyId,
-        userId: userId);
+    final adminItems = AdminNotificationService.forCompany(
+      companyId,
+      userId: userId,
+    );
     var list = prov.notifications;
     if (_filter != 'all') {
       list = list.where((n) => n.type == _filter).toList();
@@ -92,16 +94,25 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             color: AppColors.primary.withValues(alpha: 0.06),
             child: Row(
               children: [
-                const Icon(Icons.notifications_active,
-                    size: 18, color: AppColors.primary),
+                const Icon(
+                  Icons.notifications_active,
+                  size: 18,
+                  color: AppColors.primary,
+                ),
                 const SizedBox(width: 8),
                 Text(
                   'لديك $unread إشعار غير مقروء من إجمالي ${prov.notifications.length}',
-                  style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600),
+                  style: const TextStyle(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 const Spacer(),
                 FilterChip(
-                  label: const Text('غير المقروء فقط', style: TextStyle(fontSize: 11)),
+                  label: const Text(
+                    'غير المقروء فقط',
+                    style: TextStyle(fontSize: 11),
+                  ),
                   selected: _unreadOnly,
                   onSelected: (v) => setState(() => _unreadOnly = v),
                 ),
@@ -119,7 +130,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   Padding(
                     padding: const EdgeInsets.only(left: 6),
                     child: ChoiceChip(
-                      label: Text(e.value, style: const TextStyle(fontSize: 12)),
+                      label: Text(
+                        e.value,
+                        style: const TextStyle(fontSize: 12),
+                      ),
                       selected: _filter == e.key,
                       onSelected: (_) => setState(() => _filter = e.key),
                     ),
@@ -131,24 +145,26 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           Expanded(
             child: (_filter == 'admin')
                 ? (adminItems.isEmpty
-                    ? const EmptyState(
-                        message: 'لا توجد إشعارات من إدارة النظام',
-                        icon: Icons.campaign_outlined)
-                    : ListView.builder(
-                        padding: const EdgeInsets.all(12),
-                        itemCount: adminItems.length,
-                        itemBuilder: (_, i) =>
-                            _adminTile(adminItems[i], userId, companyId),
-                      ))
+                      ? const EmptyState(
+                          message: 'لا توجد إشعارات من إدارة النظام',
+                          icon: Icons.campaign_outlined,
+                        )
+                      : ListView.builder(
+                          padding: const EdgeInsets.all(12),
+                          itemCount: adminItems.length,
+                          itemBuilder: (_, i) =>
+                              _adminTile(adminItems[i], userId, companyId),
+                        ))
                 : (list.isEmpty
-                    ? const EmptyState(
-                        message: 'لا توجد إشعارات',
-                        icon: Icons.notifications_off)
-                    : ListView.builder(
-                        padding: const EdgeInsets.all(12),
-                        itemCount: list.length,
-                        itemBuilder: (_, i) => _tile(prov, list[i]),
-                      )),
+                      ? const EmptyState(
+                          message: 'لا توجد إشعارات',
+                          icon: Icons.notifications_off,
+                        )
+                      : ListView.builder(
+                          padding: const EdgeInsets.all(12),
+                          itemCount: list.length,
+                          itemBuilder: (_, i) => _tile(prov, list[i]),
+                        )),
           ),
         ],
       ),
@@ -156,8 +172,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   }
 
   /// بطاقة إشعار إداري من مالك النظام
-  Widget _adminTile(
-      AdminNotification n, String userId, String companyId) {
+  Widget _adminTile(AdminNotification n, String userId, String companyId) {
     final reader = userId.isNotEmpty ? userId : companyId;
     final read = AdminNotificationService.isRead(n, reader);
     final (Color color, IconData icon) = switch (n.importance) {
@@ -191,8 +206,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 color: color.withValues(alpha: 0.14),
                 borderRadius: BorderRadius.circular(6),
               ),
-              child: Text(n.importanceLabelAr,
-                  style: TextStyle(fontSize: 9.5, color: color)),
+              child: Text(
+                n.importanceLabelAr,
+                style: TextStyle(fontSize: 9.5, color: color),
+              ),
             ),
           ],
         ),
@@ -202,8 +219,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             const SizedBox(height: 2),
             Text(n.body, style: const TextStyle(fontSize: 12)),
             const SizedBox(height: 3),
-            Text('$dt • ${n.senderName} • ${n.audienceLabelAr}',
-                style: TextStyle(fontSize: 10.5, color: Colors.grey.shade600)),
+            Text(
+              '$dt • ${n.senderName} • ${n.audienceLabelAr}',
+              style: TextStyle(fontSize: 10.5, color: Colors.grey.shade600),
+            ),
           ],
         ),
         isThreeLine: true,
@@ -252,8 +271,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             const SizedBox(height: 2),
             Text(n.body, style: const TextStyle(fontSize: 12)),
             const SizedBox(height: 3),
-            Text('$dt • ${n.typeLabel}',
-                style: TextStyle(fontSize: 10.5, color: Colors.grey.shade600)),
+            Text(
+              '$dt • ${n.typeLabel}',
+              style: TextStyle(fontSize: 10.5, color: Colors.grey.shade600),
+            ),
           ],
         ),
         isThreeLine: true,

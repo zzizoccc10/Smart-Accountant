@@ -24,7 +24,14 @@ class MovementsScreen extends StatelessWidget {
             title: 'سجل حركات المخزون',
             companyName: prov.companyName,
             filename: 'stock_movements',
-            headers: const ['التاريخ', 'الصنف', 'النوع', 'وارد', 'صادر', 'الرصيد'],
+            headers: const [
+              'التاريخ',
+              'الصنف',
+              'النوع',
+              'وارد',
+              'صادر',
+              'الرصيد',
+            ],
             rows: [
               for (final m in movements)
                 [
@@ -55,18 +62,19 @@ class MovementsScreen extends StatelessWidget {
                   child: ListTile(
                     dense: true,
                     leading: CircleAvatar(
-                      backgroundColor: (isIn
-                              ? AppColors.success
-                              : AppColors.danger)
-                          .withValues(alpha: 0.12),
+                      backgroundColor:
+                          (isIn ? AppColors.success : AppColors.danger)
+                              .withValues(alpha: 0.12),
                       child: Icon(
                         isIn ? Icons.add : Icons.remove,
                         color: isIn ? AppColors.success : AppColors.danger,
                         size: 18,
                       ),
                     ),
-                    title: Text(m.itemName,
-                        style: const TextStyle(fontSize: 14)),
+                    title: Text(
+                      m.itemName,
+                      style: const TextStyle(fontSize: 14),
+                    ),
                     subtitle: Text(
                       '${_typeLabel(m.movementType)} • ${m.date}',
                       style: const TextStyle(fontSize: 12),

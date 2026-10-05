@@ -81,17 +81,18 @@ class AppStatusColors {
 
 class AppTheme {
   static ThemeData light() {
-    final scheme = ColorScheme.fromSeed(
-      seedColor: AppColors.primary,
-      brightness: Brightness.light,
-    ).copyWith(
-      primary: AppColors.primary,
-      onPrimary: Colors.white,
-      primaryContainer: const Color(0xFFD6E4F7),
-      secondary: AppColors.secondary,
-      error: AppColors.danger,
-      surface: AppColors.card,
-    );
+    final scheme =
+        ColorScheme.fromSeed(
+          seedColor: AppColors.primary,
+          brightness: Brightness.light,
+        ).copyWith(
+          primary: AppColors.primary,
+          onPrimary: Colors.white,
+          primaryContainer: const Color(0xFFD6E4F7),
+          secondary: AppColors.secondary,
+          error: AppColors.danger,
+          surface: AppColors.card,
+        );
 
     return ThemeData(
       useMaterial3: true,
@@ -147,14 +148,19 @@ class AppTheme {
             borderRadius: BorderRadius.circular(12),
           ),
           textStyle: const TextStyle(
-              fontFamily: 'Cairo', fontWeight: FontWeight.bold, fontSize: 15),
+            fontFamily: 'Cairo',
+            fontWeight: FontWeight.bold,
+            fontSize: 15,
+          ),
         ),
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: AppColors.primary,
           textStyle: const TextStyle(
-              fontFamily: 'Cairo', fontWeight: FontWeight.bold),
+            fontFamily: 'Cairo',
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
@@ -174,8 +180,10 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: Colors.white,
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 14,
+          vertical: 12,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: AppColors.divider),
@@ -212,11 +220,14 @@ class AppTheme {
         selectedIconTheme: IconThemeData(color: AppColors.primary),
         unselectedIconTheme: IconThemeData(color: AppColors.textMuted),
         selectedLabelTextStyle: TextStyle(
-            fontFamily: 'Cairo',
-            fontWeight: FontWeight.bold,
-            color: AppColors.primary),
-        unselectedLabelTextStyle:
-            TextStyle(fontFamily: 'Cairo', color: AppColors.textMuted),
+          fontFamily: 'Cairo',
+          fontWeight: FontWeight.bold,
+          color: AppColors.primary,
+        ),
+        unselectedLabelTextStyle: TextStyle(
+          fontFamily: 'Cairo',
+          color: AppColors.textMuted,
+        ),
         indicatorColor: Color(0x1A1565C0),
       ),
       tabBarTheme: const TabBarThemeData(
@@ -246,22 +257,30 @@ class AppTheme {
       listTileTheme: const ListTileThemeData(
         iconColor: AppColors.primary,
         titleTextStyle: TextStyle(
-            fontFamily: 'Cairo', fontWeight: FontWeight.w600, fontSize: 14,
-            color: AppColors.textDark),
+          fontFamily: 'Cairo',
+          fontWeight: FontWeight.w600,
+          fontSize: 14,
+          color: AppColors.textDark,
+        ),
         subtitleTextStyle: TextStyle(
-            fontFamily: 'Cairo', fontSize: 12, color: AppColors.textMuted),
+          fontFamily: 'Cairo',
+          fontSize: 12,
+          color: AppColors.textMuted,
+        ),
       ),
       switchTheme: SwitchThemeData(
-        thumbColor: WidgetStateProperty.resolveWith((s) =>
-            s.contains(WidgetState.selected) ? AppColors.success : null),
+        thumbColor: WidgetStateProperty.resolveWith(
+          (s) => s.contains(WidgetState.selected) ? AppColors.success : null,
+        ),
       ),
       snackBarTheme: const SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
         backgroundColor: AppColors.textDark,
         contentTextStyle: TextStyle(fontFamily: 'Cairo', color: Colors.white),
       ),
-      progressIndicatorTheme:
-          const ProgressIndicatorThemeData(color: AppColors.primary),
+      progressIndicatorTheme: const ProgressIndicatorThemeData(
+        color: AppColors.primary,
+      ),
       textTheme: const TextTheme(
         titleLarge: TextStyle(
           fontFamily: 'Cairo',
@@ -282,21 +301,23 @@ class AppTheme {
         bodyMedium: TextStyle(fontFamily: 'Cairo', color: AppColors.textBody),
         bodySmall: TextStyle(fontFamily: 'Cairo', color: AppColors.textMuted),
         labelLarge: TextStyle(
-            fontFamily: 'Cairo',
-            fontWeight: FontWeight.bold,
-            color: AppColors.textBody),
+          fontFamily: 'Cairo',
+          fontWeight: FontWeight.bold,
+          color: AppColors.textBody,
+        ),
       ),
     );
   }
 
   static ThemeData dark() {
-    final scheme = ColorScheme.fromSeed(
-      seedColor: AppColors.primary,
-      brightness: Brightness.dark,
-    ).copyWith(
-      primary: const Color(0xFF64B5F6),
-      secondary: AppColors.secondary,
-    );
+    final scheme =
+        ColorScheme.fromSeed(
+          seedColor: AppColors.primary,
+          brightness: Brightness.dark,
+        ).copyWith(
+          primary: const Color(0xFF64B5F6),
+          secondary: AppColors.secondary,
+        );
 
     return ThemeData(
       useMaterial3: true,

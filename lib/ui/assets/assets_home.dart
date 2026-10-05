@@ -24,10 +24,12 @@ class _AssetsHomeState extends State<AssetsHome> {
     final prov = context.watch<ERPProvider>();
     final curr = prov.currency;
     final assets = prov.fixedAssets
-        .where((a) =>
-            _search.isEmpty ||
-            a.name.contains(_search) ||
-            a.code.contains(_search))
+        .where(
+          (a) =>
+              _search.isEmpty ||
+              a.name.contains(_search) ||
+              a.code.contains(_search),
+        )
         .toList();
 
     return Scaffold(
@@ -56,7 +58,8 @@ class _AssetsHomeState extends State<AssetsHome> {
                   () => Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (_) => const DepreciationScreen()),
+                      builder: (_) => const DepreciationScreen(),
+                    ),
                   ),
                 ),
               ],
@@ -131,22 +134,23 @@ class _AssetsHomeState extends State<AssetsHome> {
                           onTap: () => Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (_) => AssetForm(asset: a)),
+                              builder: (_) => AssetForm(asset: a),
+                            ),
                           ),
                           leading: CircleAvatar(
-                            backgroundColor: (disposed
-                                    ? Colors.grey
-                                    : AppColors.primary)
-                                .withValues(alpha: 0.12),
+                            backgroundColor:
+                                (disposed ? Colors.grey : AppColors.primary)
+                                    .withValues(alpha: 0.12),
                             child: Icon(
                               _categoryIcon(a.category),
-                              color:
-                                  disposed ? Colors.grey : AppColors.primary,
+                              color: disposed ? Colors.grey : AppColors.primary,
                               size: 20,
                             ),
                           ),
-                          title: Text(a.name,
-                              style: const TextStyle(fontSize: 14)),
+                          title: Text(
+                            a.name,
+                            style: const TextStyle(fontSize: 14),
+                          ),
                           subtitle: Text(
                             '${a.category} • ${Fmt.num(a.cost)} $curr',
                             style: const TextStyle(fontSize: 11),
@@ -170,10 +174,11 @@ class _AssetsHomeState extends State<AssetsHome> {
                                     ? 'مُخرَّد'
                                     : 'القسط الشهري: ${Fmt.num(a.monthlyDepreciation)}',
                                 style: TextStyle(
-                                    fontSize: 10,
-                                    color: disposed
-                                        ? AppColors.danger
-                                        : Colors.grey.shade600),
+                                  fontSize: 10,
+                                  color: disposed
+                                      ? AppColors.danger
+                                      : Colors.grey.shade600,
+                                ),
                               ),
                             ],
                           ),
@@ -188,7 +193,11 @@ class _AssetsHomeState extends State<AssetsHome> {
   }
 
   Widget _actionBtn(
-      BuildContext context, IconData icon, String label, VoidCallback onTap) {
+    BuildContext context,
+    IconData icon,
+    String label,
+    VoidCallback onTap,
+  ) {
     return Expanded(
       child: InkWell(
         onTap: onTap,
@@ -203,8 +212,10 @@ class _AssetsHomeState extends State<AssetsHome> {
               child: Icon(icon, color: Colors.white, size: 22),
             ),
             const SizedBox(height: 4),
-            Text(label,
-                style: const TextStyle(color: Colors.white, fontSize: 11)),
+            Text(
+              label,
+              style: const TextStyle(color: Colors.white, fontSize: 11),
+            ),
           ],
         ),
       ),

@@ -75,8 +75,14 @@ class BasicTablesScreen extends StatelessWidget {
             tabs: [
               Tab(text: 'الفروع', icon: Icon(Icons.storefront, size: 18)),
               Tab(text: 'الوحدات', icon: Icon(Icons.straighten, size: 18)),
-              Tab(text: 'مراكز التكلفة', icon: Icon(Icons.account_tree, size: 18)),
-              Tab(text: 'أسعار الصرف', icon: Icon(Icons.currency_exchange, size: 18)),
+              Tab(
+                text: 'مراكز التكلفة',
+                icon: Icon(Icons.account_tree, size: 18),
+              ),
+              Tab(
+                text: 'أسعار الصرف',
+                icon: Icon(Icons.currency_exchange, size: 18),
+              ),
             ],
           ),
         ),
@@ -114,9 +120,14 @@ class _BranchesTab extends StatelessWidget {
                   child: ListTile(
                     onTap: () => _edit(context, prov, b),
                     leading: CircleAvatar(
-                      backgroundColor: AppColors.primary.withValues(alpha: 0.12),
-                      child: const Icon(Icons.storefront,
-                          size: 18, color: AppColors.primary),
+                      backgroundColor: AppColors.primary.withValues(
+                        alpha: 0.12,
+                      ),
+                      child: const Icon(
+                        Icons.storefront,
+                        size: 18,
+                        color: AppColors.primary,
+                      ),
                     ),
                     title: Text(b.name, style: const TextStyle(fontSize: 14)),
                     subtitle: Text(
@@ -124,11 +135,16 @@ class _BranchesTab extends StatelessWidget {
                       style: const TextStyle(fontSize: 12),
                     ),
                     trailing: IconButton(
-                      icon: const Icon(Icons.delete_outline,
-                          color: AppColors.danger),
+                      icon: const Icon(
+                        Icons.delete_outline,
+                        color: AppColors.danger,
+                      ),
                       onPressed: () async {
-                        final ok = await confirmDialog(context,
-                            title: 'حذف الفرع', message: 'حذف ${b.name}؟');
+                        final ok = await confirmDialog(
+                          context,
+                          title: 'حذف الفرع',
+                          message: 'حذف ${b.name}؟',
+                        );
                         if (ok) await prov.deleteBranch(b.id);
                       },
                     ),
@@ -178,9 +194,10 @@ class _UnitsTab extends StatelessWidget {
                       child: Text(
                         u.symbol.isEmpty ? u.code : u.symbol,
                         style: const TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.info),
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.info,
+                        ),
                       ),
                     ),
                     title: Text(u.name, style: const TextStyle(fontSize: 14)),
@@ -189,11 +206,16 @@ class _UnitsTab extends StatelessWidget {
                       style: const TextStyle(fontSize: 12),
                     ),
                     trailing: IconButton(
-                      icon: const Icon(Icons.delete_outline,
-                          color: AppColors.danger),
+                      icon: const Icon(
+                        Icons.delete_outline,
+                        color: AppColors.danger,
+                      ),
                       onPressed: () async {
-                        final ok = await confirmDialog(context,
-                            title: 'حذف الوحدة', message: 'حذف ${u.name}؟');
+                        final ok = await confirmDialog(
+                          context,
+                          title: 'حذف الوحدة',
+                          message: 'حذف ${u.name}؟',
+                        );
                         if (ok) await prov.deleteUnit(u.id);
                       },
                     ),
@@ -214,8 +236,9 @@ class _UnitsTab extends StatelessWidget {
     final code = TextEditingController(text: u?.code ?? '');
     final name = TextEditingController(text: u?.name ?? '');
     final symbol = TextEditingController(text: u?.symbol ?? '');
-    final factor =
-        TextEditingController(text: (u?.conversionFactor ?? 1).toString());
+    final factor = TextEditingController(
+      text: (u?.conversionFactor ?? 1).toString(),
+    );
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -225,28 +248,35 @@ class _UnitsTab extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
-                  controller: code,
-                  decoration: const InputDecoration(labelText: 'الكود (PCS)')),
+                controller: code,
+                decoration: const InputDecoration(labelText: 'الكود (PCS)'),
+              ),
               const SizedBox(height: 8),
               TextField(
-                  controller: name,
-                  decoration: const InputDecoration(labelText: 'الاسم')),
+                controller: name,
+                decoration: const InputDecoration(labelText: 'الاسم'),
+              ),
               const SizedBox(height: 8),
               TextField(
-                  controller: symbol,
-                  decoration: const InputDecoration(labelText: 'الرمز')),
+                controller: symbol,
+                decoration: const InputDecoration(labelText: 'الرمز'),
+              ),
               const SizedBox(height: 8),
               TextField(
-                  controller: factor,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                      labelText: 'معامل التحويل للوحدة الأساسية')),
+                controller: factor,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  labelText: 'معامل التحويل للوحدة الأساسية',
+                ),
+              ),
             ],
           ),
         ),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(ctx), child: const Text('إلغاء')),
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('إلغاء'),
+          ),
           ElevatedButton(
             onPressed: () async {
               final un = Unit(
@@ -283,7 +313,9 @@ class _CostCentersTab extends StatelessWidget {
     return Scaffold(
       body: list.isEmpty
           ? const EmptyState(
-              message: 'لا توجد مراكز تكلفة', icon: Icons.account_tree)
+              message: 'لا توجد مراكز تكلفة',
+              icon: Icons.account_tree,
+            )
           : ListView.builder(
               padding: const EdgeInsets.all(12),
               itemCount: list.length,
@@ -295,19 +327,28 @@ class _CostCentersTab extends StatelessWidget {
                     onTap: () => _edit(context, prov, c),
                     leading: CircleAvatar(
                       backgroundColor: AppColors.purple.withValues(alpha: 0.12),
-                      child: const Icon(Icons.account_tree,
-                          size: 18, color: AppColors.purple),
+                      child: const Icon(
+                        Icons.account_tree,
+                        size: 18,
+                        color: AppColors.purple,
+                      ),
                     ),
                     title: Text(c.name, style: const TextStyle(fontSize: 14)),
-                    subtitle: Text('الكود: ${c.code}',
-                        style: const TextStyle(fontSize: 12)),
+                    subtitle: Text(
+                      'الكود: ${c.code}',
+                      style: const TextStyle(fontSize: 12),
+                    ),
                     trailing: IconButton(
-                      icon: const Icon(Icons.delete_outline,
-                          color: AppColors.danger),
+                      icon: const Icon(
+                        Icons.delete_outline,
+                        color: AppColors.danger,
+                      ),
                       onPressed: () async {
-                        final ok = await confirmDialog(context,
-                            title: 'حذف مركز التكلفة',
-                            message: 'حذف ${c.name}؟');
+                        final ok = await confirmDialog(
+                          context,
+                          title: 'حذف مركز التكلفة',
+                          message: 'حذف ${c.name}؟',
+                        );
                         if (ok) await prov.deleteCostCenter(c.id);
                       },
                     ),
@@ -335,17 +376,21 @@ class _CostCentersTab extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
-                controller: code,
-                decoration: const InputDecoration(labelText: 'الكود')),
+              controller: code,
+              decoration: const InputDecoration(labelText: 'الكود'),
+            ),
             const SizedBox(height: 8),
             TextField(
-                controller: name,
-                decoration: const InputDecoration(labelText: 'الاسم')),
+              controller: name,
+              decoration: const InputDecoration(labelText: 'الاسم'),
+            ),
           ],
         ),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(ctx), child: const Text('إلغاء')),
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('إلغاء'),
+          ),
           ElevatedButton(
             onPressed: () async {
               final cc = CostCenter(
@@ -380,7 +425,9 @@ class _ExchangeRatesTab extends StatelessWidget {
     return Scaffold(
       body: list.isEmpty
           ? const EmptyState(
-              message: 'لا توجد أسعار صرف', icon: Icons.currency_exchange)
+              message: 'لا توجد أسعار صرف',
+              icon: Icons.currency_exchange,
+            )
           : ListView.builder(
               padding: const EdgeInsets.all(12),
               itemCount: list.length,
@@ -395,24 +442,31 @@ class _ExchangeRatesTab extends StatelessWidget {
                       child: Text(
                         r.currencyCode,
                         style: const TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.teal),
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.teal,
+                        ),
                       ),
                     ),
-                    title: Text('1 ${r.currencyCode}',
-                        style: const TextStyle(fontSize: 14)),
+                    title: Text(
+                      '1 ${r.currencyCode}',
+                      style: const TextStyle(fontSize: 14),
+                    ),
                     subtitle: Text(
                       'شراء: ${Fmt.num(r.buyRate)} • بيع: ${Fmt.num(r.sellRate)} • ${r.rateDate}',
                       style: const TextStyle(fontSize: 12),
                     ),
                     trailing: IconButton(
-                      icon: const Icon(Icons.delete_outline,
-                          color: AppColors.danger),
+                      icon: const Icon(
+                        Icons.delete_outline,
+                        color: AppColors.danger,
+                      ),
                       onPressed: () async {
-                        final ok = await confirmDialog(context,
-                            title: 'حذف سعر الصرف',
-                            message: 'حذف سعر ${r.currencyCode}؟');
+                        final ok = await confirmDialog(
+                          context,
+                          title: 'حذف سعر الصرف',
+                          message: 'حذف سعر ${r.currencyCode}؟',
+                        );
                         if (ok) await prov.deleteExchangeRate(r.id);
                       },
                     ),
@@ -434,7 +488,8 @@ class _ExchangeRatesTab extends StatelessWidget {
     final buy = TextEditingController(text: (r?.buyRate ?? 1).toString());
     final sell = TextEditingController(text: (r?.sellRate ?? 1).toString());
     final date = TextEditingController(text: r?.rateDate ?? today);
-    String? currencyId = r?.currencyId ??
+    String? currencyId =
+        r?.currencyId ??
         (prov.currencies.isNotEmpty ? prov.currencies.first.id : null);
 
     showDialog(
@@ -450,39 +505,48 @@ class _ExchangeRatesTab extends StatelessWidget {
                   initialValue: currencyId,
                   decoration: const InputDecoration(labelText: 'العملة'),
                   items: prov.currencies
-                      .map((c) => DropdownMenuItem(
-                            value: c.id,
-                            child: Text('${c.code} — ${c.name}'),
-                          ))
+                      .map(
+                        (c) => DropdownMenuItem(
+                          value: c.id,
+                          child: Text('${c.code} — ${c.name}'),
+                        ),
+                      )
                       .toList(),
                   onChanged: (v) => setSt(() => currencyId = v),
                 ),
                 const SizedBox(height: 8),
                 TextField(
-                    controller: buy,
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(labelText: 'سعر الشراء')),
+                  controller: buy,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(labelText: 'سعر الشراء'),
+                ),
                 const SizedBox(height: 8),
                 TextField(
-                    controller: sell,
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(labelText: 'سعر البيع')),
+                  controller: sell,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(labelText: 'سعر البيع'),
+                ),
                 const SizedBox(height: 8),
                 TextField(
-                    controller: date,
-                    decoration:
-                        const InputDecoration(labelText: 'التاريخ (YYYY-MM-DD)')),
+                  controller: date,
+                  decoration: const InputDecoration(
+                    labelText: 'التاريخ (YYYY-MM-DD)',
+                  ),
+                ),
               ],
             ),
           ),
           actions: [
             TextButton(
-                onPressed: () => Navigator.pop(ctx), child: const Text('إلغاء')),
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('إلغاء'),
+            ),
             ElevatedButton(
               onPressed: () async {
                 if (currencyId == null) return;
-                final code =
-                    prov.currencies.firstWhere((c) => c.id == currencyId).code;
+                final code = prov.currencies
+                    .firstWhere((c) => c.id == currencyId)
+                    .code;
                 final rate = ExchangeRate(
                   id: r?.id ?? AppDatabase.newId(),
                   currencyId: currencyId!,

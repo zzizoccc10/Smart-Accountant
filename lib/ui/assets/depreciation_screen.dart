@@ -29,9 +29,11 @@ class _DepreciationScreenState extends State<DepreciationScreen> {
     setState(() => _running = false);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(count == 0
-            ? 'لا توجد أصول تحتاج إهلاكاً'
-            : 'تم إهلاك $count أصل/أصول لمدة $months شهر'),
+        content: Text(
+          count == 0
+              ? 'لا توجد أصول تحتاج إهلاكاً'
+              : 'تم إهلاك $count أصل/أصول لمدة $months شهر',
+        ),
         backgroundColor: count == 0 ? AppColors.warning : AppColors.success,
       ),
     );
@@ -64,7 +66,9 @@ class _DepreciationScreenState extends State<DepreciationScreen> {
             padding: const EdgeInsets.all(12),
             child: DropdownButtonFormField<String?>(
               initialValue: _selectedAssetId,
-              decoration: const InputDecoration(labelText: 'الأصل المطلوب إهلاكه'),
+              decoration: const InputDecoration(
+                labelText: 'الأصل المطلوب إهلاكه',
+              ),
               items: [
                 const DropdownMenuItem(value: null, child: Text('كل الأصول')),
                 ...assets.map(
@@ -88,7 +92,7 @@ class _DepreciationScreenState extends State<DepreciationScreen> {
                       final pct = a.depreciableAmount <= 0
                           ? 0.0
                           : (a.accumulatedDepreciation / a.depreciableAmount)
-                              .clamp(0.0, 1.0);
+                                .clamp(0.0, 1.0);
                       return Card(
                         margin: const EdgeInsets.only(bottom: 8),
                         child: Padding(
@@ -99,10 +103,13 @@ class _DepreciationScreenState extends State<DepreciationScreen> {
                               Row(
                                 children: [
                                   Expanded(
-                                    child: Text(a.name,
-                                        style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 14)),
+                                    child: Text(
+                                      a.name,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                      ),
+                                    ),
                                   ),
                                   Badge2(
                                     a.isFullyDepreciated
@@ -135,9 +142,10 @@ class _DepreciationScreenState extends State<DepreciationScreen> {
                                   Text(
                                     'دفترية: ${Fmt.money(a.bookValue, curr)}',
                                     style: const TextStyle(
-                                        fontSize: 11,
-                                        color: AppColors.success,
-                                        fontWeight: FontWeight.bold),
+                                      fontSize: 11,
+                                      color: AppColors.success,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -165,8 +173,10 @@ class _DepreciationScreenState extends State<DepreciationScreen> {
             borderRadius: BorderRadius.circular(10),
           ),
           child: Center(
-            child: Text(label,
-                style: const TextStyle(color: Colors.white, fontSize: 12)),
+            child: Text(
+              label,
+              style: const TextStyle(color: Colors.white, fontSize: 12),
+            ),
           ),
         ),
       ),

@@ -87,15 +87,19 @@ class _PhoneFieldState extends State<PhoneField> {
         children: [
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-            child: Text('اختر الدولة',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            child: Text(
+              'اختر الدولة',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
           ),
           for (final c in Countries.all)
             ListTile(
               leading: Text(c.flag, style: const TextStyle(fontSize: 22)),
               title: Text(c.name),
-              trailing: Text(c.dial,
-                  style: const TextStyle(fontWeight: FontWeight.bold)),
+              trailing: Text(
+                c.dial,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
               selected: c.dial == _country.dial,
               onTap: () => Navigator.pop(ctx, c),
             ),
@@ -153,8 +157,12 @@ class _PhoneFieldState extends State<PhoneField> {
             final list = q.isEmpty
                 ? withPhone
                 : withPhone
-                    .where((c) => c.displayName.toLowerCase().contains(q.toLowerCase()))
-                    .toList();
+                      .where(
+                        (c) => c.displayName.toLowerCase().contains(
+                          q.toLowerCase(),
+                        ),
+                      )
+                      .toList();
             return SizedBox(
               height: MediaQuery.of(ctx).size.height * 0.75,
               child: Column(
@@ -182,12 +190,16 @@ class _PhoneFieldState extends State<PhoneField> {
                               return ListTile(
                                 leading: const CircleAvatar(
                                   backgroundColor: Color(0x1A1565C0),
-                                  child: Icon(Icons.person,
-                                      color: AppColors.primary),
+                                  child: Icon(
+                                    Icons.person,
+                                    color: AppColors.primary,
+                                  ),
                                 ),
-                                title: Text(c.displayName.isEmpty
-                                    ? '(بدون اسم)'
-                                    : c.displayName),
+                                title: Text(
+                                  c.displayName.isEmpty
+                                      ? '(بدون اسم)'
+                                      : c.displayName,
+                                ),
                                 subtitle: Text(
                                   ContactsService.bestPhone(c) ?? '',
                                   style: const TextStyle(fontSize: 12),
@@ -236,8 +248,10 @@ class _PhoneFieldState extends State<PhoneField> {
               children: [
                 Text(_country.flag, style: const TextStyle(fontSize: 18)),
                 const SizedBox(width: 4),
-                Text(_country.dial,
-                    style: const TextStyle(fontWeight: FontWeight.bold)),
+                Text(
+                  _country.dial,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
                 const Icon(Icons.arrow_drop_down),
               ],
             ),
@@ -255,19 +269,19 @@ class _PhoneFieldState extends State<PhoneField> {
               prefixIcon: const Icon(Icons.phone),
               suffixIcon: widget.allowPickContact
                   ? (_loadingContacts
-                      ? const Padding(
-                          padding: EdgeInsets.all(12),
-                          child: SizedBox(
-                            width: 18,
-                            height: 18,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          ),
-                        )
-                      : IconButton(
-                          icon: const Icon(Icons.contacts),
-                          tooltip: 'من جهات الاتصال',
-                          onPressed: _pickFromContacts,
-                        ))
+                        ? const Padding(
+                            padding: EdgeInsets.all(12),
+                            child: SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                          )
+                        : IconButton(
+                            icon: const Icon(Icons.contacts),
+                            tooltip: 'من جهات الاتصال',
+                            onPressed: _pickFromContacts,
+                          ))
                   : null,
             ),
             onChanged: (_) => _syncOut(),

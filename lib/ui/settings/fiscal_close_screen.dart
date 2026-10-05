@@ -65,21 +65,21 @@ class _FiscalCloseScreenState extends State<FiscalCloseScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(entry == null
-                ? 'لا توجد أرصدة إيرادات/مصروفات لإقفالها لهذه السنة'
-                : 'تم إقفال السنة المالية بنجاح (${entry.entryNumber})'),
-            backgroundColor:
-                entry == null ? AppColors.warning : AppColors.success,
+            content: Text(
+              entry == null
+                  ? 'لا توجد أرصدة إيرادات/مصروفات لإقفالها لهذه السنة'
+                  : 'تم إقفال السنة المالية بنجاح (${entry.entryNumber})',
+            ),
+            backgroundColor: entry == null
+                ? AppColors.warning
+                : AppColors.success,
           ),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('خطأ: $e'),
-            backgroundColor: AppColors.danger,
-          ),
+          SnackBar(content: Text('خطأ: $e'), backgroundColor: AppColors.danger),
         );
       }
     } finally {
@@ -118,11 +118,17 @@ class _FiscalCloseScreenState extends State<FiscalCloseScreen> {
               padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
-                  _row('إجمالي الإيرادات', Fmt.money(rev, curr),
-                      AppColors.success),
+                  _row(
+                    'إجمالي الإيرادات',
+                    Fmt.money(rev, curr),
+                    AppColors.success,
+                  ),
                   const Divider(),
-                  _row('إجمالي المصروفات', Fmt.money(exp, curr),
-                      AppColors.danger),
+                  _row(
+                    'إجمالي المصروفات',
+                    Fmt.money(exp, curr),
+                    AppColors.danger,
+                  ),
                   const Divider(),
                   _row(
                     profit >= 0 ? 'صافي الربح' : 'صافي الخسارة',
@@ -144,8 +150,10 @@ class _FiscalCloseScreenState extends State<FiscalCloseScreen> {
                   children: [
                     const Icon(Icons.check_circle, color: AppColors.info),
                     const SizedBox(width: 12),
-                    Text('تم إقفال سنة: $closed',
-                        style: const TextStyle(fontWeight: FontWeight.bold)),
+                    Text(
+                      'تم إقفال سنة: $closed',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
                   ],
                 ),
               ),
@@ -182,7 +190,10 @@ class _FiscalCloseScreenState extends State<FiscalCloseScreen> {
                       width: 18,
                       height: 18,
                       child: CircularProgressIndicator(
-                          strokeWidth: 2, color: Colors.white))
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
                   : const Icon(Icons.lock_clock),
               label: const Text('إقفال السنة المالية'),
             ),
@@ -192,16 +203,18 @@ class _FiscalCloseScreenState extends State<FiscalCloseScreen> {
     );
   }
 
-  Widget _row(String label, String value, Color color,
-      {bool bold = false}) {
+  Widget _row(String label, String value, Color color, {bool bold = false}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
         children: [
-          Text(label,
-              style: TextStyle(
-                  fontSize: bold ? 15 : 14,
-                  fontWeight: bold ? FontWeight.bold : FontWeight.normal)),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: bold ? 15 : 14,
+              fontWeight: bold ? FontWeight.bold : FontWeight.normal,
+            ),
+          ),
           const Spacer(),
           Text(
             value,

@@ -11,7 +11,8 @@ import 'package:provider/provider.dart';
 import '../../providers/erp_provider.dart';
 import '../../services/data_registry.dart';
 import '../../services/file_saver_io.dart'
-    if (dart.library.html) '../../services/file_saver_web.dart' as saver;
+    if (dart.library.html) '../../services/file_saver_web.dart'
+    as saver;
 import '../../services/excel_service.dart';
 import '../../services/import_service.dart';
 import '../../theme/app_theme.dart';
@@ -53,9 +54,10 @@ class _ImportScreenState extends State<ImportScreen> {
         _busy = false;
         _savedPath = path;
       });
-      _snack(path == null
-          ? 'تم تجهيز ملف Excel'
-          : 'تم حفظ الملف في: $path', AppColors.success);
+      _snack(
+        path == null ? 'تم تجهيز ملف Excel' : 'تم حفظ الملف في: $path',
+        AppColors.success,
+      );
     } catch (e) {
       if (!mounted) return;
       setState(() => _busy = false);
@@ -84,8 +86,10 @@ class _ImportScreenState extends State<ImportScreen> {
         _busy = false;
         _savedPath = path;
       });
-      _snack(path == null ? 'تم تصدير CSV' : 'تم الحفظ في: $path',
-          AppColors.success);
+      _snack(
+        path == null ? 'تم تصدير CSV' : 'تم الحفظ في: $path',
+        AppColors.success,
+      );
     } catch (e) {
       if (!mounted) return;
       setState(() => _busy = false);
@@ -131,15 +135,13 @@ class _ImportScreenState extends State<ImportScreen> {
   }
 
   void _snack(String msg, Color c) {
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(msg), backgroundColor: c));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(msg), backgroundColor: c));
   }
 
-  String _stamp() => DateTime.now()
-      .toIso8601String()
-      .replaceAll(':', '-')
-      .split('.')
-      .first;
+  String _stamp() =>
+      DateTime.now().toIso8601String().replaceAll(':', '-').split('.').first;
 
   @override
   Widget build(BuildContext context) {
@@ -178,13 +180,15 @@ class _ImportScreenState extends State<ImportScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('الأعمدة (الصف الأول = العناوين):',
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                  const Text(
+                    'الأعمدة (الصف الأول = العناوين):',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                  ),
                   const SizedBox(height: 8),
-                  Text(headers.join(' | '),
-                      style: TextStyle(
-                          fontSize: 12, color: Colors.grey.shade700)),
+                  Text(
+                    headers.join(' | '),
+                    style: TextStyle(fontSize: 12, color: Colors.grey.shade700),
+                  ),
                 ],
               ),
             ),
@@ -232,19 +236,25 @@ class _ImportScreenState extends State<ImportScreen> {
           ],
           if (_fileName != null) ...[
             const SizedBox(height: 12),
-            Text('الملف: $_fileName',
-                style: TextStyle(fontSize: 12, color: Colors.grey.shade700)),
+            Text(
+              'الملف: $_fileName',
+              style: TextStyle(fontSize: 12, color: Colors.grey.shade700),
+            ),
           ],
           if (_savedPath != null) ...[
             const SizedBox(height: 12),
             Card(
               color: AppColors.success.withValues(alpha: 0.08),
               child: ListTile(
-                leading:
-                    const Icon(Icons.check_circle, color: AppColors.success),
+                leading: const Icon(
+                  Icons.check_circle,
+                  color: AppColors.success,
+                ),
                 title: const Text('تم حفظ الملف'),
-                subtitle: Text(_savedPath!,
-                    style: const TextStyle(fontSize: 11)),
+                subtitle: Text(
+                  _savedPath!,
+                  style: const TextStyle(fontSize: 11),
+                ),
               ),
             ),
           ],
@@ -273,22 +283,33 @@ class _ImportScreenState extends State<ImportScreen> {
                         Text(
                           'نجح: ${_result!.success}  |  فشل: ${_result!.failed}',
                           style: const TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 14),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
                         ),
                       ],
                     ),
                     if (_result!.hasErrors) ...[
                       const SizedBox(height: 10),
-                      const Text('تفاصيل الأخطاء:',
-                          style: TextStyle(
-                              fontSize: 12, fontWeight: FontWeight.bold)),
-                      ..._result!.errors.take(20).map(
+                      const Text(
+                        'تفاصيل الأخطاء:',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      ..._result!.errors
+                          .take(20)
+                          .map(
                             (e) => Padding(
                               padding: const EdgeInsets.only(top: 4),
-                              child: Text('• $e',
-                                  style: const TextStyle(
-                                      fontSize: 11,
-                                      color: AppColors.danger)),
+                              child: Text(
+                                '• $e',
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  color: AppColors.danger,
+                                ),
+                              ),
                             ),
                           ),
                     ],

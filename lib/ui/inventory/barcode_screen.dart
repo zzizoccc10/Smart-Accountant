@@ -42,10 +42,12 @@ class _BarcodeScreenState extends State<BarcodeScreen> {
       MaterialPageRoute(builder: (_) => const BarcodeScannerScreen()),
     );
     if (code == null || code.isEmpty) return;
-    final match = prov.items.where((i) =>
-        i.barcode.trim() == code ||
-        i.code.trim() == code ||
-        i.id == code).firstOrNull;
+    final match = prov.items
+        .where(
+          (i) =>
+              i.barcode.trim() == code || i.code.trim() == code || i.id == code,
+        )
+        .firstOrNull;
     if (match == null) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -64,8 +66,7 @@ class _BarcodeScreenState extends State<BarcodeScreen> {
     final prov = context.watch<ERPProvider>();
     final items = prov.items;
     // ضمان أن الصنف المحدد ما زال ضمن القائمة (مطابقة بالمعرّف لتفادي اختفاء الشاشة)
-    if (_selected != null &&
-        !items.any((i) => i.id == _selected!.id)) {
+    if (_selected != null && !items.any((i) => i.id == _selected!.id)) {
       _selected = null;
     }
 
@@ -105,13 +106,17 @@ class _BarcodeScreenState extends State<BarcodeScreen> {
                     Text(
                       _selected!.name,
                       style: const TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.bold),
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       Fmt.money(_selected!.salePrice, prov.currency),
                       style: const TextStyle(
-                          color: AppColors.success, fontSize: 14),
+                        color: AppColors.success,
+                        fontSize: 14,
+                      ),
                     ),
                     const SizedBox(height: 16),
                     BarcodeWidget(
@@ -125,7 +130,10 @@ class _BarcodeScreenState extends State<BarcodeScreen> {
                     const SizedBox(height: 8),
                     Text(
                       'الكود: ${_codeFor(_selected!)}',
-                      style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+                      style: TextStyle(
+                        color: Colors.grey.shade600,
+                        fontSize: 12,
+                      ),
                     ),
                   ],
                 ),
@@ -142,9 +150,13 @@ class _BarcodeScreenState extends State<BarcodeScreen> {
                       : null,
                   icon: const Icon(Icons.remove_circle_outline),
                 ),
-                Text('$_copies',
-                    style: const TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.bold)),
+                Text(
+                  '$_copies',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 IconButton(
                   onPressed: () => setState(() => _copies++),
                   icon: const Icon(Icons.add_circle_outline),
@@ -167,12 +179,16 @@ class _BarcodeScreenState extends State<BarcodeScreen> {
                   ),
                   child: Column(
                     children: [
-                      Text(_selected!.name,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(fontSize: 10)),
-                      Text(Fmt.money(_selected!.salePrice, prov.currency),
-                          style: const TextStyle(fontSize: 9)),
+                      Text(
+                        _selected!.name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontSize: 10),
+                      ),
+                      Text(
+                        Fmt.money(_selected!.salePrice, prov.currency),
+                        style: const TextStyle(fontSize: 9),
+                      ),
                       BarcodeWidget(
                         barcode: Barcode.code128(),
                         data: _codeFor(_selected!),
@@ -189,8 +205,10 @@ class _BarcodeScreenState extends State<BarcodeScreen> {
             const Padding(
               padding: EdgeInsets.all(32),
               child: Center(
-                child: Text('اختر صنفاً لعرض الباركود',
-                    style: TextStyle(color: Colors.grey)),
+                child: Text(
+                  'اختر صنفاً لعرض الباركود',
+                  style: TextStyle(color: Colors.grey),
+                ),
               ),
             ),
         ],

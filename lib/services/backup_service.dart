@@ -10,7 +10,9 @@ import '../data/app_database.dart';
 import 'backup_io.dart' if (dart.library.html) 'backup_web.dart' as bio;
 import 'download_io.dart' if (dart.library.html) 'download_web.dart' as dl;
 import 'file_share_io.dart' if (dart.library.html) 'file_share_web.dart' as fs;
-import 'file_saver_io.dart' if (dart.library.html) 'file_saver_web.dart' as saver;
+import 'file_saver_io.dart'
+    if (dart.library.html) 'file_saver_web.dart'
+    as saver;
 
 class BackupService {
   // --------------------------- مفاتيح الإعدادات ---------------------------
@@ -63,9 +65,7 @@ class BackupService {
   /// نافذة اختيار مجلد من نظام الملفات
   static Future<String?> pickFolder() async {
     try {
-      return await bio.pickFolderImpl(
-        title: 'اختر مجلد حفظ النسخ الاحتياطي',
-      );
+      return await bio.pickFolderImpl(title: 'اختر مجلد حفظ النسخ الاحتياطي');
     } catch (_) {
       return null;
     }
@@ -121,7 +121,10 @@ class BackupService {
         final path = await bio.writeBackupFileImpl(folder, filename, bytes);
         if (path != null) {
           await AppDatabase.setSetting(_kLastFile, path);
-          await AppDatabase.setSetting(_kStamp, DateTime.now().toIso8601String());
+          await AppDatabase.setSetting(
+            _kStamp,
+            DateTime.now().toIso8601String(),
+          );
           return path;
         }
       } catch (_) {}

@@ -78,25 +78,36 @@ class InventoryReportScreen extends StatelessWidget {
                     child: const Row(
                       children: [
                         Expanded(
-                            flex: 3,
-                            child: Text('الصنف',
-                                style: TextStyle(fontWeight: FontWeight.bold))),
+                          flex: 3,
+                          child: Text(
+                            'الصنف',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
                         Expanded(
-                            child: Text('الكمية',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(fontWeight: FontWeight.bold))),
+                          child: Text(
+                            'الكمية',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
                         Expanded(
-                            flex: 2,
-                            child: Text('القيمة',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(fontWeight: FontWeight.bold))),
+                          flex: 2,
+                          child: Text(
+                            'القيمة',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
                       ],
                     ),
                   ),
                   for (final r in rows)
                     Padding(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 8),
+                        horizontal: 10,
+                        vertical: 8,
+                      ),
                       child: Row(
                         children: [
                           Expanded(
@@ -104,13 +115,19 @@ class InventoryReportScreen extends StatelessWidget {
                             child: Row(
                               children: [
                                 Expanded(
-                                  child: Text(r['name'] as String,
-                                      style: const TextStyle(fontSize: 12)),
+                                  child: Text(
+                                    r['name'] as String,
+                                    style: const TextStyle(fontSize: 12),
+                                  ),
                                 ),
                                 if ((r['reorder'] as double) > 0 &&
-                                    (r['qty'] as double) <= (r['reorder'] as double))
-                                  const Icon(Icons.warning,
-                                      color: AppColors.danger, size: 14),
+                                    (r['qty'] as double) <=
+                                        (r['reorder'] as double))
+                                  const Icon(
+                                    Icons.warning,
+                                    color: AppColors.danger,
+                                    size: 14,
+                                  ),
                               ],
                             ),
                           ),
@@ -127,7 +144,9 @@ class InventoryReportScreen extends StatelessWidget {
                               Fmt.money(r['value'] as double, curr),
                               textAlign: TextAlign.center,
                               style: const TextStyle(
-                                  fontSize: 12, fontWeight: FontWeight.bold),
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ],

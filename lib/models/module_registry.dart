@@ -46,30 +46,46 @@ class ModuleRegistry {
     key: 'sales',
     labelAr: 'البيع والشراء',
     route: 'sales',
-    permission: PermReq(any: [
-      Perm.salesView, Perm.salesCreate, Perm.purchasesView,
-      Perm.purchasesCreate, Perm.contactsView, Perm.contactsManage,
-    ]),
+    permission: PermReq(
+      any: [
+        Perm.salesView,
+        Perm.salesCreate,
+        Perm.purchasesView,
+        Perm.purchasesCreate,
+        Perm.contactsView,
+        Perm.contactsManage,
+      ],
+    ),
   );
 
   static const inventory = AppModule(
     key: 'inventory',
     labelAr: 'المخزون',
     route: 'inventory',
-    permission: PermReq(any: [
-      Perm.inventoryView, Perm.inventoryManage, Perm.inventoryTransfer,
-      Perm.inventoryCount,
-    ]),
+    permission: PermReq(
+      any: [
+        Perm.inventoryView,
+        Perm.inventoryManage,
+        Perm.inventoryTransfer,
+        Perm.inventoryCount,
+      ],
+    ),
   );
 
   static const accounts = AppModule(
     key: 'accounts',
     labelAr: 'الحسابات',
     route: 'accounts',
-    permission: PermReq(any: [
-      Perm.accountsView, Perm.accountsManage, Perm.journalView,
-      Perm.journalCreate, Perm.cashView, Perm.cashManage,
-    ]),
+    permission: PermReq(
+      any: [
+        Perm.accountsView,
+        Perm.accountsManage,
+        Perm.journalView,
+        Perm.journalCreate,
+        Perm.cashView,
+        Perm.cashManage,
+      ],
+    ),
   );
 
   static const reports = AppModule(
@@ -183,26 +199,30 @@ class ModuleRegistry {
     required bool isGuest,
     required bool isSystemOwner,
     Set<String>? perms,
-  }) =>
-      rootTabs
-          .where((m) => canAccess(
-              module: m,
-              isGuest: isGuest,
-              isSystemOwner: isSystemOwner,
-              perms: perms))
-          .toList();
+  }) => rootTabs
+      .where(
+        (m) => canAccess(
+          module: m,
+          isGuest: isGuest,
+          isSystemOwner: isSystemOwner,
+          perms: perms,
+        ),
+      )
+      .toList();
 
   /// الوجهات الإضافية المسموحة
   static List<AppModule> allowedDrawerExtras({
     required bool isGuest,
     required bool isSystemOwner,
     Set<String>? perms,
-  }) =>
-      drawerExtras
-          .where((m) => canAccess(
-              module: m,
-              isGuest: isGuest,
-              isSystemOwner: isSystemOwner,
-              perms: perms))
-          .toList();
+  }) => drawerExtras
+      .where(
+        (m) => canAccess(
+          module: m,
+          isGuest: isGuest,
+          isSystemOwner: isSystemOwner,
+          perms: perms,
+        ),
+      )
+      .toList();
 }

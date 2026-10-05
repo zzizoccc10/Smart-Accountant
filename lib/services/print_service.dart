@@ -59,21 +59,33 @@ class PrintService {
                       pw.SizedBox(height: 42, child: pw.Image(logo)),
                       pw.SizedBox(height: 4),
                     ],
-                    pw.Text(companyName,
-                        style: pw.TextStyle(
-                            fontSize: 20, fontWeight: pw.FontWeight.bold)),
+                    pw.Text(
+                      companyName,
+                      style: pw.TextStyle(
+                        fontSize: 20,
+                        fontWeight: pw.FontWeight.bold,
+                      ),
+                    ),
                     if (companyPhone.isNotEmpty)
-                      pw.Text('هاتف: $companyPhone',
-                          style: const pw.TextStyle(fontSize: 10)),
+                      pw.Text(
+                        'هاتف: $companyPhone',
+                        style: const pw.TextStyle(fontSize: 10),
+                      ),
                     if (companyAddress.isNotEmpty)
-                      pw.Text(companyAddress,
-                          style: const pw.TextStyle(fontSize: 10)),
+                      pw.Text(
+                        companyAddress,
+                        style: const pw.TextStyle(fontSize: 10),
+                      ),
                     if (taxNumber.isNotEmpty)
-                      pw.Text('الرقم الضريبي: $taxNumber',
-                          style: const pw.TextStyle(fontSize: 10)),
+                      pw.Text(
+                        'الرقم الضريبي: $taxNumber',
+                        style: const pw.TextStyle(fontSize: 10),
+                      ),
                     if (crNumber.isNotEmpty)
-                      pw.Text('سجل تجاري: $crNumber',
-                          style: const pw.TextStyle(fontSize: 10)),
+                      pw.Text(
+                        'سجل تجاري: $crNumber',
+                        style: const pw.TextStyle(fontSize: 10),
+                      ),
                   ],
                 ),
                 pw.Row(
@@ -93,13 +105,21 @@ class PrintService {
                       child: pw.Column(
                         crossAxisAlignment: pw.CrossAxisAlignment.end,
                         children: [
-                          pw.Text(typeLabel,
-                              style: pw.TextStyle(
-                                  fontSize: 14, fontWeight: pw.FontWeight.bold)),
-                          pw.Text('#${inv.invoiceNumber}',
-                              style: const pw.TextStyle(fontSize: 11)),
-                          pw.Text('التاريخ: ${inv.date}',
-                              style: const pw.TextStyle(fontSize: 10)),
+                          pw.Text(
+                            typeLabel,
+                            style: pw.TextStyle(
+                              fontSize: 14,
+                              fontWeight: pw.FontWeight.bold,
+                            ),
+                          ),
+                          pw.Text(
+                            '#${inv.invoiceNumber}',
+                            style: const pw.TextStyle(fontSize: 11),
+                          ),
+                          pw.Text(
+                            'التاريخ: ${inv.date}',
+                            style: const pw.TextStyle(fontSize: 10),
+                          ),
                         ],
                       ),
                     ),
@@ -113,12 +133,16 @@ class PrintService {
             // بيانات العميل
             pw.Row(
               children: [
-                pw.Text('الجهة: ',
-                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                pw.Text(
+                  'الجهة: ',
+                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                ),
                 pw.Text(inv.contactName),
                 pw.Spacer(),
-                pw.Text('نوع الدفع: ',
-                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                pw.Text(
+                  'نوع الدفع: ',
+                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                ),
                 pw.Text(inv.paymentType == 'cash' ? 'نقدي' : 'آجل'),
               ],
             ),
@@ -135,13 +159,16 @@ class PrintService {
                     Fmt.num(inv.lines[i].unitPrice),
                     Fmt.num(inv.lines[i].discount),
                     Fmt.num(inv.lines[i].lineTotal),
-                  ]
+                  ],
               ],
-              headerStyle:
-                  pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 11),
+              headerStyle: pw.TextStyle(
+                fontWeight: pw.FontWeight.bold,
+                fontSize: 11,
+              ),
               cellStyle: const pw.TextStyle(fontSize: 10),
-              headerDecoration:
-                  const pw.BoxDecoration(color: PdfColors.grey300),
+              headerDecoration: const pw.BoxDecoration(
+                color: PdfColors.grey300,
+              ),
               cellAlignment: pw.Alignment.centerRight,
               headerAlignment: pw.Alignment.centerRight,
             ),
@@ -236,8 +263,12 @@ class PrintService {
     );
   }
 
-  static pw.Widget _totalRow(String label, double value, String curr,
-      {bool bold = false}) {
+  static pw.Widget _totalRow(
+    String label,
+    double value,
+    String curr, {
+    bool bold = false,
+  }) {
     final style = pw.TextStyle(
       fontSize: bold ? 12 : 10,
       fontWeight: bold ? pw.FontWeight.bold : pw.FontWeight.normal,
@@ -255,11 +286,11 @@ class PrintService {
   }
 
   static String _typeLabel(String t) => switch (t) {
-        'sale' => 'فاتورة مبيعات',
-        'purchase' => 'فاتورة مشتريات',
-        'sale_return' => 'مرتجع مبيعات',
-        _ => 'مرتجع مشتريات',
-      };
+    'sale' => 'فاتورة مبيعات',
+    'purchase' => 'فاتورة مشتريات',
+    'sale_return' => 'مرتجع مبيعات',
+    _ => 'مرتجع مشتريات',
+  };
 
   /// طباعة/مشاركة الفاتورة
   static Future<void> printInvoice({
@@ -313,10 +344,7 @@ class PrintService {
       footer: footer,
       logoBytes: logoBytes,
     );
-    await Printing.sharePdf(
-      bytes: bytes,
-      filename: '${inv.invoiceNumber}.pdf',
-    );
+    await Printing.sharePdf(bytes: bytes, filename: '${inv.invoiceNumber}.pdf');
   }
 
   /// توليد سند قبض/صرف PDF
@@ -358,31 +386,47 @@ class PrintService {
                       pw.SizedBox(height: 42, child: pw.Image(logo)),
                       pw.SizedBox(height: 4),
                     ],
-                    pw.Text(companyName,
-                        style: pw.TextStyle(
-                            fontSize: 18, fontWeight: pw.FontWeight.bold)),
+                    pw.Text(
+                      companyName,
+                      style: pw.TextStyle(
+                        fontSize: 18,
+                        fontWeight: pw.FontWeight.bold,
+                      ),
+                    ),
                     if (companyPhone.isNotEmpty)
-                      pw.Text('هاتف: $companyPhone',
-                          style: const pw.TextStyle(fontSize: 10)),
+                      pw.Text(
+                        'هاتف: $companyPhone',
+                        style: const pw.TextStyle(fontSize: 10),
+                      ),
                     if (companyAddress.isNotEmpty)
-                      pw.Text(companyAddress,
-                          style: const pw.TextStyle(fontSize: 10)),
+                      pw.Text(
+                        companyAddress,
+                        style: const pw.TextStyle(fontSize: 10),
+                      ),
                     if (taxNumber.isNotEmpty)
-                      pw.Text('الرقم الضريبي: $taxNumber',
-                          style: const pw.TextStyle(fontSize: 10)),
+                      pw.Text(
+                        'الرقم الضريبي: $taxNumber',
+                        style: const pw.TextStyle(fontSize: 10),
+                      ),
                   ],
                 ),
                 pw.Container(
                   padding: const pw.EdgeInsets.symmetric(
-                      horizontal: 20, vertical: 10),
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
                   decoration: pw.BoxDecoration(
                     border: pw.Border.all(color: PdfColors.grey500),
                     borderRadius: pw.BorderRadius.circular(6),
                     color: isReceipt ? PdfColors.green50 : PdfColors.red50,
                   ),
-                  child: pw.Text(title,
-                      style: pw.TextStyle(
-                          fontSize: 18, fontWeight: pw.FontWeight.bold)),
+                  child: pw.Text(
+                    title,
+                    style: pw.TextStyle(
+                      fontSize: 18,
+                      fontWeight: pw.FontWeight.bold,
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -394,16 +438,20 @@ class PrintService {
             pw.Row(
               mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
               children: [
-                pw.Text('رقم السند: ${v.paymentNumber}',
-                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                pw.Text(
+                  'رقم السند: ${v.paymentNumber}',
+                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                ),
                 pw.Text('التاريخ: ${v.date}'),
               ],
             ),
             pw.SizedBox(height: 14),
 
             // المبلغ بالأرقام والكلمات
-            _voucherRow(isReceipt ? 'استلمنا من' : 'صرفنا إلى',
-                v.contactName.isEmpty ? '____________' : v.contactName),
+            _voucherRow(
+              isReceipt ? 'استلمنا من' : 'صرفنا إلى',
+              v.contactName.isEmpty ? '____________' : v.contactName,
+            ),
             pw.SizedBox(height: 8),
             _voucherRow('مبلغاً وقدره', Fmt.money(v.amount, currency)),
             pw.SizedBox(height: 8),
@@ -449,16 +497,18 @@ class PrintService {
       children: [
         pw.SizedBox(
           width: 110,
-          child: pw.Text('$label:',
-              style: pw.TextStyle(
-                  fontWeight: pw.FontWeight.bold, fontSize: 12)),
+          child: pw.Text(
+            '$label:',
+            style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
+          ),
         ),
         pw.Expanded(
           child: pw.Container(
             padding: const pw.EdgeInsets.only(bottom: 4),
             decoration: const pw.BoxDecoration(
               border: pw.Border(
-                  bottom: pw.BorderSide(color: PdfColors.grey400, width: 0.6)),
+                bottom: pw.BorderSide(color: PdfColors.grey400, width: 0.6),
+              ),
             ),
             child: pw.Text(value, style: const pw.TextStyle(fontSize: 12)),
           ),
@@ -479,12 +529,12 @@ class PrintService {
   }
 
   static String _methodLabel(String m) => switch (m) {
-        'cash' => 'نقدي',
-        'check' => 'شيك',
-        'card' => 'بطاقة',
-        'transfer' => 'تحويل بنكي',
-        _ => m.isEmpty ? '_____' : m,
-      };
+    'cash' => 'نقدي',
+    'check' => 'شيك',
+    'card' => 'بطاقة',
+    'transfer' => 'تحويل بنكي',
+    _ => m.isEmpty ? '_____' : m,
+  };
 
   /// طباعة سند
   static Future<void> printVoucher({
@@ -512,7 +562,9 @@ class PrintService {
       logoBytes: logoBytes,
     );
     await Printing.layoutPdf(
-        onLayout: (_) async => bytes, name: '${v.paymentNumber}.pdf');
+      onLayout: (_) async => bytes,
+      name: '${v.paymentNumber}.pdf',
+    );
   }
 
   /// مشاركة سند كملف PDF
@@ -584,12 +636,20 @@ class PrintService {
               pw.Column(
                 crossAxisAlignment: pw.CrossAxisAlignment.start,
                 children: [
-                  pw.Text(companyName,
-                      style: pw.TextStyle(
-                          fontSize: 16, fontWeight: pw.FontWeight.bold)),
-                  pw.Text(title,
-                      style: pw.TextStyle(
-                          fontSize: 13, fontWeight: pw.FontWeight.bold)),
+                  pw.Text(
+                    companyName,
+                    style: pw.TextStyle(
+                      fontSize: 16,
+                      fontWeight: pw.FontWeight.bold,
+                    ),
+                  ),
+                  pw.Text(
+                    title,
+                    style: pw.TextStyle(
+                      fontSize: 13,
+                      fontWeight: pw.FontWeight.bold,
+                    ),
+                  ),
                   if (subtitle.isNotEmpty)
                     pw.Text(subtitle, style: const pw.TextStyle(fontSize: 10)),
                 ],
@@ -606,11 +666,12 @@ class PrintService {
           pw.TableHelper.fromTextArray(
             headers: headers,
             data: rows,
-            headerStyle:
-                pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10),
+            headerStyle: pw.TextStyle(
+              fontWeight: pw.FontWeight.bold,
+              fontSize: 10,
+            ),
             cellStyle: const pw.TextStyle(fontSize: 9),
-            headerDecoration:
-                const pw.BoxDecoration(color: PdfColors.grey300),
+            headerDecoration: const pw.BoxDecoration(color: PdfColors.grey300),
             cellAlignment: pw.Alignment.centerRight,
             headerAlignment: pw.Alignment.centerRight,
           ),
@@ -620,9 +681,13 @@ class PrintService {
             for (final t in totals)
               pw.Align(
                 alignment: pw.Alignment.centerLeft,
-                child: pw.Text(t,
-                    style: pw.TextStyle(
-                        fontSize: 11, fontWeight: pw.FontWeight.bold)),
+                child: pw.Text(
+                  t,
+                  style: pw.TextStyle(
+                    fontSize: 11,
+                    fontWeight: pw.FontWeight.bold,
+                  ),
+                ),
               ),
           ],
         ],

@@ -55,8 +55,7 @@ class StatsService {
   static int opsOfCompanySince(String companyId, int days) =>
       OperationService.countOfCompanySince(companyId, days);
 
-  static int opsOfUser(String userId) =>
-      OperationService.countOfUser(userId);
+  static int opsOfUser(String userId) => OperationService.countOfUser(userId);
 
   /// عدد مستخدمي منشأة (المستخدم الرئيسي + الفرعيين)
   static int usersOfCompany(String companyId) =>
@@ -91,8 +90,13 @@ class StatsService {
     final now = DateTime.now();
     final result = <MapEntry<String, int>>[];
     for (var i = days - 1; i >= 0; i--) {
-      final d = DateTime(now.year, now.month, now.day).subtract(Duration(days: i));
-      final key = '${d.year}-${d.month.toString().padLeft(2, '0')}-'
+      final d = DateTime(
+        now.year,
+        now.month,
+        now.day,
+      ).subtract(Duration(days: i));
+      final key =
+          '${d.year}-${d.month.toString().padLeft(2, '0')}-'
           '${d.day.toString().padLeft(2, '0')}';
       final count = all.where((o) => o.createdAt.startsWith(key)).length;
       result.add(MapEntry(key, count));

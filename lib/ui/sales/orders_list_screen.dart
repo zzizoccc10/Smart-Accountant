@@ -41,14 +41,17 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
   Widget build(BuildContext context) {
     final prov = context.watch<ERPProvider>();
     final type = _tabs[_tab][1];
-    final list = prov
-        .ordersOfType(type)
-        .where((o) =>
-            _search.isEmpty ||
-            o.contactName.contains(_search) ||
-            o.docNumber.contains(_search))
-        .toList()
-      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    final list =
+        prov
+            .ordersOfType(type)
+            .where(
+              (o) =>
+                  _search.isEmpty ||
+                  o.contactName.contains(_search) ||
+                  o.docNumber.contains(_search),
+            )
+            .toList()
+          ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
     return Scaffold(
       appBar: AppBar(
@@ -58,7 +61,13 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
             title: 'المستندات التجارية — ${_tabs[_tab][0]}',
             companyName: prov.companyName,
             filename: 'orders_$type',
-            headers: const ['رقم المستند', 'التاريخ', 'الجهة', 'الحالة', 'الإجمالي'],
+            headers: const [
+              'رقم المستند',
+              'التاريخ',
+              'الجهة',
+              'الحالة',
+              'الإجمالي',
+            ],
             rows: [
               for (final o in list)
                 [
@@ -139,14 +148,11 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
         onTap: () => _showActions(context, o, prov),
         leading: CircleAvatar(
           backgroundColor: color.withValues(alpha: 0.12),
-          child: Icon(
-            switch (o.docType) {
-              'quotation' => Icons.request_quote,
-              'sales_order' => Icons.shopping_cart,
-              _ => Icons.shopping_bag,
-            },
-            color: color,
-          ),
+          child: Icon(switch (o.docType) {
+            'quotation' => Icons.request_quote,
+            'sales_order' => Icons.shopping_cart,
+            _ => Icons.shopping_bag,
+          }, color: color),
         ),
         title: Text(
           o.contactName.isEmpty ? 'جهة نقدية' : o.contactName,
@@ -156,8 +162,10 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 2),
-            Text('${o.docNumber} • ${o.date}',
-                style: const TextStyle(fontSize: 12)),
+            Text(
+              '${o.docNumber} • ${o.date}',
+              style: const TextStyle(fontSize: 12),
+            ),
             const SizedBox(height: 4),
             Row(
               children: [
@@ -172,12 +180,15 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Text(Fmt.money(o.total, curr),
-                style: const TextStyle(
-                    fontWeight: FontWeight.bold, fontSize: 13)),
+            Text(
+              Fmt.money(o.total, curr),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+            ),
             if (canConvert)
-              const Text('اضغط للتحويل',
-                  style: TextStyle(fontSize: 9, color: Colors.grey)),
+              const Text(
+                'اضغط للتحويل',
+                style: TextStyle(fontSize: 9, color: Colors.grey),
+              ),
           ],
         ),
       ),
@@ -185,11 +196,11 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
   }
 
   Color _statusColor(String s) => switch (s) {
-        'draft' => Colors.grey,
-        'confirmed' => AppColors.info,
-        'converted' => AppColors.success,
-        _ => AppColors.danger,
-      };
+    'draft' => Colors.grey,
+    'confirmed' => AppColors.info,
+    'converted' => AppColors.success,
+    _ => AppColors.danger,
+  };
 
   void _showActions(BuildContext context, OrderDoc o, ERPProvider prov) {
     showModalBottomSheet(
@@ -201,7 +212,9 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
             ListTile(
               leading: const Icon(Icons.info_outline),
               title: Text('${o.typeLabel} ${o.docNumber}'),
-              subtitle: Text('${o.contactName} • ${Fmt.money(o.total, prov.currency)}'),
+              subtitle: Text(
+                '${o.contactName} • ${Fmt.money(o.total, prov.currency)}',
+              ),
             ),
             const Divider(height: 1),
             if (o.status == 'draft')
@@ -215,8 +228,10 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
               ),
             if (o.status != 'converted')
               ListTile(
-                leading: const Icon(Icons.receipt_long,
-                    color: AppColors.success),
+                leading: const Icon(
+                  Icons.receipt_long,
+                  color: AppColors.success,
+                ),
                 title: const Text('تحويل إلى فاتورة'),
                 subtitle: const Text('إنشاء فاتورة من بنود هذا المستند'),
                 onTap: () async {
@@ -225,12 +240,18 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
                 },
               ),
             ListTile(
-              leading: const Icon(Icons.delete_outline, color: AppColors.danger),
+              leading: const Icon(
+                Icons.delete_outline,
+                color: AppColors.danger,
+              ),
               title: const Text('حذف'),
               onTap: () async {
                 Navigator.pop(ctx);
-                final ok = await confirmDialog(context,
-                    title: 'حذف', message: 'حذف ${o.typeLabel} ${o.docNumber}؟');
+                final ok = await confirmDialog(
+                  context,
+                  title: 'حذف',
+                  message: 'حذف ${o.typeLabel} ${o.docNumber}؟',
+                );
                 if (ok) await prov.deleteOrder(o.id);
               },
             ),
@@ -242,8 +263,9 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
 
   Future<void> _convert(OrderDoc o, ERPProvider prov) async {
     String paymentType = 'credit';
-    String? cashboxId =
-        prov.cashboxes.isNotEmpty ? prov.cashboxes.first.id : null;
+    String? cashboxId = prov.cashboxes.isNotEmpty
+        ? prov.cashboxes.first.id
+        : null;
     cashboxId = safeValue(cashboxId, prov.cashboxes.map((c) => c.id));
 
     final go = await showDialog<bool>(
@@ -270,8 +292,10 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
                   initialValue: cashboxId,
                   decoration: const InputDecoration(labelText: 'الصندوق'),
                   items: prov.cashboxes
-                      .map((c) =>
-                          DropdownMenuItem(value: c.id, child: Text(c.name)))
+                      .map(
+                        (c) =>
+                            DropdownMenuItem(value: c.id, child: Text(c.name)),
+                      )
                       .toList(),
                   onChanged: (v) => setSt(() => cashboxId = v),
                 ),
@@ -280,8 +304,9 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
           ),
           actions: [
             TextButton(
-                onPressed: () => Navigator.pop(ctx, false),
-                child: const Text('إلغاء')),
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('إلغاء'),
+            ),
             ElevatedButton(
               onPressed: () => Navigator.pop(ctx, true),
               child: const Text('تحويل'),

@@ -92,8 +92,10 @@ class _OperationsTabState extends State<OperationsTab> {
               Padding(
                 padding: const EdgeInsets.only(left: 6),
                 child: ChoiceChip(
-                  label: Text('كل المنشآت (${all.length})',
-                      style: const TextStyle(fontSize: 12)),
+                  label: Text(
+                    'كل المنشآت (${all.length})',
+                    style: const TextStyle(fontSize: 12),
+                  ),
                   selected: _companyFilter.isEmpty,
                   selectedColor: AppColors.primary.withValues(alpha: 0.18),
                   onSelected: (_) => setState(() {
@@ -108,8 +110,10 @@ class _OperationsTabState extends State<OperationsTab> {
                 return Padding(
                   padding: const EdgeInsets.only(left: 6),
                   child: ChoiceChip(
-                    label: Text('${c.companyName} ($count)',
-                        style: const TextStyle(fontSize: 12)),
+                    label: Text(
+                      '${c.companyName} ($count)',
+                      style: const TextStyle(fontSize: 12),
+                    ),
                     selected: on,
                     selectedColor: AppColors.teal.withValues(alpha: 0.18),
                     onSelected: (_) => setState(() {
@@ -128,7 +132,8 @@ class _OperationsTabState extends State<OperationsTab> {
               ? const EmptyState(
                   Icons.history,
                   'لا توجد عمليات',
-                  hint: 'تُسجَّل العمليات تلقائياً عند إنشاء الفواتير والقيود '
+                  hint:
+                      'تُسجَّل العمليات تلقائياً عند إنشاء الفواتير والقيود '
                       'والدخول والخروج وغيرها.',
                 )
               : ListView.builder(
@@ -153,8 +158,10 @@ class _OperationsTabState extends State<OperationsTab> {
           backgroundColor: AppColors.indigo.withValues(alpha: 0.14),
           child: const Icon(Icons.bolt, size: 17, color: AppColors.indigo),
         ),
-        title: Text(o.actionLabelAr,
-            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+        title: Text(
+          o.actionLabelAr,
+          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+        ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -164,11 +171,12 @@ class _OperationsTabState extends State<OperationsTab> {
               style: const TextStyle(fontSize: 11),
             ),
             if (o.details.isNotEmpty)
-              Text(o.details,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                      fontSize: 10.5, color: Colors.grey.shade600)),
+              Text(
+                o.details,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(fontSize: 10.5, color: Colors.grey.shade600),
+              ),
           ],
         ),
         isThreeLine: o.details.isNotEmpty,
@@ -176,11 +184,15 @@ class _OperationsTabState extends State<OperationsTab> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Text(timeAgo(o.createdAt),
-                style: TextStyle(fontSize: 10, color: Colors.grey.shade600)),
+            Text(
+              timeAgo(o.createdAt),
+              style: TextStyle(fontSize: 10, color: Colors.grey.shade600),
+            ),
             const SizedBox(height: 2),
-            Text(fmtDate(o.createdAt),
-                style: TextStyle(fontSize: 9, color: Colors.grey.shade500)),
+            Text(
+              fmtDate(o.createdAt),
+              style: TextStyle(fontSize: 9, color: Colors.grey.shade500),
+            ),
           ],
         ),
         onTap: co == null
@@ -212,12 +224,15 @@ class _OperationsTabState extends State<OperationsTab> {
             icon: const Icon(Icons.chevron_right),
             onPressed: _page > 1 ? () => setState(() => _page--) : null,
           ),
-          Text('صفحة $_page من $totalPages • $total عملية',
-              style: const TextStyle(fontSize: 12)),
+          Text(
+            'صفحة $_page من $totalPages • $total عملية',
+            style: const TextStyle(fontSize: 12),
+          ),
           IconButton(
             icon: const Icon(Icons.chevron_left),
-            onPressed:
-                _page < totalPages ? () => setState(() => _page++) : null,
+            onPressed: _page < totalPages
+                ? () => setState(() => _page++)
+                : null,
           ),
         ],
       ),

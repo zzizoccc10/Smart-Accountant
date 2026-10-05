@@ -21,6 +21,7 @@ import 'google_tab.dart';
 import 'guests_tab.dart';
 import 'notifications_tab.dart';
 import 'operations_tab.dart';
+import 'owner_settings_screen.dart';
 import 'widgets.dart';
 
 class SystemOwnerDashboard extends StatefulWidget {
@@ -75,7 +76,9 @@ class _SystemOwnerDashboardState extends State<SystemOwnerDashboard>
                   width: 16,
                   height: 16,
                   child: CircularProgressIndicator(
-                      strokeWidth: 2, color: Colors.white),
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
                 ),
               ),
             )
@@ -85,6 +88,17 @@ class _SystemOwnerDashboardState extends State<SystemOwnerDashboard>
               icon: const Icon(Icons.refresh),
               onPressed: _syncCloud,
             ),
+          IconButton(
+            tooltip: 'إعدادات مالك النظام',
+            icon: const Icon(Icons.manage_accounts),
+            onPressed: () async {
+              await Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const OwnerSettingsScreen()),
+              );
+              if (mounted) setState(() {});
+            },
+          ),
           IconButton(
             tooltip: 'خروج',
             icon: const Icon(Icons.logout),
@@ -174,10 +188,14 @@ class _HomeDashboardState extends State<_HomeDashboard> {
           ? AppColors.success.withValues(alpha: 0.08)
           : Colors.orange.withValues(alpha: 0.10),
       child: ListTile(
-        leading: Icon(ok ? Icons.cloud_done : Icons.cloud_off,
-            color: ok ? AppColors.success : Colors.orange),
+        leading: Icon(
+          ok ? Icons.cloud_done : Icons.cloud_off,
+          color: ok ? AppColors.success : Colors.orange,
+        ),
         title: Text(
-          ok ? 'متصل بـ Firebase — المزامنة مُفعّلة' : 'غير متصل — بيانات محلية',
+          ok
+              ? 'متصل بـ Firebase — المزامنة مُفعّلة'
+              : 'غير متصل — بيانات محلية',
           style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
         ),
         subtitle: Text(
@@ -202,7 +220,8 @@ class _HomeDashboardState extends State<_HomeDashboard> {
                 value: '${StatsService.companiesCount}',
                 icon: Icons.business,
                 color: AppColors.primary,
-                subtitle: '${StatsService.activeCompaniesCount} نشطة • '
+                subtitle:
+                    '${StatsService.activeCompaniesCount} نشطة • '
                     '${StatsService.stoppedCompaniesCount} موقوفة',
               ),
             ),
@@ -291,9 +310,13 @@ class _HomeDashboardState extends State<_HomeDashboard> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        Text('${e.value}',
-                            style: const TextStyle(
-                                fontSize: 10, fontWeight: FontWeight.bold)),
+                        Text(
+                          '${e.value}',
+                          style: const TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                         const SizedBox(height: 4),
                         Container(
                           height: h < 3 ? 3 : h,
@@ -301,13 +324,18 @@ class _HomeDashboardState extends State<_HomeDashboard> {
                           decoration: BoxDecoration(
                             color: AppColors.primary.withValues(alpha: 0.75),
                             borderRadius: const BorderRadius.vertical(
-                                top: Radius.circular(6)),
+                              top: Radius.circular(6),
+                            ),
                           ),
                         ),
                         const SizedBox(height: 4),
-                        Text(day,
-                            style: TextStyle(
-                                fontSize: 10, color: Colors.grey.shade600)),
+                        Text(
+                          day,
+                          style: TextStyle(
+                            fontSize: 10,
+                            color: Colors.grey.shade600,
+                          ),
+                        ),
                       ],
                     ),
                   );
@@ -343,20 +371,29 @@ class _HomeDashboardState extends State<_HomeDashboard> {
                   dense: true,
                   leading: CircleAvatar(
                     radius: 16,
-                    backgroundColor:
-                        c.isActive ? AppColors.primary : Colors.grey,
-                    child: Text(c.initials,
-                        style: const TextStyle(
-                            color: Colors.white, fontSize: 13)),
+                    backgroundColor: c.isActive
+                        ? AppColors.primary
+                        : Colors.grey,
+                    child: Text(
+                      c.initials,
+                      style: const TextStyle(color: Colors.white, fontSize: 13),
+                    ),
                   ),
-                  title: Text(c.companyName,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontSize: 13)),
-                  subtitle: Text('$us مستخدم • $ops عملية',
-                      style: const TextStyle(fontSize: 11)),
-                  trailing: BadgeChip('$ops', AppColors.indigo,
-                      icon: Icons.sync_alt),
+                  title: Text(
+                    c.companyName,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontSize: 13),
+                  ),
+                  subtitle: Text(
+                    '$us مستخدم • $ops عملية',
+                    style: const TextStyle(fontSize: 11),
+                  ),
+                  trailing: BadgeChip(
+                    '$ops',
+                    AppColors.indigo,
+                    icon: Icons.sync_alt,
+                  ),
                 );
               }).toList(),
             ),
@@ -375,8 +412,10 @@ class _HomeDashboardState extends State<_HomeDashboard> {
           const Card(
             child: ListTile(
               leading: Icon(Icons.info_outline),
-              title: Text('لا توجد عمليات مسجّلة',
-                  style: TextStyle(fontSize: 13)),
+              title: Text(
+                'لا توجد عمليات مسجّلة',
+                style: TextStyle(fontSize: 13),
+              ),
             ),
           )
         else
@@ -389,19 +428,25 @@ class _HomeDashboardState extends State<_HomeDashboard> {
                   leading: CircleAvatar(
                     radius: 15,
                     backgroundColor: AppColors.indigo.withValues(alpha: 0.14),
-                    child: const Icon(Icons.bolt,
-                        size: 15, color: AppColors.indigo),
+                    child: const Icon(
+                      Icons.bolt,
+                      size: 15,
+                      color: AppColors.indigo,
+                    ),
                   ),
-                  title: Text(o.actionLabelAr,
-                      style: const TextStyle(fontSize: 12.5)),
+                  title: Text(
+                    o.actionLabelAr,
+                    style: const TextStyle(fontSize: 12.5),
+                  ),
                   subtitle: Text(
                     '${o.userName.isEmpty ? "—" : o.userName}'
                     '${co != null ? " • ${co.companyName}" : ""}',
                     style: const TextStyle(fontSize: 10.5),
                   ),
-                  trailing: Text(timeAgo(o.createdAt),
-                      style: TextStyle(
-                          fontSize: 10, color: Colors.grey.shade600)),
+                  trailing: Text(
+                    timeAgo(o.createdAt),
+                    style: TextStyle(fontSize: 10, color: Colors.grey.shade600),
+                  ),
                 );
               }).toList(),
             ),
@@ -431,16 +476,25 @@ class _HomeDashboardState extends State<_HomeDashboard> {
                     children: [
                       Row(
                         children: [
-                          Icon(platformIcon(e.key),
-                              size: 16, color: AppColors.primary),
+                          Icon(
+                            platformIcon(e.key),
+                            size: 16,
+                            color: AppColors.primary,
+                          ),
                           const SizedBox(width: 6),
                           Expanded(
-                            child: Text(platformLabel(e.key),
-                                style: const TextStyle(fontSize: 12.5)),
+                            child: Text(
+                              platformLabel(e.key),
+                              style: const TextStyle(fontSize: 12.5),
+                            ),
                           ),
-                          Text('${e.value}',
-                              style: const TextStyle(
-                                  fontSize: 12, fontWeight: FontWeight.bold)),
+                          Text(
+                            '${e.value}',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ],
                       ),
                       const SizedBox(height: 5),
@@ -451,7 +505,8 @@ class _HomeDashboardState extends State<_HomeDashboard> {
                           minHeight: 7,
                           backgroundColor: Colors.grey.shade200,
                           valueColor: const AlwaysStoppedAnimation(
-                              AppColors.primary),
+                            AppColors.primary,
+                          ),
                         ),
                       ),
                     ],
@@ -475,14 +530,18 @@ class _HomeDashboardState extends State<_HomeDashboard> {
         Card(
           child: Column(
             children: list
-                .map((e) => ListTile(
-                      dense: true,
-                      leading: const Icon(Icons.flag,
-                          size: 18, color: AppColors.teal),
-                      title: Text(e.key,
-                          style: const TextStyle(fontSize: 13)),
-                      trailing: BadgeChip('${e.value}', AppColors.teal),
-                    ))
+                .map(
+                  (e) => ListTile(
+                    dense: true,
+                    leading: const Icon(
+                      Icons.flag,
+                      size: 18,
+                      color: AppColors.teal,
+                    ),
+                    title: Text(e.key, style: const TextStyle(fontSize: 13)),
+                    trailing: BadgeChip('${e.value}', AppColors.teal),
+                  ),
+                )
                 .toList(),
           ),
         ),

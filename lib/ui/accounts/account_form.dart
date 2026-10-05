@@ -35,7 +35,8 @@ class _AccountFormState extends State<AccountForm> {
     _code = TextEditingController(text: a?.code ?? '');
     _name = TextEditingController(text: a?.name ?? '');
     _opening = TextEditingController(
-        text: (a?.openingBalance ?? 0) == 0 ? '' : a!.openingBalance.toString());
+      text: (a?.openingBalance ?? 0) == 0 ? '' : a!.openingBalance.toString(),
+    );
     _type = a?.accountType ?? 'asset';
     _nature = a?.accountNature ?? 'debit';
     _parentId = a?.parentId;
@@ -84,8 +85,9 @@ class _AccountFormState extends State<AccountForm> {
   @override
   Widget build(BuildContext context) {
     final prov = context.watch<ERPProvider>();
-    final parents =
-        prov.accounts.where((a) => a.id != widget.account?.id).toList();
+    final parents = prov.accounts
+        .where((a) => a.id != widget.account?.id)
+        .toList();
 
     return Scaffold(
       appBar: AppBar(
@@ -173,20 +175,25 @@ class _AccountFormState extends State<AccountForm> {
               ),
               items: [
                 const DropdownMenuItem(value: null, child: Text('حساب رئيسي')),
-                ...parents.map((a) => DropdownMenuItem(
-                      value: a.id,
-                      child: Text('${a.code} — ${a.name}'),
-                    )),
+                ...parents.map(
+                  (a) => DropdownMenuItem(
+                    value: a.id,
+                    child: Text('${a.code} — ${a.name}'),
+                  ),
+                ),
               ],
               onChanged: (v) => setState(() {
                 _parentId = v;
                 // اقتراح كود فرعي تلقائي عند اختيار أب (للحسابات الجديدة)
                 if (v != null && widget.account == null) {
-                  final parent =
-                      prov.accounts.where((a) => a.id == v).firstOrNull;
+                  final parent = prov.accounts
+                      .where((a) => a.id == v)
+                      .firstOrNull;
                   if (parent != null) {
                     _code.text = AccountSyncService.nextChildCode(
-                        parent.code, prov.accounts);
+                      parent.code,
+                      prov.accounts,
+                    );
                   }
                 }
               }),

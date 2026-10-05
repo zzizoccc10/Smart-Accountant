@@ -83,33 +83,43 @@ class TrialBalanceScreen extends StatelessWidget {
                         child: const Row(
                           children: [
                             Expanded(
-                                flex: 3,
-                                child: Text('الحساب',
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold))),
+                              flex: 3,
+                              child: Text(
+                                'الحساب',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
                             Expanded(
-                                child: Text('مدين',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold))),
+                              child: Text(
+                                'مدين',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
                             Expanded(
-                                child: Text('دائن',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold))),
+                              child: Text(
+                                'دائن',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
                           ],
                         ),
                       ),
                       for (final r in rows)
                         Padding(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 8),
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
                           child: Row(
                             children: [
                               Expanded(
                                 flex: 3,
-                                child: Text('${r['code']} — ${r['name']}',
-                                    style: const TextStyle(fontSize: 12)),
+                                child: Text(
+                                  '${r['code']} — ${r['name']}',
+                                  style: const TextStyle(fontSize: 12),
+                                ),
                               ),
                               Expanded(
                                 child: Text(
@@ -138,17 +148,20 @@ class TrialBalanceScreen extends StatelessWidget {
                         child: Row(
                           children: [
                             const Expanded(
-                                flex: 3,
-                                child: Text('الإجمالي',
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold))),
+                              flex: 3,
+                              child: Text(
+                                'الإجمالي',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
                             Expanded(
                               child: Text(
                                 Fmt.num(totalDebit),
                                 textAlign: TextAlign.center,
                                 style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColors.primary),
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.primary,
+                                ),
                               ),
                             ),
                             Expanded(
@@ -156,8 +169,9 @@ class TrialBalanceScreen extends StatelessWidget {
                                 Fmt.num(totalCredit),
                                 textAlign: TextAlign.center,
                                 style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColors.primary),
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.primary,
+                                ),
                               ),
                             ),
                           ],

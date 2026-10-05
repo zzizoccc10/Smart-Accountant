@@ -34,7 +34,9 @@ class CurrenciesScreen extends StatelessWidget {
                   child: ListTile(
                     onTap: () => _edit(context, prov, c),
                     leading: CircleAvatar(
-                      backgroundColor: AppColors.primary.withValues(alpha: 0.12),
+                      backgroundColor: AppColors.primary.withValues(
+                        alpha: 0.12,
+                      ),
                       child: Text(
                         c.code,
                         style: const TextStyle(
@@ -58,8 +60,10 @@ class CurrenciesScreen extends StatelessWidget {
                       style: const TextStyle(fontSize: 12),
                     ),
                     trailing: IconButton(
-                      icon: const Icon(Icons.delete_outline,
-                          color: AppColors.danger),
+                      icon: const Icon(
+                        Icons.delete_outline,
+                        color: AppColors.danger,
+                      ),
                       onPressed: c.isBase
                           ? null
                           : () async {
@@ -116,7 +120,8 @@ class CurrenciesScreen extends StatelessWidget {
                 controller: rate,
                 keyboardType: TextInputType.number,
                 decoration: const InputDecoration(
-                    labelText: 'سعر الصرف مقابل العملة الأساسية'),
+                  labelText: 'سعر الصرف مقابل العملة الأساسية',
+                ),
               ),
             ],
           ),

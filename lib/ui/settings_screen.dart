@@ -65,13 +65,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _name = TextEditingController(text: prov.companyName);
     _phone = TextEditingController(text: prov.companyPhone);
     _address = TextEditingController(text: prov.companyAddress);
-    _tax = TextEditingController(
-        text: AppDatabase.getSetting('taxRate', '15'));
+    _tax = TextEditingController(text: AppDatabase.getSetting('taxRate', '15'));
     _footer = TextEditingController(text: prov.invoiceFooter);
     _taxNumber = TextEditingController(
-        text: AppDatabase.getSetting('taxNumber', ''));
+      text: AppDatabase.getSetting('taxNumber', ''),
+    );
     _crNumber = TextEditingController(
-        text: AppDatabase.getSetting('crNumber', ''));
+      text: AppDatabase.getSetting('crNumber', ''),
+    );
     _logoBase64 = AppDatabase.getSetting('companyLogo').isEmpty
         ? null
         : AppDatabase.getSetting('companyLogo');
@@ -151,12 +152,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('الإعدادات'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.save),
-            onPressed: _save,
-          ),
-        ],
+        actions: [IconButton(icon: const Icon(Icons.save), onPressed: _save)],
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
@@ -202,8 +198,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: _logoBase64 == null
-                            ? const Icon(Icons.image_outlined,
-                                color: Colors.grey)
+                            ? const Icon(
+                                Icons.image_outlined,
+                                color: Colors.grey,
+                              )
                             : ClipRRect(
                                 borderRadius: BorderRadius.circular(8),
                                 child: Image.memory(
@@ -217,8 +215,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text('شعار المنشأة (يظهر في الفاتورة)',
-                                style: TextStyle(fontSize: 13)),
+                            const Text(
+                              'شعار المنشأة (يظهر في الفاتورة)',
+                              style: TextStyle(fontSize: 13),
+                            ),
                             const SizedBox(height: 6),
                             Row(
                               children: [
@@ -232,8 +232,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   TextButton.icon(
                                     onPressed: () =>
                                         setState(() => _logoBase64 = null),
-                                    icon: const Icon(Icons.delete_outline,
-                                        size: 18, color: AppColors.danger),
+                                    icon: const Icon(
+                                      Icons.delete_outline,
+                                      size: 18,
+                                      color: AppColors.danger,
+                                    ),
                                     label: const Text('حذف'),
                                   ),
                                 ],
@@ -271,8 +274,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       DropdownMenuItem(value: 'ر.ي', child: Text('ريال يمني')),
                       DropdownMenuItem(value: 'ر.س', child: Text('ريال سعودي')),
                       DropdownMenuItem(value: 'ج.م', child: Text('جنيه مصري')),
-                      DropdownMenuItem(value: 'د.إ', child: Text('درهم إماراتي')),
-                      DropdownMenuItem(value: 'USD', child: Text('دولار أمريكي')),
+                      DropdownMenuItem(
+                        value: 'د.إ',
+                        child: Text('درهم إماراتي'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'USD',
+                        child: Text('دولار أمريكي'),
+                      ),
                     ],
                     onChanged: (v) => setState(() => _currency = v ?? 'ر.ي'),
                   ),
@@ -327,15 +336,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: Column(
               children: [
                 ListTile(
-                  leading: const Icon(Icons.currency_exchange,
-                      color: AppColors.info),
+                  leading: const Icon(
+                    Icons.currency_exchange,
+                    color: AppColors.info,
+                  ),
                   title: const Text('العملات وأسعار الصرف'),
                   subtitle: Text('${prov.currencies.length} عملة'),
                   trailing: const Icon(Icons.chevron_left),
                   onTap: () => Navigator.push(
                     context,
-                    MaterialPageRoute(
-                        builder: (_) => const CurrenciesScreen()),
+                    MaterialPageRoute(builder: (_) => const CurrenciesScreen()),
                   ),
                 ),
                 const Divider(height: 1),
@@ -346,8 +356,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   trailing: const Icon(Icons.chevron_left),
                   onTap: () => Navigator.push(
                     context,
-                    MaterialPageRoute(
-                        builder: (_) => const AuditLogScreen()),
+                    MaterialPageRoute(builder: (_) => const AuditLogScreen()),
                   ),
                 ),
                 const Divider(height: 1),
@@ -358,14 +367,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   trailing: const Icon(Icons.chevron_left),
                   onTap: () => Navigator.push(
                     context,
-                    MaterialPageRoute(
-                        builder: (_) => const SecurityScreen()),
+                    MaterialPageRoute(builder: (_) => const SecurityScreen()),
                   ),
                 ),
                 const Divider(height: 1),
                 ListTile(
-                  leading: const Icon(Icons.event_busy,
-                      color: AppColors.warning),
+                  leading: const Icon(
+                    Icons.event_busy,
+                    color: AppColors.warning,
+                  ),
                   title: const Text('إقفال السنة المالية'),
                   subtitle: Text(
                     prov.fiscalYearClosed.isEmpty
@@ -376,75 +386,86 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (_) => const FiscalCloseScreen()),
+                      builder: (_) => const FiscalCloseScreen(),
+                    ),
                   ),
                 ),
                 const Divider(height: 1),
                 ListTile(
-                  leading: const Icon(Icons.notifications_active,
-                      color: AppColors.danger),
+                  leading: const Icon(
+                    Icons.notifications_active,
+                    color: AppColors.danger,
+                  ),
                   title: const Text('مركز الإشعارات'),
                   subtitle: Text(
-                      '${prov.unreadNotifications} إشعار غير مقروء • ${prov.notifications.length} إجمالي'),
+                    '${prov.unreadNotifications} إشعار غير مقروء • ${prov.notifications.length} إجمالي',
+                  ),
                   trailing: const Icon(Icons.chevron_left),
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (_) => const NotificationsScreen()),
+                      builder: (_) => const NotificationsScreen(),
+                    ),
                   ),
                 ),
                 const Divider(height: 1),
                 ListTile(
                   leading: const Icon(Icons.lock_open, color: AppColors.info),
                   title: const Text('صلاحيات التطبيق'),
-                  subtitle:
-                      const Text('جهات الاتصال • التخزين • واتساب • SMS'),
+                  subtitle: const Text('جهات الاتصال • التخزين • واتساب • SMS'),
                   trailing: const Icon(Icons.chevron_left),
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (_) => const PermissionsScreen()),
+                      builder: (_) => const PermissionsScreen(),
+                    ),
                   ),
                 ),
                 const Divider(height: 1),
                 ListTile(
-                  leading:
-                      const Icon(Icons.contact_phone, color: AppColors.teal),
+                  leading: const Icon(
+                    Icons.contact_phone,
+                    color: AppColors.teal,
+                  ),
                   title: const Text('استيراد جهات الاتصال من الهاتف'),
-                  subtitle:
-                      const Text('إضافة العملاء والموردين من دفتر الهاتف'),
+                  subtitle: const Text(
+                    'إضافة العملاء والموردين من دفتر الهاتف',
+                  ),
                   trailing: const Icon(Icons.chevron_left),
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (_) => const ContactsImportScreen()),
+                      builder: (_) => const ContactsImportScreen(),
+                    ),
                   ),
                 ),
                 const Divider(height: 1),
                 ListTile(
-                  leading:
-                      const Icon(Icons.table_chart, color: AppColors.success),
+                  leading: const Icon(
+                    Icons.table_chart,
+                    color: AppColors.success,
+                  ),
                   title: const Text('الجداول الأساسية'),
                   subtitle: Text(
-                      '${prov.branches.length} فرع • ${prov.units.length} وحدة • ${prov.costCenters.length} مركز تكلفة • ${prov.exchangeRates.length} سعر صرف'),
+                    '${prov.branches.length} فرع • ${prov.units.length} وحدة • ${prov.costCenters.length} مركز تكلفة • ${prov.exchangeRates.length} سعر صرف',
+                  ),
                   trailing: const Icon(Icons.chevron_left),
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (_) => const BasicTablesScreen()),
+                      builder: (_) => const BasicTablesScreen(),
+                    ),
                   ),
                 ),
                 const Divider(height: 1),
                 ListTile(
-                  leading:
-                      const Icon(Icons.upload_file, color: AppColors.teal),
+                  leading: const Icon(Icons.upload_file, color: AppColors.teal),
                   title: const Text('استيراد البيانات (Excel / CSV)'),
                   subtitle: const Text('استيراد الأصناف والعملاء والموردين'),
                   trailing: const Icon(Icons.chevron_left),
                   onTap: () => Navigator.push(
                     context,
-                    MaterialPageRoute(
-                        builder: (_) => const ImportScreen()),
+                    MaterialPageRoute(builder: (_) => const ImportScreen()),
                   ),
                 ),
               ],
@@ -456,16 +477,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: Column(
               children: [
                 ListTile(
-                  leading: const Icon(Icons.people_alt,
-                      color: AppColors.primary),
+                  leading: const Icon(
+                    Icons.people_alt,
+                    color: AppColors.primary,
+                  ),
                   title: const Text('المستخدمون والصلاحيات'),
                   subtitle: Text(
-                      '${UserService.all().length} مستخدم • ${_currentUserName()}'),
+                    '${UserService.all().length} مستخدم • ${_currentUserName()}',
+                  ),
                   trailing: const Icon(Icons.chevron_left),
                   onTap: () => Navigator.push(
                     context,
-                    MaterialPageRoute(
-                        builder: (_) => const UsersScreen()),
+                    MaterialPageRoute(builder: (_) => const UsersScreen()),
                   ),
                 ),
                 const Divider(height: 1),
@@ -487,8 +510,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   trailing: const Icon(Icons.chevron_left),
                   onTap: () => Navigator.push(
                     context,
-                    MaterialPageRoute(
-                        builder: (_) => const SyncScreen()),
+                    MaterialPageRoute(builder: (_) => const SyncScreen()),
                   ),
                 ),
               ],
@@ -500,8 +522,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: Column(
               children: [
                 ListTile(
-                  leading: const Icon(Icons.folder_special,
-                      color: AppColors.info),
+                  leading: const Icon(
+                    Icons.folder_special,
+                    color: AppColors.info,
+                  ),
                   title: const Text('مكان النسخة الاحتياطية'),
                   subtitle: Text(BackupService.suggestedFolder),
                   trailing: const Icon(Icons.chevron_left),
@@ -509,7 +533,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     await Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (_) => const BackupLocationScreen()),
+                        builder: (_) => const BackupLocationScreen(),
+                      ),
                     );
                     if (context.mounted) setState(() {});
                   },
@@ -524,8 +549,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       final chosen = await Navigator.push<bool>(
                         context,
                         MaterialPageRoute(
-                            builder: (_) =>
-                                const BackupLocationScreen(firstTime: true)),
+                          builder: (_) =>
+                              const BackupLocationScreen(firstTime: true),
+                        ),
                       );
                       if (chosen != true) return;
                     }
@@ -535,9 +561,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       setState(() {});
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text(path == null
-                              ? 'تم تصدير النسخة الاحتياطية'
-                              : 'حُفظت في: $path'),
+                          content: Text(
+                            path == null
+                                ? 'تم تصدير النسخة الاحتياطية'
+                                : 'حُفظت في: $path',
+                          ),
                           backgroundColor: AppColors.success,
                         ),
                       );
@@ -548,18 +576,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ListTile(
                   leading: const Icon(Icons.share, color: AppColors.indigo),
                   title: const Text('مشاركة النسخة الاحتياطية'),
-                  subtitle:
-                      const Text('إرسال الملف عبر واتساب/البريد/درايف'),
+                  subtitle: const Text('إرسال الملف عبر واتساب/البريد/درايف'),
                   onTap: () async {
                     final ok = await BackupService.shareBackup();
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text(ok
-                              ? 'تم تجهيز الملف للمشاركة'
-                              : 'تعذّرت المشاركة'),
-                          backgroundColor:
-                              ok ? AppColors.success : AppColors.danger,
+                          content: Text(
+                            ok ? 'تم تجهيز الملف للمشاركة' : 'تعذّرت المشاركة',
+                          ),
+                          backgroundColor: ok
+                              ? AppColors.success
+                              : AppColors.danger,
                         ),
                       );
                     }
@@ -572,13 +600,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   subtitle: const Text('استرجاع البيانات من ملف JSON'),
                   onTap: () => Navigator.push(
                     context,
-                    MaterialPageRoute(
-                        builder: (_) => const RestoreScreen()),
+                    MaterialPageRoute(builder: (_) => const RestoreScreen()),
                   ),
                 ),
                 const Divider(height: 1),
                 ListTile(
-                  leading: const Icon(Icons.delete_forever, color: AppColors.danger),
+                  leading: const Icon(
+                    Icons.delete_forever,
+                    color: AppColors.danger,
+                  ),
                   title: const Text('إعادة تعيين البيانات'),
                   subtitle: const Text('حذف كل البيانات والبدء من جديد'),
                   onTap: () async {
@@ -608,17 +638,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
               padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
-                  const Icon(Icons.account_balance_wallet_rounded,
-                      size: 40, color: AppColors.primary),
+                  const Icon(
+                    Icons.account_balance_wallet_rounded,
+                    size: 40,
+                    color: AppColors.primary,
+                  ),
                   const SizedBox(height: 8),
-                  const Text('المحاسب السهل',
-                      style: TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.bold)),
-                  Text('الإصدار 1.0.0',
-                      style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
+                  const Text(
+                    'المحاسب السهل',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    'الإصدار 1.0.0',
+                    style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+                  ),
                   const SizedBox(height: 4),
-                  Text('نظام محاسبي متكامل يعمل دون اتصال',
-                      style: TextStyle(color: Colors.grey.shade600, fontSize: 11)),
+                  Text(
+                    'نظام محاسبي متكامل يعمل دون اتصال',
+                    style: TextStyle(color: Colors.grey.shade600, fontSize: 11),
+                  ),
                 ],
               ),
             ),

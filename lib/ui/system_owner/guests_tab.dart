@@ -81,12 +81,17 @@ class _GuestsTabState extends State<GuestsTab> {
           padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Row(
             children: [
-              BadgeChip('${all.length} زائر', AppColors.warning,
-                  icon: Icons.person_outline),
+              BadgeChip(
+                '${all.length} زائر',
+                AppColors.warning,
+                icon: Icons.person_outline,
+              ),
               const Spacer(),
               FilterChip(
-                label: const Text('تحوّلوا لحساب فقط',
-                    style: TextStyle(fontSize: 11.5)),
+                label: const Text(
+                  'تحوّلوا لحساب فقط',
+                  style: TextStyle(fontSize: 11.5),
+                ),
                 selected: _onlyConverted,
                 selectedColor: AppColors.success.withValues(alpha: 0.18),
                 onSelected: (v) => setState(() {
@@ -104,7 +109,8 @@ class _GuestsTabState extends State<GuestsTab> {
               ? const EmptyState(
                   Icons.person_off_outlined,
                   'لا يوجد زوار',
-                  hint: 'يُسجَّل هنا كل من دخل التطبيق من زر «الدخول بدون حساب».',
+                  hint:
+                      'يُسجَّل هنا كل من دخل التطبيق من زر «الدخول بدون حساب».',
                 )
               : ListView.builder(
                   padding: const EdgeInsets.all(12),
@@ -130,8 +136,11 @@ class _GuestsTabState extends State<GuestsTab> {
               backgroundColor: g.converted
                   ? AppColors.success
                   : AppColors.warning.withValues(alpha: 0.85),
-              child: Icon(platformIcon(g.platform),
-                  color: Colors.white, size: 20),
+              child: Icon(
+                platformIcon(g.platform),
+                color: Colors.white,
+                size: 20,
+              ),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -146,12 +155,17 @@ class _GuestsTabState extends State<GuestsTab> {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
-                              fontSize: 13.5, fontWeight: FontWeight.bold),
+                            fontSize: 13.5,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                       if (g.converted)
-                        const BadgeChip('تحوّل لحساب', AppColors.success,
-                            icon: Icons.check_circle_outline),
+                        const BadgeChip(
+                          'تحوّل لحساب',
+                          AppColors.success,
+                          icon: Icons.check_circle_outline,
+                        ),
                     ],
                   ),
                   const SizedBox(height: 6),
@@ -159,26 +173,42 @@ class _GuestsTabState extends State<GuestsTab> {
                     spacing: 6,
                     runSpacing: 6,
                     children: [
-                      BadgeChip(platformLabel(g.platform), AppColors.info,
-                          icon: platformIcon(g.platform)),
                       BadgeChip(
-                          g.country.isEmpty ? 'غير معروف' : g.country,
-                          AppColors.teal,
-                          icon: Icons.public),
-                      BadgeChip('${g.visits} زيارة', AppColors.indigo,
-                          icon: Icons.repeat),
+                        platformLabel(g.platform),
+                        AppColors.info,
+                        icon: platformIcon(g.platform),
+                      ),
+                      BadgeChip(
+                        g.country.isEmpty ? 'غير معروف' : g.country,
+                        AppColors.teal,
+                        icon: Icons.public,
+                      ),
+                      BadgeChip(
+                        '${g.visits} زيارة',
+                        AppColors.indigo,
+                        icon: Icons.repeat,
+                      ),
                     ],
                   ),
                   const SizedBox(height: 7),
-                  Text('أول ظهور: ${fmtDay(g.firstSeenAt)}',
-                      style: TextStyle(
-                          fontSize: 10.5, color: Colors.grey.shade600)),
-                  Text('آخر ظهور: ${timeAgo(g.lastSeenAt)}',
-                      style: TextStyle(
-                          fontSize: 10.5, color: Colors.grey.shade600)),
-                  Text('المعرّف: ${g.deviceId}',
-                      style: TextStyle(
-                          fontSize: 10, color: Colors.grey.shade500)),
+                  Text(
+                    'أول ظهور: ${fmtDay(g.firstSeenAt)}',
+                    style: TextStyle(
+                      fontSize: 10.5,
+                      color: Colors.grey.shade600,
+                    ),
+                  ),
+                  Text(
+                    'آخر ظهور: ${timeAgo(g.lastSeenAt)}',
+                    style: TextStyle(
+                      fontSize: 10.5,
+                      color: Colors.grey.shade600,
+                    ),
+                  ),
+                  Text(
+                    'المعرّف: ${g.deviceId}',
+                    style: TextStyle(fontSize: 10, color: Colors.grey.shade500),
+                  ),
                 ],
               ),
             ),
@@ -194,11 +224,13 @@ class _GuestsTabState extends State<GuestsTab> {
                     content: const Text('هل تريد حذف هذا السجل؟'),
                     actions: [
                       TextButton(
-                          onPressed: () => Navigator.pop(dlgCtx, false),
-                          child: const Text('إلغاء')),
+                        onPressed: () => Navigator.pop(dlgCtx, false),
+                        child: const Text('إلغاء'),
+                      ),
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.danger),
+                          backgroundColor: AppColors.danger,
+                        ),
                         onPressed: () => Navigator.pop(dlgCtx, true),
                         child: const Text('حذف'),
                       ),
@@ -231,12 +263,15 @@ class _GuestsTabState extends State<GuestsTab> {
             icon: const Icon(Icons.chevron_right),
             onPressed: _page > 1 ? () => setState(() => _page--) : null,
           ),
-          Text('صفحة $_page من $totalPages • $total زائر',
-              style: const TextStyle(fontSize: 12)),
+          Text(
+            'صفحة $_page من $totalPages • $total زائر',
+            style: const TextStyle(fontSize: 12),
+          ),
           IconButton(
             icon: const Icon(Icons.chevron_left),
-            onPressed:
-                _page < totalPages ? () => setState(() => _page++) : null,
+            onPressed: _page < totalPages
+                ? () => setState(() => _page++)
+                : null,
           ),
         ],
       ),

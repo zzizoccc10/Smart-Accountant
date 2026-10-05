@@ -6,14 +6,13 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 
 import 'data_registry.dart';
-import 'file_saver_io.dart' if (dart.library.html) 'file_saver_web.dart' as saver;
+import 'file_saver_io.dart'
+    if (dart.library.html) 'file_saver_web.dart'
+    as saver;
 
 /// تصدير كيان (حسب معرّفه في DataRegistry) إلى ملف Excel مع نافذة اختيار المكان.
 /// يعرض رسائل النجاح/الفشل عبر SnackBar.
-Future<void> exportEntityExcel(
-  BuildContext context,
-  String entityId,
-) async {
+Future<void> exportEntityExcel(BuildContext context, String entityId) async {
   final messenger = ScaffoldMessenger.of(context);
   final entity = DataRegistry.byId(entityId);
   if (entity == null) {
@@ -41,16 +40,10 @@ Future<void> exportEntityExcel(
       ),
     );
   } catch (e) {
-    messenger.showSnackBar(
-      SnackBar(content: Text('تعذّر التصدير: $e')),
-    );
+    messenger.showSnackBar(SnackBar(content: Text('تعذّر التصدير: $e')));
   }
 }
 
 String _stamp() {
-  return DateTime.now()
-      .toIso8601String()
-      .replaceAll(':', '-')
-      .split('.')
-      .first;
+  return DateTime.now().toIso8601String().replaceAll(':', '-').split('.').first;
 }

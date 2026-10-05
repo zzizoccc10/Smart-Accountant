@@ -50,8 +50,12 @@ class _StockTransferScreenState extends State<StockTransferScreen> {
                       isExpanded: true,
                       decoration: const InputDecoration(labelText: 'من مخزن'),
                       items: prov.warehouses
-                          .map((w) => DropdownMenuItem(
-                              value: w.id, child: Text(w.name)))
+                          .map(
+                            (w) => DropdownMenuItem(
+                              value: w.id,
+                              child: Text(w.name),
+                            ),
+                          )
                           .toList(),
                       onChanged: (v) => setState(() => _from = v ?? _from),
                     ),
@@ -66,8 +70,12 @@ class _StockTransferScreenState extends State<StockTransferScreen> {
                       isExpanded: true,
                       decoration: const InputDecoration(labelText: 'إلى مخزن'),
                       items: prov.warehouses
-                          .map((w) => DropdownMenuItem(
-                              value: w.id, child: Text(w.name)))
+                          .map(
+                            (w) => DropdownMenuItem(
+                              value: w.id,
+                              child: Text(w.name),
+                            ),
+                          )
                           .toList(),
                       onChanged: (v) => setState(() => _to = v ?? _to),
                     ),
@@ -91,8 +99,10 @@ class _StockTransferScreenState extends State<StockTransferScreen> {
               child: Padding(
                 padding: EdgeInsets.all(24),
                 child: Center(
-                  child: Text('لم تُضف أصناف بعد',
-                      style: TextStyle(color: Colors.grey)),
+                  child: Text(
+                    'لم تُضف أصناف بعد',
+                    style: TextStyle(color: Colors.grey),
+                  ),
                 ),
               ),
             )
@@ -103,10 +113,15 @@ class _StockTransferScreenState extends State<StockTransferScreen> {
                   for (int i = 0; i < _lines.length; i++)
                     ListTile(
                       title: Text(_lines[i]['name'] as String),
-                      subtitle: Text('الكمية: ${Fmt.num(_lines[i]['qty'] as double)}'),
+                      subtitle: Text(
+                        'الكمية: ${Fmt.num(_lines[i]['qty'] as double)}',
+                      ),
                       trailing: IconButton(
-                        icon: const Icon(Icons.close,
-                            color: AppColors.danger, size: 18),
+                        icon: const Icon(
+                          Icons.close,
+                          color: AppColors.danger,
+                          size: 18,
+                        ),
                         onPressed: () => setState(() => _lines.removeAt(i)),
                       ),
                     ),
@@ -140,9 +155,9 @@ class _StockTransferScreenState extends State<StockTransferScreen> {
   Future<void> _save() async {
     if (_lines.isEmpty) return;
     if (_from == _to) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('اختر مخزنين مختلفين')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('اختر مخزنين مختلفين')));
       return;
     }
     setState(() => _saving = true);
@@ -206,10 +221,7 @@ class _TransferLineDialogState extends State<_TransferLineDialog> {
             isExpanded: true,
             decoration: const InputDecoration(labelText: 'الصنف'),
             items: widget.items
-                .map((it) => DropdownMenuItem(
-                      value: it,
-                      child: Text(it.name),
-                    ))
+                .map((it) => DropdownMenuItem(value: it, child: Text(it.name)))
                 .toList(),
             onChanged: (v) => setState(() => _item = v),
           ),
@@ -230,10 +242,10 @@ class _TransferLineDialogState extends State<_TransferLineDialog> {
           onPressed: _item == null
               ? null
               : () => Navigator.pop(context, {
-                    'itemId': _item.id,
-                    'name': _item.name,
-                    'qty': double.tryParse(_qty.text) ?? 1,
-                  }),
+                  'itemId': _item.id,
+                  'name': _item.name,
+                  'qty': double.tryParse(_qty.text) ?? 1,
+                }),
           child: const Text('إضافة'),
         ),
       ],

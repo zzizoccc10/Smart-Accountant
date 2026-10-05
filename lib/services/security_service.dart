@@ -40,9 +40,7 @@ class SecurityService {
   /// توليد معرّف جهاز ثابت/عشوائي
   static String newDeviceId() {
     final data = List<int>.generate(12, (_) => _rnd.nextInt(256));
-    final part = data
-        .map((b) => b.toRadixString(16).padLeft(2, '0'))
-        .join();
+    final part = data.map((b) => b.toRadixString(16).padLeft(2, '0')).join();
     return 'dev_$part';
   }
 

@@ -14,10 +14,12 @@ import 'package:flutter/foundation.dart';
 class FirebaseConfig {
   // -------- Android (مُهيّأ من google-services.json) --------
   static const String androidApiKey = 'AIzaSyDAxvd7thR_bPN2mtehLwYEu7D_sYAkP8c';
-  static const String androidAppId = '1:462002399803:android:dfe82af1661b5a16974a1e';
+  static const String androidAppId =
+      '1:462002399803:android:dfe82af1661b5a16974a1e';
   static const String androidMessagingSenderId = '462002399803';
   static const String androidProjectId = 'easy-accountant-1acb8';
-  static const String androidStorageBucket = 'easy-accountant-1acb8.firebasestorage.app';
+  static const String androidStorageBucket =
+      'easy-accountant-1acb8.firebasestorage.app';
 
   // -------- Web (مُفعّل — نفس مشروع easy-accountant-1acb8) --------
   // ✅ تم اختبار Auth + Firestore على الويب بنجاح مع هذه القيم.
@@ -26,7 +28,8 @@ class FirebaseConfig {
   static const String webMessagingSenderId = '462002399803';
   static const String webProjectId = 'easy-accountant-1acb8';
   static const String webAuthDomain = 'easy-accountant-1acb8.firebaseapp.com';
-  static const String webStorageBucket = 'easy-accountant-1acb8.firebasestorage.app';
+  static const String webStorageBucket =
+      'easy-accountant-1acb8.firebasestorage.app';
 
   // -------- iOS (يُملأ بعد رفع GoogleService-Info.plist) --------
   static const String iosApiKey = '';

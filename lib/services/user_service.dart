@@ -134,10 +134,7 @@ class UserService {
     final u = byId(userId);
     if (u == null) return;
     final cred = SecurityService.createPassword(newPassword);
-    await update(u.copyWith(
-      passwordHash: cred.hash,
-      passwordSalt: cred.salt,
-    ));
+    await update(u.copyWith(passwordHash: cred.hash, passwordSalt: cred.salt));
   }
 
   /// عدد مستخدمي منشأة معيّنة
@@ -149,8 +146,11 @@ class UserService {
   /// مستخدمو منشأة معيّنة
   static List<AppUser> ofCompany(String companyId, {String? excludeId}) {
     return all()
-        .where((u) =>
-            u.companyId == companyId && (excludeId == null || u.id != excludeId))
+        .where(
+          (u) =>
+              u.companyId == companyId &&
+              (excludeId == null || u.id != excludeId),
+        )
         .toList();
   }
 
@@ -263,11 +263,12 @@ class UserService {
 
   static List<UserActivity> recentActivity({int limit = 100}) {
     try {
-      final list = _activity.values
-          .whereType<Map>()
-          .map((m) => UserActivity.fromMap(Map<String, dynamic>.from(m)))
-          .toList()
-        ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      final list =
+          _activity.values
+              .whereType<Map>()
+              .map((m) => UserActivity.fromMap(Map<String, dynamic>.from(m)))
+              .toList()
+            ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
       return list.take(limit).toList();
     } catch (_) {
       return [];
@@ -286,20 +287,17 @@ class UserService {
           .doc(AppDatabase.getSetting('companyId', 'default_company'))
           .collection('users')
           .doc(u.id)
-          .set(
-        {
-          'id': u.id,
-          'name': u.name,
-          'email': u.email,
-          'phone': u.phone,
-          'role': u.role.name,
-          'isActive': u.isActive,
-          'branchId': u.branchId,
-          'fcmToken': u.fcmToken,
-          'updatedAt': FieldValue.serverTimestamp(),
-        },
-        SetOptions(merge: true),
-      );
+          .set({
+            'id': u.id,
+            'name': u.name,
+            'email': u.email,
+            'phone': u.phone,
+            'role': u.role.name,
+            'isActive': u.isActive,
+            'branchId': u.branchId,
+            'fcmToken': u.fcmToken,
+            'updatedAt': FieldValue.serverTimestamp(),
+          }, SetOptions(merge: true));
       // علّم كمُزامَن
       await _users.put(u.id, u.copyWith(synced: true).toMap());
     } catch (e) {
@@ -334,7 +332,8 @@ class UserService {
   static void logStatus() {
     if (kDebugMode) {
       debugPrint(
-          '[UserService] cloud: $isCloudAvailable, users: ${_users.length}');
+        '[UserService] cloud: $isCloudAvailable, users: ${_users.length}',
+      );
     }
   }
 }

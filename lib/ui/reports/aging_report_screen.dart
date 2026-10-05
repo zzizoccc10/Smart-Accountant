@@ -60,8 +60,10 @@ class AgingReportScreen extends StatelessWidget {
     ];
     final keys = buckets.keys.toList();
 
-    final totalBalance =
-        customerRows.fold<double>(0.0, (s, r) => s + (r['balance'] as double));
+    final totalBalance = customerRows.fold<double>(
+      0.0,
+      (s, r) => s + (r['balance'] as double),
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -78,7 +80,7 @@ class AgingReportScreen extends StatelessWidget {
               '0-30',
               '31-60',
               '61-90',
-              '+90'
+              '+90',
             ],
             rows: [
               for (final r in customerRows)
@@ -91,18 +93,24 @@ class AgingReportScreen extends StatelessWidget {
                   '',
                   '',
                 ],
-              ['— إجمالي الأعمار —', '', '', for (final k in keys) Fmt.num(buckets[k]!)],
+              [
+                '— إجمالي الأعمار —',
+                '',
+                '',
+                for (final k in keys) Fmt.num(buckets[k]!),
+              ],
             ],
-            totals: [
-              'إجمالي الذمم: ${Fmt.money(totalBalance, curr)}',
-            ],
+            totals: ['إجمالي الذمم: ${Fmt.money(totalBalance, curr)}'],
           ),
         ],
       ),
       body: ListView(
         padding: const EdgeInsets.all(12),
         children: [
-          const SectionTitle('توزيع الذمم حسب العمر', icon: Icons.hourglass_bottom),
+          const SectionTitle(
+            'توزيع الذمم حسب العمر',
+            icon: Icons.hourglass_bottom,
+          ),
           Card(
             child: Padding(
               padding: const EdgeInsets.all(16),
@@ -123,12 +131,17 @@ class AgingReportScreen extends StatelessWidget {
                           ),
                           const SizedBox(width: 10),
                           Expanded(
-                              child: Text(keys[i],
-                                  style: const TextStyle(fontSize: 13))),
+                            child: Text(
+                              keys[i],
+                              style: const TextStyle(fontSize: 13),
+                            ),
+                          ),
                           Text(
                             Fmt.money(buckets[keys[i]]!, curr),
                             style: const TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 13),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13,
+                            ),
                           ),
                         ],
                       ),
@@ -141,7 +154,9 @@ class AgingReportScreen extends StatelessWidget {
           const SectionTitle('ذمم العملاء', icon: Icons.people),
           if (customerRows.isEmpty)
             const EmptyState(
-                message: 'لا توجد ذمم مدينة', icon: Icons.people_outline)
+              message: 'لا توجد ذمم مدينة',
+              icon: Icons.people_outline,
+            )
           else
             Card(
               child: Column(
@@ -150,14 +165,17 @@ class AgingReportScreen extends StatelessWidget {
                     ListTile(
                       dense: true,
                       leading: const Icon(Icons.person, color: AppColors.info),
-                      title: Text(r['name'] as String,
-                          style: const TextStyle(fontSize: 13)),
+                      title: Text(
+                        r['name'] as String,
+                        style: const TextStyle(fontSize: 13),
+                      ),
                       trailing: Text(
                         Fmt.money(r['balance'] as double, curr),
                         style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.danger,
-                            fontSize: 12),
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.danger,
+                          fontSize: 12,
+                        ),
                       ),
                     ),
                 ],

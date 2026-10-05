@@ -55,8 +55,11 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
     final users = UserService.ofCompany(c.id);
     final mainUser = users.where((u) => u.isOwner).toList();
     final subUsers = users.where((u) => !u.isOwner).toList()
-      ..sort((a, b) => OperationService.countOfUser(b.id)
-          .compareTo(OperationService.countOfUser(a.id)));
+      ..sort(
+        (a, b) => OperationService.countOfUser(
+          b.id,
+        ).compareTo(OperationService.countOfUser(a.id)),
+      );
 
     final ops = StatsService.opsOfCompany(c.id);
     final devices = ControlService.devicesOfCompany(c.id);
@@ -89,9 +92,11 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
               children: [
                 SwitchListTile(
                   title: const Text('المنشأة مُفعّلة'),
-                  subtitle: Text(c.isActive
-                      ? 'يمكن للمستخدمين الدخول'
-                      : 'الدخول موقوف مؤقتاً'),
+                  subtitle: Text(
+                    c.isActive
+                        ? 'يمكن للمستخدمين الدخول'
+                        : 'الدخول موقوف مؤقتاً',
+                  ),
                   value: c.isActive,
                   activeThumbColor: AppColors.success,
                   onChanged: (v) async {
@@ -101,17 +106,21 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
                 ),
                 const Divider(height: 1),
                 ListTile(
-                  leading: const Icon(Icons.verified_user,
-                      color: AppColors.primary),
+                  leading: const Icon(
+                    Icons.verified_user,
+                    color: AppColors.primary,
+                  ),
                   title: const Text('الفئة/الخطة'),
                   trailing: DropdownButton<CompanyPlan>(
                     value: c.plan,
                     underline: const SizedBox.shrink(),
                     items: CompanyPlan.values
-                        .map((p) => DropdownMenuItem(
-                              value: p,
-                              child: Text(p.labelAr),
-                            ))
+                        .map(
+                          (p) => DropdownMenuItem(
+                            value: p,
+                            child: Text(p.labelAr),
+                          ),
+                        )
                         .toList(),
                     onChanged: (p) async {
                       if (p == null) return;
@@ -162,42 +171,56 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
               padding: const EdgeInsets.all(14),
               child: Column(
                 children: [
-                  KvRow('اسم المنشأة', c.companyName,
-                      icon: Icons.business),
-                  KvRow('صاحب المنشأة', c.ownerName,
-                      icon: Icons.person),
-                  KvRow('اسم المستخدم', '@${c.username}',
-                      icon: Icons.account_circle_outlined),
+                  KvRow('اسم المنشأة', c.companyName, icon: Icons.business),
+                  KvRow('صاحب المنشأة', c.ownerName, icon: Icons.person),
+                  KvRow(
+                    'اسم المستخدم',
+                    '@${c.username}',
+                    icon: Icons.account_circle_outlined,
+                  ),
                   KvRow('البريد', c.email, icon: Icons.email_outlined),
                   KvRow('الهاتف', c.phone, icon: Icons.phone_outlined),
-                  KvRow('أُنشئ في', fmtDate(c.createdAt),
-                      icon: Icons.event),
-                  KvRow('آخر دخول',
-                      c.lastLoginAt.isEmpty
-                          ? 'لم يدخل بعد'
-                          : fmtDate(c.lastLoginAt),
-                      icon: Icons.schedule),
-                  KvRow('طريقة الإنشاء', _viaLabel(c.createdVia),
-                      icon: Icons.input),
-                  KvRow('نوع الهاتف',
-                      device == null
-                          ? 'غير مسجّل'
-                          : (device.deviceLabel.isEmpty
+                  KvRow('أُنشئ في', fmtDate(c.createdAt), icon: Icons.event),
+                  KvRow(
+                    'آخر دخول',
+                    c.lastLoginAt.isEmpty
+                        ? 'لم يدخل بعد'
+                        : fmtDate(c.lastLoginAt),
+                    icon: Icons.schedule,
+                  ),
+                  KvRow(
+                    'طريقة الإنشاء',
+                    _viaLabel(c.createdVia),
+                    icon: Icons.input,
+                  ),
+                  KvRow(
+                    'نوع الهاتف',
+                    device == null
+                        ? 'غير مسجّل'
+                        : (device.deviceLabel.isEmpty
                               ? platformLabel(device.platform)
                               : device.deviceLabel),
-                      icon: device == null
-                          ? Icons.smartphone
-                          : platformIcon(device.platform)),
-                  KvRow('نظام الجهاز', device?.osVersion ?? '',
-                      icon: Icons.memory),
-                  KvRow('الدولة',
-                      device == null || device.country.isEmpty
-                          ? 'غير معروف'
-                          : device.country,
-                      icon: Icons.public),
-                  KvRow('معرّف الجهاز',
-                      c.deviceId.isEmpty ? '—' : c.deviceId,
-                      icon: Icons.fingerprint),
+                    icon: device == null
+                        ? Icons.smartphone
+                        : platformIcon(device.platform),
+                  ),
+                  KvRow(
+                    'نظام الجهاز',
+                    device?.osVersion ?? '',
+                    icon: Icons.memory,
+                  ),
+                  KvRow(
+                    'الدولة',
+                    device == null || device.country.isEmpty
+                        ? 'غير معروف'
+                        : device.country,
+                    icon: Icons.public,
+                  ),
+                  KvRow(
+                    'معرّف الجهاز',
+                    c.deviceId.isEmpty ? '—' : c.deviceId,
+                    icon: Icons.fingerprint,
+                  ),
                 ],
               ),
             ),
@@ -273,8 +296,7 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
             child: Column(
               children: [
                 ListTile(
-                  leading: const Icon(Icons.password,
-                      color: AppColors.warning),
+                  leading: const Icon(Icons.password, color: AppColors.warning),
                   title: const Text('إعادة تعيين كلمة مرور المنشأة'),
                   trailing: const Icon(Icons.chevron_left),
                   onTap: _resetPasswordDialog,
@@ -292,17 +314,23 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
           const SizedBox(height: 16),
 
           // ------- المستخدم الرئيسي -------
-          SectionTitle('المستخدم الرئيسي', Icons.star,
-              trailing: BadgeChip('${mainUser.length}', AppColors.purple)),
+          SectionTitle(
+            'المستخدم الرئيسي',
+            Icons.star,
+            trailing: BadgeChip('${mainUser.length}', AppColors.purple),
+          ),
           if (mainUser.isEmpty)
             Card(
               child: ListTile(
                 leading: const Icon(Icons.info_outline),
-                title: const Text('لا يوجد مستخدم رئيسي مسجّل محلياً',
-                    style: TextStyle(fontSize: 13)),
+                title: const Text(
+                  'لا يوجد مستخدم رئيسي مسجّل محلياً',
+                  style: TextStyle(fontSize: 13),
+                ),
                 subtitle: Text(
-                    'اسم المستخدم: @${c.username}', 
-                    style: const TextStyle(fontSize: 11)),
+                  'اسم المستخدم: @${c.username}',
+                  style: const TextStyle(fontSize: 11),
+                ),
               ),
             )
           else
@@ -311,16 +339,22 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
           const SizedBox(height: 16),
 
           // ------- المستخدمون الفرعيون -------
-          SectionTitle('المستخدمون الفرعيون (${subUsers.length})',
-              Icons.people_outline),
+          SectionTitle(
+            'المستخدمون الفرعيون (${subUsers.length})',
+            Icons.people_outline,
+          ),
           if (subUsers.isEmpty)
             const Card(
               child: ListTile(
                 leading: Icon(Icons.info_outline),
-                title: Text('لا يوجد مستخدمون فرعيون',
-                    style: TextStyle(fontSize: 13)),
-                subtitle: Text('يُضافون من داخل الحساب الرئيسي للمنشأة',
-                    style: TextStyle(fontSize: 11)),
+                title: Text(
+                  'لا يوجد مستخدمون فرعيون',
+                  style: TextStyle(fontSize: 13),
+                ),
+                subtitle: Text(
+                  'يُضافون من داخل الحساب الرئيسي للمنشأة',
+                  style: TextStyle(fontSize: 11),
+                ),
               ),
             )
           else
@@ -363,10 +397,13 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
                     backgroundColor: u.isActive
                         ? (isMain ? AppColors.purple : AppColors.teal)
                         : Colors.grey.shade400,
-                    child: Text(u.initials,
-                        style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold)),
+                    child: Text(
+                      u.initials,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
@@ -376,16 +413,22 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
                         Row(
                           children: [
                             Expanded(
-                              child: Text(u.name,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                      fontSize: 13.5,
-                                      fontWeight: FontWeight.bold)),
+                              child: Text(
+                                u.name,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontSize: 13.5,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                             ),
                             if (isMain)
-                              const BadgeChip('رئيسي', AppColors.purple,
-                                  icon: Icons.star),
+                              const BadgeChip(
+                                'رئيسي',
+                                AppColors.purple,
+                                icon: Icons.star,
+                              ),
                           ],
                         ),
                         const SizedBox(height: 2),
@@ -395,7 +438,9 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                              fontSize: 11, color: Colors.grey.shade600),
+                            fontSize: 11,
+                            color: Colors.grey.shade600,
+                          ),
                         ),
                       ],
                     ),
@@ -410,11 +455,14 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
                       if (mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text(v
-                                ? 'تم تفعيل «${u.name}»'
-                                : 'تم إيقاف «${u.name}»'),
-                            backgroundColor:
-                                v ? AppColors.success : AppColors.warning,
+                            content: Text(
+                              v
+                                  ? 'تم تفعيل «${u.name}»'
+                                  : 'تم إيقاف «${u.name}»',
+                            ),
+                            backgroundColor: v
+                                ? AppColors.success
+                                : AppColors.warning,
                           ),
                         );
                       }
@@ -427,22 +475,30 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
                 spacing: 6,
                 runSpacing: 6,
                 children: [
-                  BadgeChip('$ops عملية', AppColors.indigo,
-                      icon: Icons.sync_alt),
-                  BadgeChip('$granted/${Perm.all.length} صلاحية',
-                      AppColors.info, icon: Icons.tune),
+                  BadgeChip(
+                    '$ops عملية',
+                    AppColors.indigo,
+                    icon: Icons.sync_alt,
+                  ),
+                  BadgeChip(
+                    '$granted/${Perm.all.length} صلاحية',
+                    AppColors.info,
+                    icon: Icons.tune,
+                  ),
                   if (device != null)
                     BadgeChip(
-                        device.deviceLabel.isEmpty
-                            ? platformLabel(device.platform)
-                            : device.deviceLabel,
-                        AppColors.purple,
-                        icon: platformIcon(device.platform)),
+                      device.deviceLabel.isEmpty
+                          ? platformLabel(device.platform)
+                          : device.deviceLabel,
+                      AppColors.purple,
+                      icon: platformIcon(device.platform),
+                    ),
                   if (device != null)
                     BadgeChip(
-                        device.country.isEmpty ? 'غير معروف' : device.country,
-                        AppColors.teal,
-                        icon: Icons.public),
+                      device.country.isEmpty ? 'غير معروف' : device.country,
+                      AppColors.teal,
+                      icon: Icons.public,
+                    ),
                 ],
               ),
               const SizedBox(height: 4),
@@ -451,11 +507,18 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text('اضغط لإدارة الصلاحيات',
-                        style: TextStyle(
-                            fontSize: 10.5, color: Colors.grey.shade600)),
-                    const Icon(Icons.chevron_left,
-                        size: 16, color: AppColors.primary),
+                    Text(
+                      'اضغط لإدارة الصلاحيات',
+                      style: TextStyle(
+                        fontSize: 10.5,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                    const Icon(
+                      Icons.chevron_left,
+                      size: 16,
+                      color: AppColors.primary,
+                    ),
                   ],
                 ),
               ),
@@ -498,8 +561,9 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
         ),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(dlgCtx, false),
-              child: const Text('إلغاء')),
+            onPressed: () => Navigator.pop(dlgCtx, false),
+            child: const Text('إلغاء'),
+          ),
           ElevatedButton(
             onPressed: () {
               if (ctrl.text.length < 6) return;
@@ -540,40 +604,47 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
-                  controller: name,
-                  decoration:
-                      const InputDecoration(labelText: 'اسم المنشأة')),
+                controller: name,
+                decoration: const InputDecoration(labelText: 'اسم المنشأة'),
+              ),
               TextField(
-                  controller: owner,
-                  decoration:
-                      const InputDecoration(labelText: 'صاحب المنشأة')),
+                controller: owner,
+                decoration: const InputDecoration(labelText: 'صاحب المنشأة'),
+              ),
               TextField(
-                  controller: phone,
-                  decoration: const InputDecoration(labelText: 'الهاتف')),
+                controller: phone,
+                decoration: const InputDecoration(labelText: 'الهاتف'),
+              ),
               TextField(
-                  controller: email,
-                  decoration: const InputDecoration(
-                      labelText: 'البريد الإلكتروني')),
+                controller: email,
+                decoration: const InputDecoration(
+                  labelText: 'البريد الإلكتروني',
+                ),
+              ),
             ],
           ),
         ),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(dlgCtx, false),
-              child: const Text('إلغاء')),
+            onPressed: () => Navigator.pop(dlgCtx, false),
+            child: const Text('إلغاء'),
+          ),
           ElevatedButton(
-              onPressed: () => Navigator.pop(dlgCtx, true),
-              child: const Text('حفظ')),
+            onPressed: () => Navigator.pop(dlgCtx, true),
+            child: const Text('حفظ'),
+          ),
         ],
       ),
     );
     if (ok == true) {
-      await ControlService.updateCompany(c.copyWith(
-        companyName: name.text.trim(),
-        ownerName: owner.text.trim(),
-        phone: phone.text.trim(),
-        email: email.text.trim(),
-      ));
+      await ControlService.updateCompany(
+        c.copyWith(
+          companyName: name.text.trim(),
+          ownerName: owner.text.trim(),
+          phone: phone.text.trim(),
+          email: email.text.trim(),
+        ),
+      );
       _reload();
     }
   }
@@ -584,15 +655,17 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
       context: context,
       builder: (dlgCtx) => AlertDialog(
         title: const Text('حذف المنشأة'),
-        content: Text('هل تريد حذف «${c.companyName}» نهائياً؟ '
-            'لا يمكن التراجع عن هذا الإجراء.'),
+        content: Text(
+          'هل تريد حذف «${c.companyName}» نهائياً؟ '
+          'لا يمكن التراجع عن هذا الإجراء.',
+        ),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(dlgCtx, false),
-              child: const Text('إلغاء')),
+            onPressed: () => Navigator.pop(dlgCtx, false),
+            child: const Text('إلغاء'),
+          ),
           ElevatedButton(
-            style:
-                ElevatedButton.styleFrom(backgroundColor: AppColors.danger),
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.danger),
             onPressed: () => Navigator.pop(dlgCtx, true),
             child: const Text('حذف'),
           ),

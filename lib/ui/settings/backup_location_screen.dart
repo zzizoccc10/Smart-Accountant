@@ -40,8 +40,12 @@ class _BackupLocationScreenState extends State<BackupLocationScreen> {
     super.dispose();
   }
 
-  bool get _isWeb => !(Platform.isAndroid || Platform.isIOS || Platform.isLinux ||
-      Platform.isMacOS || Platform.isWindows);
+  bool get _isWeb =>
+      !(Platform.isAndroid ||
+          Platform.isIOS ||
+          Platform.isLinux ||
+          Platform.isMacOS ||
+          Platform.isWindows);
 
   Future<void> _browse() async {
     final dir = await BackupService.pickFolder();
@@ -86,7 +90,11 @@ class _BackupLocationScreenState extends State<BackupLocationScreen> {
     final hasExisting = BackupService.hasFolder;
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.firstTime ? 'مكان حفظ النسخة الاحتياطية' : 'مكان النسخة الاحتياطية'),
+        title: Text(
+          widget.firstTime
+              ? 'مكان حفظ النسخة الاحتياطية'
+              : 'مكان النسخة الاحتياطية',
+        ),
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
@@ -158,14 +166,19 @@ class _BackupLocationScreenState extends State<BackupLocationScreen> {
                     const SizedBox(height: 12),
                     Row(
                       children: [
-                        const Icon(Icons.check_circle,
-                            color: AppColors.success, size: 18),
+                        const Icon(
+                          Icons.check_circle,
+                          color: AppColors.success,
+                          size: 18,
+                        ),
                         const SizedBox(width: 6),
                         Expanded(
                           child: Text(
                             'المكان الحالي: ${_selected!}',
                             style: const TextStyle(
-                                fontSize: 12, color: AppColors.success),
+                              fontSize: 12,
+                              color: AppColors.success,
+                            ),
                           ),
                         ),
                       ],
@@ -183,7 +196,10 @@ class _BackupLocationScreenState extends State<BackupLocationScreen> {
                     width: 18,
                     height: 18,
                     child: CircularProgressIndicator(
-                        strokeWidth: 2, color: Colors.white))
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
+                  )
                 : const Icon(Icons.save),
             label: Text(_saving ? 'جارٍ الحفظ...' : 'حفظ المكان'),
           ),
@@ -196,8 +212,10 @@ class _BackupLocationScreenState extends State<BackupLocationScreen> {
                 nav.pop(false);
               },
               icon: const Icon(Icons.delete_outline, color: AppColors.danger),
-              label: const Text('مسح المكان المحدد',
-                  style: TextStyle(color: AppColors.danger)),
+              label: const Text(
+                'مسح المكان المحدد',
+                style: TextStyle(color: AppColors.danger),
+              ),
             ),
           ],
         ],

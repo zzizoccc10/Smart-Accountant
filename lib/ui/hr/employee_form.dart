@@ -41,11 +41,14 @@ class _EmployeeFormState extends State<EmployeeForm> {
     _email = TextEditingController(text: e?.email ?? '');
     _nationalId = TextEditingController(text: e?.nationalId ?? '');
     _basic = TextEditingController(
-        text: (e?.basicSalary ?? 0) == 0 ? '' : e!.basicSalary.toString());
+      text: (e?.basicSalary ?? 0) == 0 ? '' : e!.basicSalary.toString(),
+    );
     _allowances = TextEditingController(
-        text: (e?.allowances ?? 0) == 0 ? '' : e!.allowances.toString());
+      text: (e?.allowances ?? 0) == 0 ? '' : e!.allowances.toString(),
+    );
     _deductions = TextEditingController(
-        text: (e?.deductions ?? 0) == 0 ? '' : e!.deductions.toString());
+      text: (e?.deductions ?? 0) == 0 ? '' : e!.deductions.toString(),
+    );
     _active = e?.isActive ?? true;
   }
 
@@ -141,7 +144,9 @@ class _EmployeeFormState extends State<EmployeeForm> {
                 Expanded(
                   child: TextFormField(
                     controller: _job,
-                    decoration: const InputDecoration(labelText: 'المسمى الوظيفي'),
+                    decoration: const InputDecoration(
+                      labelText: 'المسمى الوظيفي',
+                    ),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -179,8 +184,10 @@ class _EmployeeFormState extends State<EmployeeForm> {
               ],
             ),
             const SizedBox(height: 16),
-            const Text('الراتب',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+            const Text(
+              'الراتب',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+            ),
             const SizedBox(height: 8),
             TextFormField(
               controller: _basic,
@@ -205,7 +212,9 @@ class _EmployeeFormState extends State<EmployeeForm> {
                   child: TextFormField(
                     controller: _deductions,
                     keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(labelText: 'الخصومات الثابتة'),
+                    decoration: const InputDecoration(
+                      labelText: 'الخصومات الثابتة',
+                    ),
                   ),
                 ),
               ],

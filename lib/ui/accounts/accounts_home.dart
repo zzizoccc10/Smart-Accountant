@@ -23,22 +23,54 @@ class AccountsHome extends StatelessWidget {
     final curr = prov.currency;
 
     final menu = [
-      _MenuItem(Icons.account_tree, 'دليل الحسابات', AppColors.primary,
-          () => const CoaScreen()),
-      _MenuItem(Icons.people, 'العملاء والموردون', AppColors.info,
-          () => const ContactsScreen()),
-      _MenuItem(Icons.account_balance_wallet, 'الصناديق', AppColors.success,
-          () => const CashboxesScreen()),
-      _MenuItem(Icons.receipt, 'سند قبض', AppColors.teal,
-          () => const VoucherForm(type: 'receipt')),
-      _MenuItem(Icons.payments, 'سند صرف', AppColors.warning,
-          () => const VoucherForm(type: 'payment')),
-      _MenuItem(Icons.receipt_long, 'سجل السندات', AppColors.indigo,
-          () => const VouchersScreen()),
-      _MenuItem(Icons.money_off, 'المصروفات', AppColors.danger,
-          () => const ExpensesScreen()),
-      _MenuItem(Icons.book, 'قيود اليومية', AppColors.purple,
-          () => const JournalEntriesScreen()),
+      _MenuItem(
+        Icons.account_tree,
+        'دليل الحسابات',
+        AppColors.primary,
+        () => const CoaScreen(),
+      ),
+      _MenuItem(
+        Icons.people,
+        'العملاء والموردون',
+        AppColors.info,
+        () => const ContactsScreen(),
+      ),
+      _MenuItem(
+        Icons.account_balance_wallet,
+        'الصناديق',
+        AppColors.success,
+        () => const CashboxesScreen(),
+      ),
+      _MenuItem(
+        Icons.receipt,
+        'سند قبض',
+        AppColors.teal,
+        () => const VoucherForm(type: 'receipt'),
+      ),
+      _MenuItem(
+        Icons.payments,
+        'سند صرف',
+        AppColors.warning,
+        () => const VoucherForm(type: 'payment'),
+      ),
+      _MenuItem(
+        Icons.receipt_long,
+        'سجل السندات',
+        AppColors.indigo,
+        () => const VouchersScreen(),
+      ),
+      _MenuItem(
+        Icons.money_off,
+        'المصروفات',
+        AppColors.danger,
+        () => const ExpensesScreen(),
+      ),
+      _MenuItem(
+        Icons.book,
+        'قيود اليومية',
+        AppColors.purple,
+        () => const JournalEntriesScreen(),
+      ),
     ];
 
     return RefreshIndicator(
@@ -98,9 +130,7 @@ class AccountsHome extends StatelessWidget {
             mainAxisSpacing: 12,
             crossAxisSpacing: 12,
             childAspectRatio: 1.9,
-            children: menu
-                .map((m) => _menuCard(context, m))
-                .toList(),
+            children: menu.map((m) => _menuCard(context, m)).toList(),
           ),
           const SizedBox(height: 20),
           // آخر القيود
@@ -110,8 +140,7 @@ class AccountsHome extends StatelessWidget {
             trailing: TextButton(
               onPressed: () => Navigator.push(
                 context,
-                MaterialPageRoute(
-                    builder: (_) => const JournalEntriesScreen()),
+                MaterialPageRoute(builder: (_) => const JournalEntriesScreen()),
               ),
               child: const Text('عرض الكل'),
             ),
@@ -122,20 +151,28 @@ class AccountsHome extends StatelessWidget {
               icon: Icons.book_outlined,
             )
           else
-            ...prov.journals.reversed.take(5).map(
+            ...prov.journals.reversed
+                .take(5)
+                .map(
                   (j) => Card(
                     margin: const EdgeInsets.only(bottom: 8),
                     child: ListTile(
                       dense: true,
                       leading: const Icon(Icons.book, color: AppColors.purple),
-                      title: Text(j.description,
-                          style: const TextStyle(fontSize: 13)),
-                      subtitle: Text('${j.entryNumber} • ${j.date}',
-                          style: const TextStyle(fontSize: 11)),
+                      title: Text(
+                        j.description,
+                        style: const TextStyle(fontSize: 13),
+                      ),
+                      subtitle: Text(
+                        '${j.entryNumber} • ${j.date}',
+                        style: const TextStyle(fontSize: 11),
+                      ),
                       trailing: Text(
                         Fmt.money(j.totalDebit, curr),
                         style: const TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 12),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
                       ),
                     ),
                   ),
@@ -171,7 +208,9 @@ class AccountsHome extends StatelessWidget {
                 child: Text(
                   m.title,
                   style: const TextStyle(
-                      fontSize: 13, fontWeight: FontWeight.bold),
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ],

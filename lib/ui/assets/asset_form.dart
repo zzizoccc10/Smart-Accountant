@@ -57,15 +57,17 @@ class _AssetFormState extends State<AssetForm> {
     _name = TextEditingController(text: a?.name ?? '');
     _code = TextEditingController(text: a?.code ?? '');
     _cost = TextEditingController(
-        text: (a?.cost ?? 0) == 0 ? '' : a!.cost.toString());
+      text: (a?.cost ?? 0) == 0 ? '' : a!.cost.toString(),
+    );
     _salvage = TextEditingController(
-        text: (a?.salvageValue ?? 0) == 0 ? '' : a!.salvageValue.toString());
+      text: (a?.salvageValue ?? 0) == 0 ? '' : a!.salvageValue.toString(),
+    );
     _life = TextEditingController(text: (a?.usefulLifeYears ?? 5).toString());
     _notes = TextEditingController(text: a?.notes ?? '');
     _category = a?.category ?? 'أجهزة كمبيوتر';
     _accountCode = a?.assetAccountCode ?? _catAccount[_category]!;
-    _purchaseDate = a?.purchaseDate ??
-        DateTime.now().toIso8601String().substring(0, 10);
+    _purchaseDate =
+        a?.purchaseDate ?? DateTime.now().toIso8601String().substring(0, 10);
   }
 
   @override
@@ -88,8 +90,7 @@ class _AssetFormState extends State<AssetForm> {
       lastDate: DateTime(now.year + 5),
     );
     if (picked != null) {
-      setState(() =>
-          _purchaseDate = picked.toIso8601String().substring(0, 10));
+      setState(() => _purchaseDate = picked.toIso8601String().substring(0, 10));
     }
   }
 
@@ -206,7 +207,9 @@ class _AssetFormState extends State<AssetForm> {
             TextFormField(
               controller: _code,
               decoration: const InputDecoration(
-                  labelText: 'الكود', hintText: 'مثال: FA-001'),
+                labelText: 'الكود',
+                hintText: 'مثال: FA-001',
+              ),
             ),
             const SizedBox(height: 12),
             DropdownButtonFormField<String>(
@@ -256,8 +259,9 @@ class _AssetFormState extends State<AssetForm> {
                     controller: _salvage,
                     keyboardType: TextInputType.number,
                     onChanged: (_) => setState(() {}),
-                    decoration:
-                        const InputDecoration(labelText: 'القيمة التخريدية'),
+                    decoration: const InputDecoration(
+                      labelText: 'القيمة التخريدية',
+                    ),
                   ),
                 ),
               ],
@@ -267,7 +271,8 @@ class _AssetFormState extends State<AssetForm> {
               controller: _life,
               keyboardType: TextInputType.number,
               decoration: const InputDecoration(
-                  labelText: 'العمر الإنتاجي (سنوات)'),
+                labelText: 'العمر الإنتاجي (سنوات)',
+              ),
               validator: (v) {
                 final d = int.tryParse(v ?? '');
                 if (d == null || d <= 0) return 'أدخل رقماً موجباً';
@@ -295,20 +300,26 @@ class _AssetFormState extends State<AssetForm> {
                     Text(
                       'القسط الشهري: ${Fmt.money(_previewMonthly(), curr)}',
                       style: const TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 13),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
+                      ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       'القسط السنوي: ${Fmt.money(_previewAnnual(), curr)}',
                       style: TextStyle(
-                          fontSize: 12, color: Colors.grey.shade700),
+                        fontSize: 12,
+                        color: Colors.grey.shade700,
+                      ),
                     ),
                     if (!isNew) ...[
                       const SizedBox(height: 4),
                       Text(
                         'مجمع الإهلاك الحالي: ${Fmt.money(widget.asset!.accumulatedDepreciation, curr)}',
                         style: TextStyle(
-                            fontSize: 12, color: Colors.grey.shade700),
+                          fontSize: 12,
+                          color: Colors.grey.shade700,
+                        ),
                       ),
                       Text(
                         'القيمة الدفترية: ${Fmt.money(widget.asset!.bookValue, curr)}',

@@ -4,8 +4,7 @@
 // ============================================================================
 import 'dart:typed_data';
 
-import 'download_io.dart'
-    if (dart.library.html) 'download_web.dart' as dl;
+import 'download_io.dart' if (dart.library.html) 'download_web.dart' as dl;
 import 'print_service.dart';
 
 class ExportService {
@@ -32,29 +31,37 @@ class ExportService {
   }
 
   static Future<void> _deliver(
-      Uint8List bytes, String filename, String mime) async {
+    Uint8List bytes,
+    String filename,
+    String mime,
+  ) async {
     await dl.downloadBytesImpl(bytes, filename, mime);
   }
 
   /// بناء ملف Excel بصيغة SpreadsheetML 2003 (لا يحتاج مكتبة خارجية)
   static String _buildSpreadsheetMl(
-      List<String> headers, List<List<String>> rows) {
+    List<String> headers,
+    List<List<String>> rows,
+  ) {
     final sb = StringBuffer();
     sb.writeln('<?xml version="1.0" encoding="UTF-8"?>');
     sb.writeln('<?mso-application progid="Excel.Sheet"?>');
     sb.writeln(
-        '<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"');
+      '<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"',
+    );
     sb.writeln(' xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">');
     sb.writeln('<Styles>');
     sb.writeln(
-        '<Style ss:ID="hdr"><Font ss:Bold="1"/><Interior ss:Color="#DDEEFF" ss:Pattern="Solid"/></Style>');
+      '<Style ss:ID="hdr"><Font ss:Bold="1"/><Interior ss:Color="#DDEEFF" ss:Pattern="Solid"/></Style>',
+    );
     sb.writeln('</Styles>');
     sb.writeln('<Worksheet ss:Name="Report"><Table>');
 
     sb.writeln('<Row>');
     for (final h in headers) {
       sb.writeln(
-          '<Cell ss:StyleID="hdr"><Data ss:Type="String">${_x(h)}</Data></Cell>');
+        '<Cell ss:StyleID="hdr"><Data ss:Type="String">${_x(h)}</Data></Cell>',
+      );
     }
     sb.writeln('</Row>');
 

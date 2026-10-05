@@ -33,13 +33,17 @@ class _ItemFormState extends State<ItemForm> {
     _name = TextEditingController(text: i?.name ?? '');
     _barcode = TextEditingController(text: i?.barcode ?? '');
     _purchase = TextEditingController(
-        text: (i?.purchasePrice ?? 0) == 0 ? '' : i!.purchasePrice.toString());
+      text: (i?.purchasePrice ?? 0) == 0 ? '' : i!.purchasePrice.toString(),
+    );
     _sale = TextEditingController(
-        text: (i?.salePrice ?? 0) == 0 ? '' : i!.salePrice.toString());
+      text: (i?.salePrice ?? 0) == 0 ? '' : i!.salePrice.toString(),
+    );
     _reorder = TextEditingController(
-        text: (i?.reorderLevel ?? 0) == 0 ? '' : i!.reorderLevel.toString());
+      text: (i?.reorderLevel ?? 0) == 0 ? '' : i!.reorderLevel.toString(),
+    );
     _openingQty = TextEditingController(
-        text: (i?.openingQty ?? 0) == 0 ? '' : i!.openingQty.toString());
+      text: (i?.openingQty ?? 0) == 0 ? '' : i!.openingQty.toString(),
+    );
     _categoryId = i?.categoryId;
     _costMethod = i?.costMethod ?? 'Average';
   }
@@ -79,23 +83,27 @@ class _ItemFormState extends State<ItemForm> {
         final whId = prov.warehouses.isNotEmpty
             ? prov.warehouses.first.id
             : 'wh_main';
-        await AppDatabase.saveBalance(InventoryBalance(
-          itemId: item.id,
-          warehouseId: whId,
-          quantity: qty,
-          avgCost: item.purchasePrice,
-        ));
-        await AppDatabase.saveMovement(InventoryMovement(
-          id: AppDatabase.newId(),
-          itemId: item.id,
-          itemName: item.name,
-          warehouseId: whId,
-          date: DateTime.now().toIso8601String().split('T')[0],
-          movementType: 'opening',
-          quantityIn: qty,
-          unitCost: item.purchasePrice,
-          balanceAfter: qty,
-        ));
+        await AppDatabase.saveBalance(
+          InventoryBalance(
+            itemId: item.id,
+            warehouseId: whId,
+            quantity: qty,
+            avgCost: item.purchasePrice,
+          ),
+        );
+        await AppDatabase.saveMovement(
+          InventoryMovement(
+            id: AppDatabase.newId(),
+            itemId: item.id,
+            itemName: item.name,
+            warehouseId: whId,
+            date: DateTime.now().toIso8601String().split('T')[0],
+            movementType: 'opening',
+            quantityIn: qty,
+            unitCost: item.purchasePrice,
+            balanceAfter: qty,
+          ),
+        );
       }
       prov.reload();
     } else {
@@ -108,7 +116,9 @@ class _ItemFormState extends State<ItemForm> {
   Widget build(BuildContext context) {
     final prov = context.watch<ERPProvider>();
     return Scaffold(
-      appBar: AppBar(title: Text(widget.item == null ? 'صنف جديد' : 'تعديل صنف')),
+      appBar: AppBar(
+        title: Text(widget.item == null ? 'صنف جديد' : 'تعديل صنف'),
+      ),
       body: Form(
         key: _formKey,
         child: ListView(
@@ -141,8 +151,9 @@ class _ItemFormState extends State<ItemForm> {
               ),
               items: [
                 const DropdownMenuItem(value: null, child: Text('بدون تصنيف')),
-                ...prov.categories
-                    .map((c) => DropdownMenuItem(value: c.id, child: Text(c.name))),
+                ...prov.categories.map(
+                  (c) => DropdownMenuItem(value: c.id, child: Text(c.name)),
+                ),
               ],
               onChanged: (v) => setState(() => _categoryId = v),
             ),
@@ -197,9 +208,18 @@ class _ItemFormState extends State<ItemForm> {
                 prefixIcon: Icon(Icons.calculate),
               ),
               items: const [
-                DropdownMenuItem(value: 'Average', child: Text('المتوسط المرجّح')),
-                DropdownMenuItem(value: 'FIFO', child: Text('الوارد أولاً صادر أولاً (FIFO)')),
-                DropdownMenuItem(value: 'LIFO', child: Text('الوارد أخيراً صادر أولاً (LIFO)')),
+                DropdownMenuItem(
+                  value: 'Average',
+                  child: Text('المتوسط المرجّح'),
+                ),
+                DropdownMenuItem(
+                  value: 'FIFO',
+                  child: Text('الوارد أولاً صادر أولاً (FIFO)'),
+                ),
+                DropdownMenuItem(
+                  value: 'LIFO',
+                  child: Text('الوارد أخيراً صادر أولاً (LIFO)'),
+                ),
               ],
               onChanged: (v) => setState(() => _costMethod = v ?? 'Average'),
             ),

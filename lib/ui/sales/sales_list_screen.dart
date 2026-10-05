@@ -40,10 +40,12 @@ class _SalesListScreenState extends State<SalesListScreen> {
     final type = _tabs[_tab][1];
     final list = prov.invoices
         .where((i) => i.invoiceType == type)
-        .where((i) =>
-            _search.isEmpty ||
-            i.contactName.contains(_search) ||
-            i.invoiceNumber.contains(_search))
+        .where(
+          (i) =>
+              _search.isEmpty ||
+              i.contactName.contains(_search) ||
+              i.invoiceNumber.contains(_search),
+        )
         .toList()
         .reversed
         .toList();
@@ -98,11 +100,16 @@ class _SalesListScreenState extends State<SalesListScreen> {
                           ),
                           leading: const CircleAvatar(
                             backgroundColor: Color(0x1A1565C0),
-                            child: Icon(Icons.receipt, color: AppColors.primary),
+                            child: Icon(
+                              Icons.receipt,
+                              color: AppColors.primary,
+                            ),
                           ),
-                          title: Text(inv.contactName.isEmpty
-                              ? 'عميل نقدي'
-                              : inv.contactName),
+                          title: Text(
+                            inv.contactName.isEmpty
+                                ? 'عميل نقدي'
+                                : inv.contactName,
+                          ),
                           subtitle: Text('${inv.invoiceNumber} • ${inv.date}'),
                           trailing: Text(
                             Fmt.money(inv.total, prov.currency),

@@ -70,6 +70,38 @@ class AppDatabase {
 
   static String newId() => _uuid.v4();
 
+  // --------------------------------------------------------------------------
+  // خطّاف المزامنة: يُنفّذ عند أي حفظ/حذف، لتسجيل العملية في قائمة المزامنة
+  // الفورية (يُسجّله SyncQueue عند التهيئة — لتفادي الاستيراد الدائري).
+  // التوقيع: (اسم الصندوق، مفتاح العنصر، هل هي عملية حذف)
+  // --------------------------------------------------------------------------
+  static void Function(String box, String key, bool isDelete)? onWrite;
+
+  static void _notifyWrite(String box, String key, {bool isDelete = false}) {
+    try {
+      onWrite?.call(box, key, isDelete);
+    } catch (_) {}
+  }
+
+  /// حفظ عنصر في صندوق مع تعليمه كمحلي غير مُزامَن + إشعار قائمة المزامنة.
+  static Future<void> _save(
+    Box box,
+    String boxName,
+    String key,
+    Map<String, dynamic> map,
+  ) async {
+    map['synced'] = false;
+    map['updatedAt'] = DateTime.now().toIso8601String();
+    await box.put(key, map);
+    _notifyWrite(boxName, key);
+  }
+
+  /// حذف عنصر من صندوق + إشعار قائمة المزامنة (لحذفه سحابياً).
+  static Future<void> _remove(Box box, String boxName, String key) async {
+    await box.delete(key);
+    _notifyWrite(boxName, key, isDelete: true);
+  }
+
   /// تهيئة قاعدة البيانات — تُستدعى من main()
   static Future<void> init() async {
     await Hive.initFlutter();
@@ -120,8 +152,9 @@ class AppDatabase {
       .toList();
 
   static Future<void> saveAccount(Account acc) =>
-      _bAccounts.put(acc.id, acc.toMap());
-  static Future<void> deleteAccount(String id) => _bAccounts.delete(id);
+      _save(_bAccounts, boxAccounts, acc.id, acc.toMap());
+  static Future<void> deleteAccount(String id) =>
+      _remove(_bAccounts, boxAccounts, id);
 
   static Account? accountByCode(String code) {
     for (final v in _bAccounts.values) {
@@ -146,8 +179,10 @@ class AppDatabase {
       .where((c) => !c.isDeleted)
       .toList();
 
-  static Future<void> saveContact(Contact c) => _bContacts.put(c.id, c.toMap());
-  static Future<void> deleteContact(String id) => _bContacts.delete(id);
+  static Future<void> saveContact(Contact c) =>
+      _save(_bContacts, boxContacts, c.id, c.toMap());
+  static Future<void> deleteContact(String id) =>
+      _remove(_bContacts, boxContacts, id);
 
   static Contact? contactById(String? id) {
     if (id == null) return null;
@@ -161,8 +196,9 @@ class AppDatabase {
       .where((it) => !it.isDeleted)
       .toList();
 
-  static Future<void> saveItem(Item it) => _bItems.put(it.id, it.toMap());
-  static Future<void> deleteItem(String id) => _bItems.delete(id);
+  static Future<void> saveItem(Item it) =>
+      _save(_bItems, boxItems, it.id, it.toMap());
+  static Future<void> deleteItem(String id) => _remove(_bItems, boxItems, id);
 
   static Item? itemById(String? id) {
     if (id == null) return null;
@@ -175,8 +211,9 @@ class AppDatabase {
       .toList();
 
   static Future<void> saveCategory(ItemCategory c) =>
-      _bCategories.put(c.id, c.toMap());
-  static Future<void> deleteCategory(String id) => _bCategories.delete(id);
+      _save(_bCategories, boxCategories, c.id, c.toMap());
+  static Future<void> deleteCategory(String id) =>
+      _remove(_bCategories, boxCategories, id);
 
   // ---------------------------- الفواتير ----------------------------
   static List<Invoice> get invoices => _bInvoices.values
@@ -185,8 +222,9 @@ class AppDatabase {
       .toList();
 
   static Future<void> saveInvoice(Invoice inv) =>
-      _bInvoices.put(inv.id, inv.toMap());
-  static Future<void> deleteInvoice(String id) => _bInvoices.delete(id);
+      _save(_bInvoices, boxInvoices, inv.id, inv.toMap());
+  static Future<void> deleteInvoice(String id) =>
+      _remove(_bInvoices, boxInvoices, id);
 
   // ---------------------------- السندات ----------------------------
   static List<Payment> get payments => _bPayments.values
@@ -194,8 +232,10 @@ class AppDatabase {
       .where((p) => !p.isDeleted)
       .toList();
 
-  static Future<void> savePayment(Payment p) => _bPayments.put(p.id, p.toMap());
-  static Future<void> deletePayment(String id) => _bPayments.delete(id);
+  static Future<void> savePayment(Payment p) =>
+      _save(_bPayments, boxPayments, p.id, p.toMap());
+  static Future<void> deletePayment(String id) =>
+      _remove(_bPayments, boxPayments, id);
 
   // ---------------------------- تخصيص الدفعات ----------------------------
   static List<PaymentAllocation> get allocations => _bAllocations.values
@@ -203,9 +243,10 @@ class AppDatabase {
       .toList();
 
   static Future<void> saveAllocation(PaymentAllocation a) =>
-      _bAllocations.put(a.id, a.toMap());
+      _save(_bAllocations, boxAllocations, a.id, a.toMap());
 
-  static Future<void> deleteAllocation(String id) => _bAllocations.delete(id);
+  static Future<void> deleteAllocation(String id) =>
+      _remove(_bAllocations, boxAllocations, id);
 
   static List<PaymentAllocation> allocationsOfPayment(String paymentId) =>
       allocations.where((a) => a.paymentId == paymentId).toList();
@@ -219,17 +260,19 @@ class AppDatabase {
       .where((e) => !e.isDeleted)
       .toList();
 
-  static Future<void> saveExpense(Expense e) => _bExpenses.put(e.id, e.toMap());
-  static Future<void> deleteExpense(String id) => _bExpenses.delete(id);
+  static Future<void> saveExpense(Expense e) =>
+      _save(_bExpenses, boxExpenses, e.id, e.toMap());
+  static Future<void> deleteExpense(String id) =>
+      _remove(_bExpenses, boxExpenses, id);
 
   static List<ExpenseCategory> get expenseCategories => _bExpenseCats.values
       .map((e) => ExpenseCategory.fromMap(Map<String, dynamic>.from(e)))
       .toList();
 
   static Future<void> saveExpenseCategory(ExpenseCategory c) =>
-      _bExpenseCats.put(c.id, c.toMap());
+      _save(_bExpenseCats, boxExpenseCats, c.id, c.toMap());
   static Future<void> deleteExpenseCategory(String id) =>
-      _bExpenseCats.delete(id);
+      _remove(_bExpenseCats, boxExpenseCats, id);
 
   // ---------------------------- حركات المخزون ----------------------------
   static List<InventoryMovement> get movements => _bMovements.values
@@ -237,7 +280,7 @@ class AppDatabase {
       .toList();
 
   static Future<void> saveMovement(InventoryMovement m) =>
-      _bMovements.put(m.id, m.toMap());
+      _save(_bMovements, boxMovements, m.id, m.toMap());
 
   // ---------------------------- أرصدة المخزون ----------------------------
   static List<InventoryBalance> get balances => _bBalances.values
@@ -253,7 +296,7 @@ class AppDatabase {
   }
 
   static Future<void> saveBalance(InventoryBalance b) =>
-      _bBalances.put(b.key, b.toMap());
+      _save(_bBalances, boxBalances, b.key, b.toMap());
 
   static double totalStockQty(String itemId) => balances
       .where((b) => b.itemId == itemId)
@@ -264,8 +307,10 @@ class AppDatabase {
       .map((e) => Cashbox.fromMap(Map<String, dynamic>.from(e)))
       .toList();
 
-  static Future<void> saveCashbox(Cashbox c) => _bCashboxes.put(c.id, c.toMap());
-  static Future<void> deleteCashbox(String id) => _bCashboxes.delete(id);
+  static Future<void> saveCashbox(Cashbox c) =>
+      _save(_bCashboxes, boxCashboxes, c.id, c.toMap());
+  static Future<void> deleteCashbox(String id) =>
+      _remove(_bCashboxes, boxCashboxes, id);
 
   static Cashbox? cashboxById(String? id) {
     if (id == null) return null;
@@ -279,8 +324,9 @@ class AppDatabase {
       .toList();
 
   static Future<void> saveWarehouse(Warehouse w) =>
-      _bWarehouses.put(w.id, w.toMap());
-  static Future<void> deleteWarehouse(String id) => _bWarehouses.delete(id);
+      _save(_bWarehouses, boxWarehouses, w.id, w.toMap());
+  static Future<void> deleteWarehouse(String id) =>
+      _remove(_bWarehouses, boxWarehouses, id);
 
   // ---------------------------- القيود ----------------------------
   static List<JournalEntry> get journals => _bJournals.values
@@ -288,8 +334,9 @@ class AppDatabase {
       .toList();
 
   static Future<void> saveJournal(JournalEntry j) =>
-      _bJournals.put(j.id, j.toMap());
-  static Future<void> deleteJournal(String id) => _bJournals.delete(id);
+      _save(_bJournals, boxJournals, j.id, j.toMap());
+  static Future<void> deleteJournal(String id) =>
+      _remove(_bJournals, boxJournals, id);
 
   // ---------------------------- الموظفون ----------------------------
   static List<Employee> get employees => _bEmployees.values
@@ -297,8 +344,9 @@ class AppDatabase {
       .toList();
 
   static Future<void> saveEmployee(Employee e) =>
-      _bEmployees.put(e.id, e.toMap());
-  static Future<void> deleteEmployee(String id) => _bEmployees.delete(id);
+      _save(_bEmployees, boxEmployees, e.id, e.toMap());
+  static Future<void> deleteEmployee(String id) =>
+      _remove(_bEmployees, boxEmployees, id);
 
   static Employee? employeeById(String? id) {
     if (id == null) return null;
@@ -312,12 +360,11 @@ class AppDatabase {
       .toList();
 
   static Future<void> saveAttendance(Attendance a) =>
-      _bAttendance.put(a.id, a.toMap());
+      _save(_bAttendance, boxAttendance, a.id, a.toMap());
 
   static List<Attendance> attendanceOf(String employeeId, String period) =>
       attendance
-          .where((a) =>
-              a.employeeId == employeeId && a.date.startsWith(period))
+          .where((a) => a.employeeId == employeeId && a.date.startsWith(period))
           .toList();
 
   // ---------------------------- الرواتب ----------------------------
@@ -326,11 +373,12 @@ class AppDatabase {
       .toList();
 
   static Future<void> savePayroll(PayrollRecord p) =>
-      _bPayroll.put(p.id, p.toMap());
-  static Future<void> deletePayroll(String id) => _bPayroll.delete(id);
+      _save(_bPayroll, boxPayroll, p.id, p.toMap());
+  static Future<void> deletePayroll(String id) =>
+      _remove(_bPayroll, boxPayroll, id);
 
-  static bool payrollExists(String employeeId, String period) => payrolls
-      .any((p) => p.employeeId == employeeId && p.period == period);
+  static bool payrollExists(String employeeId, String period) =>
+      payrolls.any((p) => p.employeeId == employeeId && p.period == period);
 
   // ---------------------------- العملات ----------------------------
   static List<Currency> get currencies => _bCurrencies.values
@@ -338,8 +386,9 @@ class AppDatabase {
       .toList();
 
   static Future<void> saveCurrency(Currency c) =>
-      _bCurrencies.put(c.id, c.toMap());
-  static Future<void> deleteCurrency(String id) => _bCurrencies.delete(id);
+      _save(_bCurrencies, boxCurrencies, c.id, c.toMap());
+  static Future<void> deleteCurrency(String id) =>
+      _remove(_bCurrencies, boxCurrencies, id);
 
   // ---------------------------- الأصول الثابتة ----------------------------
   static List<FixedAsset> get fixedAssets => _bFixedAssets.values
@@ -347,8 +396,9 @@ class AppDatabase {
       .toList();
 
   static Future<void> saveFixedAsset(FixedAsset a) =>
-      _bFixedAssets.put(a.id, a.toMap());
-  static Future<void> deleteFixedAsset(String id) => _bFixedAssets.delete(id);
+      _save(_bFixedAssets, boxFixedAssets, a.id, a.toMap());
+  static Future<void> deleteFixedAsset(String id) =>
+      _remove(_bFixedAssets, boxFixedAssets, id);
 
   static FixedAsset? fixedAssetById(String? id) {
     if (id == null) return null;
@@ -363,8 +413,9 @@ class AppDatabase {
       .toList();
 
   static Future<void> saveBranch(Branch b) =>
-      _bBranches.put(b.id, b.toMap());
-  static Future<void> deleteBranch(String id) => _bBranches.delete(id);
+      _save(_bBranches, boxBranches, b.id, b.toMap());
+  static Future<void> deleteBranch(String id) =>
+      _remove(_bBranches, boxBranches, id);
 
   static Branch? branchById(String? id) {
     if (id == null) return null;
@@ -378,8 +429,9 @@ class AppDatabase {
       .where((u) => !u.isDeleted)
       .toList();
 
-  static Future<void> saveUnit(Unit u) => _bUnits.put(u.id, u.toMap());
-  static Future<void> deleteUnit(String id) => _bUnits.delete(id);
+  static Future<void> saveUnit(Unit u) =>
+      _save(_bUnits, boxUnits, u.id, u.toMap());
+  static Future<void> deleteUnit(String id) => _remove(_bUnits, boxUnits, id);
 
   static Unit? unitById(String? id) {
     if (id == null) return null;
@@ -394,16 +446,14 @@ class AppDatabase {
       .toList();
 
   static Future<void> saveCostCenter(CostCenter c) =>
-      _bCostCenters.put(c.id, c.toMap());
+      _save(_bCostCenters, boxCostCenters, c.id, c.toMap());
   static Future<void> deleteCostCenter(String id) =>
-      _bCostCenters.delete(id);
+      _remove(_bCostCenters, boxCostCenters, id);
 
   static CostCenter? costCenterById(String? id) {
     if (id == null) return null;
     final v = _bCostCenters.get(id);
-    return v == null
-        ? null
-        : CostCenter.fromMap(Map<String, dynamic>.from(v));
+    return v == null ? null : CostCenter.fromMap(Map<String, dynamic>.from(v));
   }
 
   // ---------------------------- أسعار الصرف ----------------------------
@@ -412,9 +462,9 @@ class AppDatabase {
       .toList();
 
   static Future<void> saveExchangeRate(ExchangeRate r) =>
-      _bExchangeRates.put(r.id, r.toMap());
+      _save(_bExchangeRates, boxExchangeRates, r.id, r.toMap());
   static Future<void> deleteExchangeRate(String id) =>
-      _bExchangeRates.delete(id);
+      _remove(_bExchangeRates, boxExchangeRates, id);
 
   static List<ExchangeRate> exchangeRatesOfCurrency(String currencyId) =>
       exchangeRates.where((r) => r.currencyId == currencyId).toList();
@@ -425,8 +475,10 @@ class AppDatabase {
       .where((o) => !o.isDeleted)
       .toList();
 
-  static Future<void> saveOrder(OrderDoc o) => _bOrders.put(o.id, o.toMap());
-  static Future<void> deleteOrder(String id) => _bOrders.delete(id);
+  static Future<void> saveOrder(OrderDoc o) =>
+      _save(_bOrders, boxOrders, o.id, o.toMap());
+  static Future<void> deleteOrder(String id) =>
+      _remove(_bOrders, boxOrders, id);
 
   static OrderDoc? orderById(String? id) {
     if (id == null) return null;
@@ -472,9 +524,8 @@ class AppDatabase {
     return list;
   }
 
-  static int get unreadNotificationsCount => notifications
-      .where((n) => !n.isRead)
-      .length;
+  static int get unreadNotificationsCount =>
+      notifications.where((n) => !n.isRead).length;
 
   static Future<void> saveNotification(AppNotification n) async {
     await _bNotifications.put(n.id, n.toMap());
@@ -525,6 +576,7 @@ class AppDatabase {
     final year = DateTime.now().year;
     return '$prefix$current/$year';
   }
+
   // ============================ النسخ الاحتياطي ============================
   /// أسماء الصناديق مع مراجعها (للنسخ الاحتياطي والاستعادة)
   static Map<String, Box> get _allBoxes => {
@@ -630,6 +682,7 @@ class AppDatabase {
     await _bSettings.delete('seeded');
     await _seed();
   }
+
   // ============================ البيانات الأولية ============================
   static Future<void> _seed() async {
     // 1. دليل الحسابات
@@ -639,30 +692,57 @@ class AppDatabase {
     }
 
     // 2. المخازن
-    await _bWarehouses.put('wh_main', Warehouse(
-      id: 'wh_main', name: 'المخزن الرئيسي', code: 'WH-01', location: 'الفرع الرئيسي',
-    ).toMap());
-    await _bWarehouses.put('wh_branch1', Warehouse(
-      id: 'wh_branch1', name: 'مخزن فرع 1', code: 'WH-02', location: 'فرع 1',
-    ).toMap());
+    await _bWarehouses.put(
+      'wh_main',
+      Warehouse(
+        id: 'wh_main',
+        name: 'المخزن الرئيسي',
+        code: 'WH-01',
+        location: 'الفرع الرئيسي',
+      ).toMap(),
+    );
+    await _bWarehouses.put(
+      'wh_branch1',
+      Warehouse(
+        id: 'wh_branch1',
+        name: 'مخزن فرع 1',
+        code: 'WH-02',
+        location: 'فرع 1',
+      ).toMap(),
+    );
 
     // 3. الصناديق
     final cashAcc = accountByCode(CoA.cash);
-    await _bCashboxes.put('cb_main', Cashbox(
-      id: 'cb_main',
-      name: 'الصندوق الرئيسي',
-      code: 'CSH-01',
-      accountId: cashAcc?.id ?? '',
-      accountName: cashAcc?.name ?? 'الصندوق الرئيسي',
-      openingBalance: 0,
-      currentBalance: 0,
-    ).toMap());
+    await _bCashboxes.put(
+      'cb_main',
+      Cashbox(
+        id: 'cb_main',
+        name: 'الصندوق الرئيسي',
+        code: 'CSH-01',
+        accountId: cashAcc?.id ?? '',
+        accountName: cashAcc?.name ?? 'الصندوق الرئيسي',
+        openingBalance: 0,
+        currentBalance: 0,
+      ).toMap(),
+    );
 
     // 4. تصنيفات الأصناف
-    await _bCategories.put('cat_1', ItemCategory(id: 'cat_1', name: 'ملابس').toMap());
-    await _bCategories.put('cat_2', ItemCategory(id: 'cat_2', name: 'أحذية').toMap());
-    await _bCategories.put('cat_3', ItemCategory(id: 'cat_3', name: 'إلكترونيات').toMap());
-    await _bCategories.put('cat_4', ItemCategory(id: 'cat_4', name: 'مواد غذائية').toMap());
+    await _bCategories.put(
+      'cat_1',
+      ItemCategory(id: 'cat_1', name: 'ملابس').toMap(),
+    );
+    await _bCategories.put(
+      'cat_2',
+      ItemCategory(id: 'cat_2', name: 'أحذية').toMap(),
+    );
+    await _bCategories.put(
+      'cat_3',
+      ItemCategory(id: 'cat_3', name: 'إلكترونيات').toMap(),
+    );
+    await _bCategories.put(
+      'cat_4',
+      ItemCategory(id: 'cat_4', name: 'مواد غذائية').toMap(),
+    );
 
     // 5. تصنيفات المصروفات (مرتبطة بحسابات المصروفات)
     final expCats = [
@@ -677,12 +757,15 @@ class AppDatabase {
     ];
     for (var i = 0; i < expCats.length; i++) {
       final acc = accountByCode(expCats[i][1]);
-      await _bExpenseCats.put('expcat_$i', ExpenseCategory(
-        id: 'expcat_$i',
-        name: expCats[i][0],
-        accountId: acc?.id ?? '',
-        accountName: acc?.name ?? expCats[i][0],
-      ).toMap());
+      await _bExpenseCats.put(
+        'expcat_$i',
+        ExpenseCategory(
+          id: 'expcat_$i',
+          name: expCats[i][0],
+          accountId: acc?.id ?? '',
+          accountName: acc?.name ?? expCats[i][0],
+        ).toMap(),
+      );
     }
 
     // 6. إعدادات افتراضية
@@ -699,24 +782,52 @@ class AppDatabase {
     await _bSettings.put('fiscalYearClosed', '');
 
     // 7. العملات الافتراضية
-    await _bCurrencies.put('cur_base', Currency(
-      id: 'cur_base', code: 'YER', name: 'ريال يمني', symbol: 'ر.ي',
-      rate: 1.0, isBase: true,
-    ).toMap());
-    await _bCurrencies.put('cur_usd', Currency(
-      id: 'cur_usd', code: 'USD', name: 'دولار أمريكي', symbol: '\$',
-      rate: 530.0, isBase: false,
-    ).toMap());
-    await _bCurrencies.put('cur_sar', Currency(
-      id: 'cur_sar', code: 'SAR', name: 'ريال سعودي', symbol: 'ر.س',
-      rate: 141.0, isBase: false,
-    ).toMap());
+    await _bCurrencies.put(
+      'cur_base',
+      Currency(
+        id: 'cur_base',
+        code: 'YER',
+        name: 'ريال يمني',
+        symbol: 'ر.ي',
+        rate: 1.0,
+        isBase: true,
+      ).toMap(),
+    );
+    await _bCurrencies.put(
+      'cur_usd',
+      Currency(
+        id: 'cur_usd',
+        code: 'USD',
+        name: 'دولار أمريكي',
+        symbol: '\$',
+        rate: 530.0,
+        isBase: false,
+      ).toMap(),
+    );
+    await _bCurrencies.put(
+      'cur_sar',
+      Currency(
+        id: 'cur_sar',
+        code: 'SAR',
+        name: 'ريال سعودي',
+        symbol: 'ر.س',
+        rate: 141.0,
+        isBase: false,
+      ).toMap(),
+    );
 
     // 8. الفروع
-    await _bBranches.put('br_main', Branch(
-      id: 'br_main', code: 'BR-01', name: 'الفرع الرئيسي',
-      address: '', phone: '', email: '',
-    ).toMap());
+    await _bBranches.put(
+      'br_main',
+      Branch(
+        id: 'br_main',
+        code: 'BR-01',
+        name: 'الفرع الرئيسي',
+        address: '',
+        phone: '',
+        email: '',
+      ).toMap(),
+    );
 
     // 9. وحدات القياس
     final unitsSeed = <List<String>>[
@@ -728,32 +839,50 @@ class AppDatabase {
       ['unt_pack', 'PKG', 'علبة', 'ع'],
     ];
     for (final u in unitsSeed) {
-      await _bUnits.put(u[0], Unit(
-        id: u[0], code: u[1], name: u[2], symbol: u[3],
-      ).toMap());
+      await _bUnits.put(
+        u[0],
+        Unit(id: u[0], code: u[1], name: u[2], symbol: u[3]).toMap(),
+      );
     }
 
     // 10. مراكز التكلفة
-    await _bCostCenters.put('cc_admin', CostCenter(
-      id: 'cc_admin', code: 'CC-01', name: 'الإدارة العامة',
-    ).toMap());
-    await _bCostCenters.put('cc_sales', CostCenter(
-      id: 'cc_sales', code: 'CC-02', name: 'المبيعات',
-    ).toMap());
-    await _bCostCenters.put('cc_wh', CostCenter(
-      id: 'cc_wh', code: 'CC-03', name: 'المخازن',
-    ).toMap());
+    await _bCostCenters.put(
+      'cc_admin',
+      CostCenter(id: 'cc_admin', code: 'CC-01', name: 'الإدارة العامة').toMap(),
+    );
+    await _bCostCenters.put(
+      'cc_sales',
+      CostCenter(id: 'cc_sales', code: 'CC-02', name: 'المبيعات').toMap(),
+    );
+    await _bCostCenters.put(
+      'cc_wh',
+      CostCenter(id: 'cc_wh', code: 'CC-03', name: 'المخازن').toMap(),
+    );
 
     // 11. أسعار الصرف الافتراضية (مقابل العملة الأساسية: الريال اليمني YER)
     final today = DateTime.now().toIso8601String().split('T').first;
-    await _bExchangeRates.put('xr_usd', ExchangeRate(
-      id: 'xr_usd', currencyId: 'cur_usd', currencyCode: 'USD',
-      rateDate: today, buyRate: 525.0, sellRate: 535.0,
-    ).toMap());
-    await _bExchangeRates.put('xr_sar', ExchangeRate(
-      id: 'xr_sar', currencyId: 'cur_sar', currencyCode: 'SAR',
-      rateDate: today, buyRate: 140.0, sellRate: 142.0,
-    ).toMap());
+    await _bExchangeRates.put(
+      'xr_usd',
+      ExchangeRate(
+        id: 'xr_usd',
+        currencyId: 'cur_usd',
+        currencyCode: 'USD',
+        rateDate: today,
+        buyRate: 525.0,
+        sellRate: 535.0,
+      ).toMap(),
+    );
+    await _bExchangeRates.put(
+      'xr_sar',
+      ExchangeRate(
+        id: 'xr_sar',
+        currencyId: 'cur_sar',
+        currencyCode: 'SAR',
+        rateDate: today,
+        buyRate: 140.0,
+        sellRate: 142.0,
+      ).toMap(),
+    );
 
     await _bSettings.put('seeded', true);
   }
@@ -775,14 +904,28 @@ class AppDatabase {
     if (base != null) {
       final bm = Map<String, dynamic>.from(base);
       if (bm['code'] == 'SAR' && bm['isBase'] == true) {
-        await _bCurrencies.put('cur_base', Currency(
-          id: 'cur_base', code: 'YER', name: 'ريال يمني', symbol: 'ر.ي',
-          rate: 1.0, isBase: true,
-        ).toMap());
-        await _bCurrencies.put('cur_sar', Currency(
-          id: 'cur_sar', code: 'SAR', name: 'ريال سعودي', symbol: 'ر.س',
-          rate: 141.0, isBase: false,
-        ).toMap());
+        await _bCurrencies.put(
+          'cur_base',
+          Currency(
+            id: 'cur_base',
+            code: 'YER',
+            name: 'ريال يمني',
+            symbol: 'ر.ي',
+            rate: 1.0,
+            isBase: true,
+          ).toMap(),
+        );
+        await _bCurrencies.put(
+          'cur_sar',
+          Currency(
+            id: 'cur_sar',
+            code: 'SAR',
+            name: 'ريال سعودي',
+            symbol: 'ر.س',
+            rate: 141.0,
+            isBase: false,
+          ).toMap(),
+        );
       }
     }
     await _bSettings.put('defaultsYemen', true);

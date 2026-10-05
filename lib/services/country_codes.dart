@@ -11,8 +11,7 @@ class Country {
 
 class Countries {
   /// اليمن هي الدولة الافتراضية
-  static const Country defaultCountry =
-      Country('اليمن', '+967', 'YE', '🇾🇪');
+  static const Country defaultCountry = Country('اليمن', '+967', 'YE', '🇾🇪');
 
   static const List<Country> all = [
     Country('اليمن', '+967', 'YE', '🇾🇪'),

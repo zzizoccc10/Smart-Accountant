@@ -58,14 +58,13 @@ class AdminNotification {
     this.senderName = 'إدارة النظام',
     this.synced = false,
     List<String>? readBy,
-  })  : targetCompanies = targetCompanies ?? [],
-        targetUsers = targetUsers ?? [],
-        readBy = readBy ?? [],
-        createdAt = createdAt ?? DateTime.now().toIso8601String();
+  }) : targetCompanies = targetCompanies ?? [],
+       targetUsers = targetUsers ?? [],
+       readBy = readBy ?? [],
+       createdAt = createdAt ?? DateTime.now().toIso8601String();
 
   String get audienceLabelAr => NotifyAudience.values
-      .firstWhere((a) => a.key == audience,
-          orElse: () => NotifyAudience.all)
+      .firstWhere((a) => a.key == audience, orElse: () => NotifyAudience.all)
       .labelAr;
 
   String get importanceLabelAr {
@@ -80,20 +79,21 @@ class AdminNotification {
   }
 
   Map<String, dynamic> toMap() => {
-        'id': id,
-        'title': title,
-        'body': body,
-        'audience': audience,
-        'targetCompanies': targetCompanies,
-        'targetUsers': targetUsers,
-        'importance': importance,
-        'createdAt': createdAt,
-        'senderName': senderName,
-        'synced': synced,
-        'readBy': readBy,
-      };
+    'id': id,
+    'title': title,
+    'body': body,
+    'audience': audience,
+    'targetCompanies': targetCompanies,
+    'targetUsers': targetUsers,
+    'importance': importance,
+    'createdAt': createdAt,
+    'senderName': senderName,
+    'synced': synced,
+    'readBy': readBy,
+  };
 
-  factory AdminNotification.fromMap(Map<String, dynamic> m) => AdminNotification(
+  factory AdminNotification.fromMap(Map<String, dynamic> m) =>
+      AdminNotification(
         id: m['id'].toString(),
         title: m['title'] as String? ?? '',
         body: m['body'] as String? ?? '',
@@ -114,17 +114,17 @@ class AdminNotification {
       );
 
   Map<String, dynamic> toCloud() => {
-        'id': id,
-        'title': title,
-        'body': body,
-        'audience': audience,
-        'targetCompanies': targetCompanies,
-        'targetUsers': targetUsers,
-        'importance': importance,
-        'createdAt': createdAt,
-        'senderName': senderName,
-        'serverAt': FieldValue.serverTimestamp(),
-      };
+    'id': id,
+    'title': title,
+    'body': body,
+    'audience': audience,
+    'targetCompanies': targetCompanies,
+    'targetUsers': targetUsers,
+    'importance': importance,
+    'createdAt': createdAt,
+    'senderName': senderName,
+    'serverAt': FieldValue.serverTimestamp(),
+  };
 }
 
 class AdminNotificationService {
@@ -148,11 +148,14 @@ class AdminNotificationService {
   // ---------------------------- القراءة ----------------------------
   static List<AdminNotification> all() {
     try {
-      final list = _box.values
-          .whereType<Map>()
-          .map((m) => AdminNotification.fromMap(Map<String, dynamic>.from(m)))
-          .toList()
-        ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      final list =
+          _box.values
+              .whereType<Map>()
+              .map(
+                (m) => AdminNotification.fromMap(Map<String, dynamic>.from(m)),
+              )
+              .toList()
+            ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
       return list;
     } catch (_) {
       return [];
@@ -168,8 +171,11 @@ class AdminNotificationService {
   }
 
   /// هل يستهدف الإشعار هذا السياق (منشأة/مستخدم)؟
-  static bool matches(AdminNotification n,
-      {required String companyId, String userId = ''}) {
+  static bool matches(
+    AdminNotification n, {
+    required String companyId,
+    String userId = '',
+  }) {
     switch (n.audience) {
       case 'all':
         return true;
@@ -183,8 +189,10 @@ class AdminNotificationService {
   }
 
   /// إشعارات موجّهة للمستخدم/المنشأة الحالية (الأحدث أولاً)
-  static List<AdminNotification> forCompany(String companyId,
-      {String userId = ''}) {
+  static List<AdminNotification> forCompany(
+    String companyId, {
+    String userId = '',
+  }) {
     return all()
         .where((n) => matches(n, companyId: companyId, userId: userId))
         .toList();
@@ -195,9 +203,10 @@ class AdminNotificationService {
 
   static int unreadCount(String companyId, {String userId = ''}) {
     final reader = userId.isNotEmpty ? userId : companyId;
-    return forCompany(companyId, userId: userId)
-        .where((n) => !isRead(n, reader))
-        .length;
+    return forCompany(
+      companyId,
+      userId: userId,
+    ).where((n) => !isRead(n, reader)).length;
   }
 
   // ---------------------------- الكتابة ----------------------------
@@ -243,7 +252,10 @@ class AdminNotificationService {
     await _box.put(id, n.toMap());
   }
 
-  static Future<void> markAllRead(String companyId, {String userId = ''}) async {
+  static Future<void> markAllRead(
+    String companyId, {
+    String userId = '',
+  }) async {
     final reader = userId.isNotEmpty ? userId : companyId;
     if (reader.isEmpty) return;
     for (final n in forCompany(companyId, userId: userId)) {
@@ -321,8 +333,8 @@ class AdminNotificationService {
       final local = _box.get(n.id);
       final readBy = local is Map
           ? ((Map<String, dynamic>.from(local)['readBy'] as List?) ?? const [])
-              .map((e) => e.toString())
-              .toList()
+                .map((e) => e.toString())
+                .toList()
           : <String>[];
       n.readBy = readBy;
       n.synced = true;
@@ -332,24 +344,26 @@ class AdminNotificationService {
 
   static void logStatus() {
     if (kDebugMode) {
-      debugPrint('[AdminNotification] total: ${_box.length}, '
-          'cloud: ${_db != null}');
+      debugPrint(
+        '[AdminNotification] total: ${_box.length}, '
+        'cloud: ${_db != null}',
+      );
     }
   }
 }
 
 extension _AdminNotifCopy on AdminNotification {
   AdminNotification copyWithSynced() => AdminNotification(
-        id: id,
-        title: title,
-        body: body,
-        audience: audience,
-        targetCompanies: targetCompanies,
-        targetUsers: targetUsers,
-        importance: importance,
-        createdAt: createdAt,
-        senderName: senderName,
-        synced: true,
-        readBy: readBy,
-      );
+    id: id,
+    title: title,
+    body: body,
+    audience: audience,
+    targetCompanies: targetCompanies,
+    targetUsers: targetUsers,
+    importance: importance,
+    createdAt: createdAt,
+    senderName: senderName,
+    synced: true,
+    readBy: readBy,
+  );
 }

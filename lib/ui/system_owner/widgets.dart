@@ -56,9 +56,14 @@ class BadgeChip extends StatelessWidget {
             Icon(icon, size: 11, color: color),
             const SizedBox(width: 3),
           ],
-          Text(text,
-              style: TextStyle(
-                  fontSize: 10.5, color: color, fontWeight: FontWeight.w600)),
+          Text(
+            text,
+            style: TextStyle(
+              fontSize: 10.5,
+              color: color,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         ],
       ),
     );
@@ -97,18 +102,23 @@ class StatCard extends StatelessWidget {
                   child: Icon(icon, color: color, size: 18),
                 ),
                 const Spacer(),
-                Text(value,
-                    style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: color)),
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: color,
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: 8),
             Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
             if (subtitle != null)
-              Text(subtitle!,
-                  style: TextStyle(fontSize: 11, color: Colors.grey.shade600)),
+              Text(
+                subtitle!,
+                style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
+              ),
           ],
         ),
       ),
@@ -136,13 +146,16 @@ class KvRow extends StatelessWidget {
           ],
           SizedBox(
             width: 118,
-            child: Text(k,
-                style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
+            child: Text(
+              k,
+              style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+            ),
           ),
           Expanded(
-            child: Text(v.isEmpty ? '—' : v,
-                style: const TextStyle(
-                    fontSize: 13, fontWeight: FontWeight.w500)),
+            child: Text(
+              v.isEmpty ? '—' : v,
+              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+            ),
           ),
         ],
       ),
@@ -166,9 +179,10 @@ class SectionTitle extends StatelessWidget {
           Icon(icon, size: 18, color: AppColors.primary),
           const SizedBox(width: 8),
           Expanded(
-            child: Text(text,
-                style: const TextStyle(
-                    fontWeight: FontWeight.bold, fontSize: 15)),
+            child: Text(
+              text,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+            ),
           ),
           if (trailing != null) trailing!,
         ],
@@ -221,14 +235,18 @@ class EmptyState extends StatelessWidget {
           children: [
             Icon(icon, size: 56, color: Colors.grey.shade400),
             const SizedBox(height: 12),
-            Text(title,
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontWeight: FontWeight.bold)),
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
             if (hint != null) ...[
               const SizedBox(height: 6),
-              Text(hint!,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
+              Text(
+                hint!,
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+              ),
             ],
           ],
         ),
@@ -261,11 +279,18 @@ class MiniStat extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(value,
-              style: TextStyle(
-                  fontWeight: FontWeight.bold, fontSize: 17, color: color)),
-          Text(label,
-              style: TextStyle(fontSize: 11, color: Colors.grey.shade700)),
+          Text(
+            value,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 17,
+              color: color,
+            ),
+          ),
+          Text(
+            label,
+            style: TextStyle(fontSize: 11, color: Colors.grey.shade700),
+          ),
         ],
       ),
     );

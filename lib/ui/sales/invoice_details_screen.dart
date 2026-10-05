@@ -165,7 +165,10 @@ class InvoiceDetailsScreen extends StatelessWidget {
                 for (final l in inv.lines)
                   ListTile(
                     dense: true,
-                    title: Text(l.itemName, style: const TextStyle(fontSize: 14)),
+                    title: Text(
+                      l.itemName,
+                      style: const TextStyle(fontSize: 14),
+                    ),
                     subtitle: Text(
                       '${Fmt.num(l.quantity)} × ${Fmt.money(l.unitPrice, curr)}',
                       style: const TextStyle(fontSize: 12),
@@ -186,8 +189,11 @@ class InvoiceDetailsScreen extends StatelessWidget {
                 children: [
                   _row('المجموع', Fmt.money(inv.subtotal, curr)),
                   if (inv.discountAmount > 0)
-                    _row('الخصم', '- ${Fmt.money(inv.discountAmount, curr)}',
-                        color: AppColors.danger),
+                    _row(
+                      'الخصم',
+                      '- ${Fmt.money(inv.discountAmount, curr)}',
+                      color: AppColors.danger,
+                    ),
                   _row('الضريبة', Fmt.money(inv.taxAmount, curr)),
                   if (inv.shipping > 0)
                     _row('التوصيل', Fmt.money(inv.shipping, curr)),
@@ -195,8 +201,11 @@ class InvoiceDetailsScreen extends StatelessWidget {
                   _row('الإجمالي', Fmt.money(inv.total, curr), bold: true),
                   if (inv.paymentType == 'credit') ...[
                     _row('المدفوع', Fmt.money(inv.paidAmount, curr)),
-                    _row('المتبقي', Fmt.money(inv.remaining, curr),
-                        color: AppColors.danger),
+                    _row(
+                      'المتبقي',
+                      Fmt.money(inv.remaining, curr),
+                      color: AppColors.danger,
+                    ),
                   ],
                 ],
               ),
@@ -280,9 +289,9 @@ Future<void> _send(
       break;
   }
   if (context.mounted && !ok && channel != 'call') {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('تعذّر فتح التطبيق المطلوب')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('تعذّر فتح التطبيق المطلوب')));
   }
 }
 
@@ -297,10 +306,14 @@ String _invoiceText(ERPProvider prov, Invoice inv) {
   b.writeln(prov.companyName);
   b.writeln('فاتورة رقم: ${inv.invoiceNumber}');
   b.writeln('التاريخ: ${inv.date}');
-  b.writeln('الجهة: ${inv.contactName.isEmpty ? "عميل نقدي" : inv.contactName}');
+  b.writeln(
+    'الجهة: ${inv.contactName.isEmpty ? "عميل نقدي" : inv.contactName}',
+  );
   b.writeln('----------------------');
   for (final l in inv.lines) {
-    b.writeln('${l.itemName} × ${l.quantity} = ${l.lineTotal.toStringAsFixed(2)}');
+    b.writeln(
+      '${l.itemName} × ${l.quantity} = ${l.lineTotal.toStringAsFixed(2)}',
+    );
   }
   b.writeln('----------------------');
   b.writeln('الإجمالي: ${Fmt.money(inv.total, prov.currency)}');
@@ -318,9 +331,9 @@ Future<void> _print(
   bool share,
 ) async {
   try {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('جارٍ تجهيز PDF...')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('جارٍ تجهيز PDF...')));
     if (share) {
       await PrintService.shareInvoice(
         inv: inv,

@@ -52,8 +52,7 @@ class _LockScreenState extends State<LockScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.lock_outline,
-                    size: 72, color: Colors.white),
+                const Icon(Icons.lock_outline, size: 72, color: Colors.white),
                 const SizedBox(height: 16),
                 const Text(
                   'المحاسب السهل',

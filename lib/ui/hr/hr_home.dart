@@ -26,10 +26,12 @@ class _HrHomeState extends State<HrHome> {
     final prov = context.watch<ERPProvider>();
     final curr = prov.currency;
     final employees = prov.employees
-        .where((e) =>
-            _search.isEmpty ||
-            e.name.contains(_search) ||
-            e.jobTitle.contains(_search))
+        .where(
+          (e) =>
+              _search.isEmpty ||
+              e.name.contains(_search) ||
+              e.jobTitle.contains(_search),
+        )
         .toList();
 
     return Scaffold(
@@ -139,11 +141,13 @@ class _HrHomeState extends State<HrHome> {
                           onTap: () => Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (_) => EmployeeForm(employee: e)),
+                              builder: (_) => EmployeeForm(employee: e),
+                            ),
                           ),
                           leading: CircleAvatar(
-                            backgroundColor:
-                                AppColors.primary.withValues(alpha: 0.12),
+                            backgroundColor: AppColors.primary.withValues(
+                              alpha: 0.12,
+                            ),
                             child: Text(
                               e.name.isNotEmpty ? e.name.characters.first : '؟',
                               style: const TextStyle(
@@ -152,8 +156,10 @@ class _HrHomeState extends State<HrHome> {
                               ),
                             ),
                           ),
-                          title: Text(e.name,
-                              style: const TextStyle(fontSize: 14)),
+                          title: Text(
+                            e.name,
+                            style: const TextStyle(fontSize: 14),
+                          ),
                           subtitle: Text(
                             e.jobTitle.isEmpty ? 'بدون مسمى' : e.jobTitle,
                             style: const TextStyle(fontSize: 12),
@@ -171,9 +177,13 @@ class _HrHomeState extends State<HrHome> {
                                 ),
                               ),
                               if (!e.isActive)
-                                const Text('غير نشط',
-                                    style: TextStyle(
-                                        fontSize: 10, color: AppColors.danger)),
+                                const Text(
+                                  'غير نشط',
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    color: AppColors.danger,
+                                  ),
+                                ),
                             ],
                           ),
                         ),
@@ -187,7 +197,11 @@ class _HrHomeState extends State<HrHome> {
   }
 
   Widget _actionBtn(
-      BuildContext context, IconData icon, String label, VoidCallback onTap) {
+    BuildContext context,
+    IconData icon,
+    String label,
+    VoidCallback onTap,
+  ) {
     return Expanded(
       child: InkWell(
         onTap: onTap,
@@ -202,8 +216,10 @@ class _HrHomeState extends State<HrHome> {
               child: Icon(icon, color: Colors.white, size: 22),
             ),
             const SizedBox(height: 4),
-            Text(label,
-                style: const TextStyle(color: Colors.white, fontSize: 11)),
+            Text(
+              label,
+              style: const TextStyle(color: Colors.white, fontSize: 11),
+            ),
           ],
         ),
       ),

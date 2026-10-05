@@ -71,18 +71,23 @@ class _ItemPickerSheetState extends State<ItemPickerSheet> {
               const Spacer(),
               IconButton(
                 tooltip: 'مسح الباركود',
-                icon: const Icon(Icons.qr_code_scanner,
-                    color: AppColors.primary),
+                icon: const Icon(
+                  Icons.qr_code_scanner,
+                  color: AppColors.primary,
+                ),
                 onPressed: () async {
                   final code = await Navigator.push<String>(
                     context,
                     MaterialPageRoute(
-                        builder: (_) => const BarcodeScannerScreen()),
+                      builder: (_) => const BarcodeScannerScreen(),
+                    ),
                   );
                   if (code == null || code.isEmpty) return;
                   final match = prov.items
-                      .where((i) =>
-                          i.barcode.trim() == code || i.code.trim() == code)
+                      .where(
+                        (i) =>
+                            i.barcode.trim() == code || i.code.trim() == code,
+                      )
                       .firstOrNull;
                   if (match == null) {
                     if (!context.mounted) return;
@@ -96,10 +101,9 @@ class _ItemPickerSheetState extends State<ItemPickerSheet> {
                   }
                   setState(() {
                     _item = match;
-                    _price.text = (widget.isSale
-                            ? match.salePrice
-                            : match.purchasePrice)
-                        .toString();
+                    _price.text =
+                        (widget.isSale ? match.salePrice : match.purchasePrice)
+                            .toString();
                   });
                 },
               ),
@@ -118,20 +122,23 @@ class _ItemPickerSheetState extends State<ItemPickerSheet> {
               prefixIcon: Icon(Icons.inventory_2),
             ),
             items: prov.items
-                .map((it) => DropdownMenuItem(
-                      value: it,
-                      child: Text(
-                        '${it.name} (متاح: ${Fmt.num(prov.stockQty(it.id))})',
-                      ),
-                    ))
+                .map(
+                  (it) => DropdownMenuItem(
+                    value: it,
+                    child: Text(
+                      '${it.name} (متاح: ${Fmt.num(prov.stockQty(it.id))})',
+                    ),
+                  ),
+                )
                 .toList(),
             onChanged: (v) {
               setState(() {
                 _item = v;
-                _price.text = (widget.isSale
-                        ? (v?.salePrice ?? 0)
-                        : (v?.purchasePrice ?? 0))
-                    .toString();
+                _price.text =
+                    (widget.isSale
+                            ? (v?.salePrice ?? 0)
+                            : (v?.purchasePrice ?? 0))
+                        .toString();
               });
             },
           ),

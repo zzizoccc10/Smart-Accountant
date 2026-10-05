@@ -56,7 +56,8 @@ class _OrderFormState extends State<OrderForm> {
     // تهيئة المخزن من القائمة الفعلية
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final prov = context.read<ERPProvider>();
-      if ((_warehouseId.isEmpty || !prov.warehouses.any((w) => w.id == _warehouseId)) &&
+      if ((_warehouseId.isEmpty ||
+              !prov.warehouses.any((w) => w.id == _warehouseId)) &&
           prov.warehouses.isNotEmpty) {
         setState(() => _warehouseId = prov.warehouses.first.id);
       }
@@ -78,17 +79,27 @@ class _OrderFormState extends State<OrderForm> {
     final prov = context.watch<ERPProvider>();
     final curr = prov.currency;
     final contacts = prov.contacts
-        .where((c) => isSale ? c.contactType != 'supplier' : c.contactType != 'customer')
+        .where(
+          (c) => isSale
+              ? c.contactType != 'supplier'
+              : c.contactType != 'customer',
+        )
         .toList();
 
     // قيم آمنة للقوائم المنسدلة
     final safeContact = safeValue(
-        _contactId, contacts.map((c) => c.id).toSet());
+      _contactId,
+      contacts.map((c) => c.id).toSet(),
+    );
     final safeWarehouse = safeValueOrFirst(
-        _warehouseId, prov.warehouses.map((w) => w.id).toList());
+      _warehouseId,
+      prov.warehouses.map((w) => w.id).toList(),
+    );
 
     return Scaffold(
-      appBar: AppBar(title: Text(widget.existing == null ? 'جديد: $title' : 'تعديل: $title')),
+      appBar: AppBar(
+        title: Text(widget.existing == null ? 'جديد: $title' : 'تعديل: $title'),
+      ),
       body: ListView(
         padding: const EdgeInsets.all(12),
         children: [
@@ -106,10 +117,13 @@ class _OrderFormState extends State<OrderForm> {
                     ),
                     items: [
                       DropdownMenuItem(
-                          value: null,
-                          child: Text(isSale ? 'عميل نقدي' : 'مورد نقدي')),
-                      ...contacts.map((c) =>
-                          DropdownMenuItem(value: c.id, child: Text(c.name))),
+                        value: null,
+                        child: Text(isSale ? 'عميل نقدي' : 'مورد نقدي'),
+                      ),
+                      ...contacts.map(
+                        (c) =>
+                            DropdownMenuItem(value: c.id, child: Text(c.name)),
+                      ),
                     ],
                     onChanged: (v) => setState(() => _contactId = v),
                   ),
@@ -137,7 +151,9 @@ class _OrderFormState extends State<OrderForm> {
                               labelText: 'صالحة حتى / التسليم',
                               prefixIcon: Icon(Icons.event),
                             ),
-                            child: Text(_validUntil.isEmpty ? '—' : _validUntil),
+                            child: Text(
+                              _validUntil.isEmpty ? '—' : _validUntil,
+                            ),
                           ),
                         ),
                       ),
@@ -152,10 +168,15 @@ class _OrderFormState extends State<OrderForm> {
                       prefixIcon: Icon(Icons.warehouse),
                     ),
                     items: prov.warehouses
-                        .map((w) =>
-                            DropdownMenuItem(value: w.id, child: Text(w.name)))
+                        .map(
+                          (w) => DropdownMenuItem(
+                            value: w.id,
+                            child: Text(w.name),
+                          ),
+                        )
                         .toList(),
-                    onChanged: (v) => setState(() => _warehouseId = v ?? 'wh_main'),
+                    onChanged: (v) =>
+                        setState(() => _warehouseId = v ?? 'wh_main'),
                   ),
                 ],
               ),
@@ -176,8 +197,10 @@ class _OrderFormState extends State<OrderForm> {
               child: Padding(
                 padding: EdgeInsets.all(24),
                 child: Center(
-                  child: Text('لم تُضف أصناف بعد — اضغط "إضافة صنف"',
-                      style: TextStyle(color: Colors.grey)),
+                  child: Text(
+                    'لم تُضف أصناف بعد — اضغط "إضافة صنف"',
+                    style: TextStyle(color: Colors.grey),
+                  ),
                 ),
               ),
             )
@@ -187,8 +210,10 @@ class _OrderFormState extends State<OrderForm> {
                 children: [
                   for (int i = 0; i < _lines.length; i++)
                     ListTile(
-                      title: Text(_lines[i].itemName,
-                          style: const TextStyle(fontSize: 14)),
+                      title: Text(
+                        _lines[i].itemName,
+                        style: const TextStyle(fontSize: 14),
+                      ),
                       subtitle: Text(
                         '${Fmt.num(_lines[i].quantity)} × ${Fmt.money(_lines[i].unitPrice, curr)}',
                         style: const TextStyle(fontSize: 12),
@@ -196,14 +221,20 @@ class _OrderFormState extends State<OrderForm> {
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text(Fmt.money(_lines[i].lineTotal, curr),
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 13)),
+                          Text(
+                            Fmt.money(_lines[i].lineTotal, curr),
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13,
+                            ),
+                          ),
                           IconButton(
-                            icon: const Icon(Icons.close,
-                                size: 18, color: AppColors.danger),
-                            onPressed: () =>
-                                setState(() => _lines.removeAt(i)),
+                            icon: const Icon(
+                              Icons.close,
+                              size: 18,
+                              color: AppColors.danger,
+                            ),
+                            onPressed: () => setState(() => _lines.removeAt(i)),
                           ),
                         ],
                       ),
@@ -222,14 +253,19 @@ class _OrderFormState extends State<OrderForm> {
                   Row(
                     children: [
                       const Expanded(
-                          child: Text('خصم إضافي', style: TextStyle(fontSize: 13))),
+                        child: Text(
+                          'خصم إضافي',
+                          style: TextStyle(fontSize: 13),
+                        ),
+                      ),
                       SizedBox(
                         width: 100,
                         child: TextField(
                           keyboardType: TextInputType.number,
                           decoration: const InputDecoration(isDense: true),
                           onChanged: (v) => setState(
-                              () => _discountAmount = double.tryParse(v) ?? 0),
+                            () => _discountAmount = double.tryParse(v) ?? 0,
+                          ),
                         ),
                       ),
                     ],
@@ -238,14 +274,16 @@ class _OrderFormState extends State<OrderForm> {
                     Row(
                       children: [
                         const Expanded(
-                            child: Text('الشحن', style: TextStyle(fontSize: 13))),
+                          child: Text('الشحن', style: TextStyle(fontSize: 13)),
+                        ),
                         SizedBox(
                           width: 100,
                           child: TextField(
                             keyboardType: TextInputType.number,
                             decoration: const InputDecoration(isDense: true),
                             onChanged: (v) => setState(
-                                () => _shipping = double.tryParse(v) ?? 0),
+                              () => _shipping = double.tryParse(v) ?? 0,
+                            ),
                           ),
                         ),
                       ],
@@ -253,15 +291,22 @@ class _OrderFormState extends State<OrderForm> {
                   const Divider(),
                   Row(
                     children: [
-                      const Text('الإجمالي',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 15)),
+                      const Text(
+                        'الإجمالي',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                        ),
+                      ),
                       const Spacer(),
-                      Text(Fmt.money(_total, curr),
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                              color: AppColors.primary)),
+                      Text(
+                        Fmt.money(_total, curr),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: AppColors.primary,
+                        ),
+                      ),
                     ],
                   ),
                 ],
@@ -293,14 +338,14 @@ class _OrderFormState extends State<OrderForm> {
   }
 
   Widget _amtRow(String label, double val, String curr) => Padding(
-        padding: const EdgeInsets.symmetric(vertical: 2),
-        child: Row(
-          children: [
-            Expanded(child: Text(label, style: const TextStyle(fontSize: 13))),
-            Text(Fmt.money(val, curr), style: const TextStyle(fontSize: 13)),
-          ],
-        ),
-      );
+    padding: const EdgeInsets.symmetric(vertical: 2),
+    child: Row(
+      children: [
+        Expanded(child: Text(label, style: const TextStyle(fontSize: 13))),
+        Text(Fmt.money(val, curr), style: const TextStyle(fontSize: 13)),
+      ],
+    ),
+  );
 
   Future<void> _pickDate(bool validUntil) async {
     final picked = await showDatePicker(
@@ -327,10 +372,8 @@ class _OrderFormState extends State<OrderForm> {
     final result = await showModalBottomSheet<InvoiceLine>(
       context: context,
       isScrollControlled: true,
-      builder: (_) => ItemPickerSheet(
-        isSale: isSale,
-        defaultTaxRate: prov.taxRate,
-      ),
+      builder: (_) =>
+          ItemPickerSheet(isSale: isSale, defaultTaxRate: prov.taxRate),
     );
     if (result != null) setState(() => _lines.add(result));
   }

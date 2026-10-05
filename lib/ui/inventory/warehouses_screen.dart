@@ -30,11 +30,12 @@ class WarehousesScreen extends StatelessWidget {
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(n > 0
-                        ? 'تمت المزامنة — تحديث $n عنصر'
-                        : 'المخازن متزامنة بالفعل'),
-                    backgroundColor:
-                        n > 0 ? AppColors.success : AppColors.info,
+                    content: Text(
+                      n > 0
+                          ? 'تمت المزامنة — تحديث $n عنصر'
+                          : 'المخازن متزامنة بالفعل',
+                    ),
+                    backgroundColor: n > 0 ? AppColors.success : AppColors.info,
                   ),
                 );
               }
@@ -62,19 +63,22 @@ class WarehousesScreen extends StatelessWidget {
                   child: ListTile(
                     onTap: () => _openForm(context, prov, w),
                     leading: CircleAvatar(
-                      backgroundColor:
-                          AppColors.purple.withValues(alpha: 0.12),
-                      child: const Icon(Icons.warehouse,
-                          color: AppColors.purple, size: 20),
+                      backgroundColor: AppColors.purple.withValues(alpha: 0.12),
+                      child: const Icon(
+                        Icons.warehouse,
+                        color: AppColors.purple,
+                        size: 20,
+                      ),
                     ),
-                    title: Text(w.name,
-                        style: const TextStyle(fontSize: 14)),
+                    title: Text(w.name, style: const TextStyle(fontSize: 14)),
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         if (w.location.isNotEmpty)
-                          Text('الموقع: ${w.location}',
-                              style: const TextStyle(fontSize: 12)),
+                          Text(
+                            'الموقع: ${w.location}',
+                            style: const TextStyle(fontSize: 12),
+                          ),
                         Text(
                           acc != null
                               ? 'الحساب: ${acc.code} — ${acc.name}'
@@ -91,13 +95,18 @@ class WarehousesScreen extends StatelessWidget {
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Badge2(w.allowNegative ? 'سالب مسموح' : 'سالب ممنوع',
-                            color: w.allowNegative
-                                ? AppColors.warning
-                                : AppColors.success),
+                        Badge2(
+                          w.allowNegative ? 'سالب مسموح' : 'سالب ممنوع',
+                          color: w.allowNegative
+                              ? AppColors.warning
+                              : AppColors.success,
+                        ),
                         IconButton(
-                          icon: const Icon(Icons.delete_outline,
-                              color: AppColors.danger, size: 20),
+                          icon: const Icon(
+                            Icons.delete_outline,
+                            color: AppColors.danger,
+                            size: 20,
+                          ),
                           onPressed: () async {
                             final ok = await confirmDialog(
                               context,

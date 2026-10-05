@@ -34,10 +34,12 @@ class _SalesHomeState extends State<SalesHome> {
     final type = _tabs[_tab][1];
     final list = prov.invoices
         .where((i) => i.invoiceType == type)
-        .where((i) =>
-            _search.isEmpty ||
-            i.contactName.contains(_search) ||
-            i.invoiceNumber.contains(_search))
+        .where(
+          (i) =>
+              _search.isEmpty ||
+              i.contactName.contains(_search) ||
+              i.invoiceNumber.contains(_search),
+        )
         .toList()
         .reversed
         .toList();
@@ -94,9 +96,7 @@ class _SalesHomeState extends State<SalesHome> {
                   icon: const Icon(Icons.description_outlined),
                   onPressed: () => Navigator.push(
                     context,
-                    MaterialPageRoute(
-                      builder: (_) => const OrdersListScreen(),
-                    ),
+                    MaterialPageRoute(builder: (_) => const OrdersListScreen()),
                   ),
                 ),
               ],
@@ -114,7 +114,8 @@ class _SalesHomeState extends State<SalesHome> {
                     child: ListView.builder(
                       padding: const EdgeInsets.fromLTRB(12, 0, 12, 80),
                       itemCount: list.length,
-                      itemBuilder: (_, i) => _invoiceTile(context, list[i], prov),
+                      itemBuilder: (_, i) =>
+                          _invoiceTile(context, list[i], prov),
                     ),
                   ),
           ),
@@ -123,9 +124,7 @@ class _SalesHomeState extends State<SalesHome> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (_) => InvoiceForm(invoiceType: type),
-          ),
+          MaterialPageRoute(builder: (_) => InvoiceForm(invoiceType: type)),
         ),
         icon: const Icon(Icons.add),
         label: Text('${_tabs[_tab][0]} جديدة'),

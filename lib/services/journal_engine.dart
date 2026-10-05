@@ -20,9 +20,7 @@ class JournalEngine {
     final totalDebit = lines.fold(0.0, (s, l) => s + l.debit);
     final totalCredit = lines.fold(0.0, (s, l) => s + l.credit);
     if ((totalDebit - totalCredit).abs() > 0.001) {
-      throw Exception(
-        'القيد غير متوازن! مدين=$totalDebit دائن=$totalCredit',
-      );
+      throw Exception('القيد غير متوازن! مدين=$totalDebit دائن=$totalCredit');
     }
 
     final entry = JournalEntry(
@@ -407,8 +405,7 @@ class JournalEngine {
     required double amount,
   }) async {
     final exp = AppDatabase.accountByCode(CoA.depreciationExpense);
-    final accDep =
-        AppDatabase.accountByCode(CoA.accumulatedDepreciation);
+    final accDep = AppDatabase.accountByCode(CoA.accumulatedDepreciation);
     final lines = [
       dr(exp, amount, 'إهلاك ${asset.name}'),
       cr(accDep, amount, 'مجمع إهلاك ${asset.name}'),
@@ -445,7 +442,9 @@ class JournalEngine {
       lines.add(dr(cash, saleAmount, 'بيع أصل'));
     }
     if (asset.accumulatedDepreciation > 0) {
-      lines.add(dr(accDep, asset.accumulatedDepreciation, 'استبعاد مجمع الإهلاك'));
+      lines.add(
+        dr(accDep, asset.accumulatedDepreciation, 'استبعاد مجمع الإهلاك'),
+      );
     }
     lines.add(cr(assetAcc, asset.cost, 'استبعاد الأصل'));
     if (diff > 0.001) {

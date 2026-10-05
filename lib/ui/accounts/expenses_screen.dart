@@ -27,7 +27,13 @@ class ExpensesScreen extends StatelessWidget {
             title: 'تقرير المصروفات',
             companyName: prov.companyName,
             filename: 'expenses',
-            headers: const ['رقم المصروف', 'التاريخ', 'التصنيف', 'البيان', 'المبلغ'],
+            headers: const [
+              'رقم المصروف',
+              'التاريخ',
+              'التصنيف',
+              'البيان',
+              'المبلغ',
+            ],
             rows: [
               for (final e in list)
                 [
@@ -45,10 +51,7 @@ class ExpensesScreen extends StatelessWidget {
         ],
       ),
       body: list.isEmpty
-          ? const EmptyState(
-              message: 'لا توجد مصروفات',
-              icon: Icons.money_off,
-            )
+          ? const EmptyState(message: 'لا توجد مصروفات', icon: Icons.money_off)
           : ListView.builder(
               padding: const EdgeInsets.fromLTRB(12, 12, 12, 80),
               itemCount: list.length,
@@ -61,8 +64,10 @@ class ExpensesScreen extends StatelessWidget {
                       backgroundColor: Color(0x1AC62828),
                       child: Icon(Icons.money_off, color: AppColors.danger),
                     ),
-                    title: Text(e.categoryName,
-                        style: const TextStyle(fontWeight: FontWeight.bold)),
+                    title: Text(
+                      e.categoryName,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
                     subtitle: Text(
                       '${e.expenseNumber} • ${e.date}${e.description.isNotEmpty ? ' • ${e.description}' : ''}',
                       style: const TextStyle(fontSize: 12),
@@ -70,7 +75,9 @@ class ExpensesScreen extends StatelessWidget {
                     trailing: Text(
                       Fmt.money(e.total, curr),
                       style: const TextStyle(
-                          fontWeight: FontWeight.bold, color: AppColors.danger),
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.danger,
+                      ),
                     ),
                   ),
                 );
@@ -133,9 +140,9 @@ class _ExpenseFormState extends State<_ExpenseForm> {
   Future<void> _save() async {
     final amount = double.tryParse(_amount.text) ?? 0;
     if (amount <= 0 || _category == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('أكمل البيانات المطلوبة')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('أكمل البيانات المطلوبة')));
       return;
     }
     setState(() => _saving = true);
@@ -173,36 +180,40 @@ class _ExpenseFormState extends State<_ExpenseForm> {
               child: Column(
                 children: [
                   DropdownButtonFormField<ExpenseCategory>(
-                    initialValue: safeValue(
-                        _category, prov.expenseCategories),
+                    initialValue: safeValue(_category, prov.expenseCategories),
                     isExpanded: true,
                     decoration: const InputDecoration(
                       labelText: 'التصنيف',
                       prefixIcon: Icon(Icons.category),
                     ),
                     items: prov.expenseCategories
-                        .map((c) => DropdownMenuItem(
-                              value: c,
-                              child: Text(c.name),
-                            ))
+                        .map(
+                          (c) =>
+                              DropdownMenuItem(value: c, child: Text(c.name)),
+                        )
                         .toList(),
                     onChanged: (v) => setState(() => _category = v),
                   ),
                   const SizedBox(height: 12),
                   DropdownButtonFormField<String>(
                     initialValue: safeValue(
-                        _cashboxId, prov.cashboxes.map((c) => c.id)),
+                      _cashboxId,
+                      prov.cashboxes.map((c) => c.id),
+                    ),
                     isExpanded: true,
                     decoration: const InputDecoration(
                       labelText: 'الصندوق الدافع',
                       prefixIcon: Icon(Icons.account_balance_wallet),
                     ),
                     items: prov.cashboxes
-                        .map((c) => DropdownMenuItem(
-                              value: c.id,
-                              child: Text(
-                                  '${c.name} (${Fmt.money(c.currentBalance, curr)})'),
-                            ))
+                        .map(
+                          (c) => DropdownMenuItem(
+                            value: c.id,
+                            child: Text(
+                              '${c.name} (${Fmt.money(c.currentBalance, curr)})',
+                            ),
+                          ),
+                        )
                         .toList(),
                     onChanged: (v) => setState(() => _cashboxId = v),
                   ),

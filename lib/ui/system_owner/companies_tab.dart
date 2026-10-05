@@ -38,12 +38,12 @@ class _CompaniesTabState extends State<CompaniesTab> {
   }
 
   List<CompanyAccount> get _filtered => ControlService.filterAndSort(
-        query: _query,
-        sort: _sort,
-        withinDays: _withinDays,
-        opsCount: StatsService.opsOfCompany,
-        usersCount: StatsService.usersOfCompany,
-      );
+    query: _query,
+    sort: _sort,
+    withinDays: _withinDays,
+    opsCount: StatsService.opsOfCompany,
+    usersCount: StatsService.usersOfCompany,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -51,8 +51,7 @@ class _CompaniesTabState extends State<CompaniesTab> {
     final totalPages = all.isEmpty ? 1 : ((all.length - 1) ~/ pageSize) + 1;
     if (_page > totalPages) _page = totalPages;
     final start = (_page - 1) * pageSize;
-    final pageItems =
-        all.skip(start).take(pageSize).toList(growable: false);
+    final pageItems = all.skip(start).take(pageSize).toList(growable: false);
 
     return Column(
       children: [
@@ -64,7 +63,8 @@ class _CompaniesTabState extends State<CompaniesTab> {
               ? const EmptyState(
                   Icons.business_outlined,
                   'لا توجد منشآت مطابقة',
-                  hint: 'جرّب تغيير البحث أو الفلتر. تظهر المنشآت هنا فور '
+                  hint:
+                      'جرّب تغيير البحث أو الفلتر. تظهر المنشآت هنا فور '
                       'إنشاء أي مستخدم حساباً من شاشة الدخول.',
                 )
               : ListView.builder(
@@ -126,14 +126,20 @@ class _CompaniesTabState extends State<CompaniesTab> {
             children: [
               const Icon(Icons.filter_list, size: 17, color: AppColors.primary),
               const SizedBox(width: 6),
-              Text('الفلتر',
-                  style: TextStyle(
-                      fontSize: 12.5,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey.shade700)),
+              Text(
+                'الفلتر',
+                style: TextStyle(
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey.shade700,
+                ),
+              ),
               const Spacer(),
-              BadgeChip('$count منشأة', AppColors.primary,
-                  icon: Icons.business),
+              BadgeChip(
+                '$count منشأة',
+                AppColors.primary,
+                icon: Icons.business,
+              ),
             ],
           ),
           const SizedBox(height: 8),
@@ -146,11 +152,7 @@ class _CompaniesTabState extends State<CompaniesTab> {
                 _chip('الأكثر مستخدمين', 'mostUsers'),
                 _chip('الأقدم', 'oldest'),
                 const SizedBox(width: 4),
-                Container(
-                  width: 1,
-                  height: 22,
-                  color: Colors.grey.shade300,
-                ),
+                Container(width: 1, height: 22, color: Colors.grey.shade300),
                 const SizedBox(width: 8),
                 _periodChip('آخر 7 أيام', 7),
                 _periodChip('آخر 30 يوم', 30),
@@ -162,8 +164,10 @@ class _CompaniesTabState extends State<CompaniesTab> {
                       _page = 1;
                     }),
                     icon: const Icon(Icons.clear, size: 15),
-                    label: const Text('إزالة الفترة',
-                        style: TextStyle(fontSize: 11.5)),
+                    label: const Text(
+                      'إزالة الفترة',
+                      style: TextStyle(fontSize: 11.5),
+                    ),
                   ),
               ],
             ),
@@ -239,13 +243,17 @@ class _CompaniesTabState extends State<CompaniesTab> {
             children: [
               CircleAvatar(
                 radius: 22,
-                backgroundColor:
-                    c.isActive ? AppColors.primary : Colors.grey.shade400,
-                child: Text(c.initials,
-                    style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 17,
-                        fontWeight: FontWeight.bold)),
+                backgroundColor: c.isActive
+                    ? AppColors.primary
+                    : Colors.grey.shade400,
+                child: Text(
+                  c.initials,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 17,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -255,15 +263,22 @@ class _CompaniesTabState extends State<CompaniesTab> {
                     Row(
                       children: [
                         Expanded(
-                          child: Text(c.companyName,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                  fontSize: 14.5, fontWeight: FontWeight.bold)),
+                          child: Text(
+                            c.companyName,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 14.5,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
                         if (!c.isActive)
-                          const BadgeChip('موقوفة', AppColors.danger,
-                              icon: Icons.pause_circle_outline),
+                          const BadgeChip(
+                            'موقوفة',
+                            AppColors.danger,
+                            icon: Icons.pause_circle_outline,
+                          ),
                       ],
                     ),
                     const SizedBox(height: 3),
@@ -273,28 +288,45 @@ class _CompaniesTabState extends State<CompaniesTab> {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                          fontSize: 11.5, color: Colors.grey.shade600),
+                        fontSize: 11.5,
+                        color: Colors.grey.shade600,
+                      ),
                     ),
                     const SizedBox(height: 8),
                     Wrap(
                       spacing: 6,
                       runSpacing: 6,
                       children: [
-                        BadgeChip('$ops عملية', AppColors.indigo,
-                            icon: Icons.sync_alt),
-                        BadgeChip('$users مستخدم', AppColors.teal,
-                            icon: Icons.people_outline),
-                        BadgeChip('$devices جهاز', AppColors.purple,
-                            icon: Icons.devices),
-                        BadgeChip(c.plan.labelAr, AppColors.info,
-                            icon: Icons.workspace_premium),
+                        BadgeChip(
+                          '$ops عملية',
+                          AppColors.indigo,
+                          icon: Icons.sync_alt,
+                        ),
+                        BadgeChip(
+                          '$users مستخدم',
+                          AppColors.teal,
+                          icon: Icons.people_outline,
+                        ),
+                        BadgeChip(
+                          '$devices جهاز',
+                          AppColors.purple,
+                          icon: Icons.devices,
+                        ),
+                        BadgeChip(
+                          c.plan.labelAr,
+                          AppColors.info,
+                          icon: Icons.workspace_premium,
+                        ),
                       ],
                     ),
                     const SizedBox(height: 7),
                     Row(
                       children: [
-                        Icon(Icons.schedule,
-                            size: 12, color: Colors.grey.shade500),
+                        Icon(
+                          Icons.schedule,
+                          size: 12,
+                          color: Colors.grey.shade500,
+                        ),
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
@@ -302,7 +334,9 @@ class _CompaniesTabState extends State<CompaniesTab> {
                                 ? 'آخر دخول: لم يدخل بعد'
                                 : 'آخر دخول: ${timeAgo(c.lastLoginAt)}',
                             style: TextStyle(
-                                fontSize: 10.5, color: Colors.grey.shade600),
+                              fontSize: 10.5,
+                              color: Colors.grey.shade600,
+                            ),
                           ),
                         ),
                         Switch(
@@ -316,9 +350,11 @@ class _CompaniesTabState extends State<CompaniesTab> {
                               setState(() {});
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  content: Text(v
-                                      ? 'تم تفعيل «${c.companyName}»'
-                                      : 'تم إيقاف «${c.companyName}»'),
+                                  content: Text(
+                                    v
+                                        ? 'تم تفعيل «${c.companyName}»'
+                                        : 'تم إيقاف «${c.companyName}»',
+                                  ),
                                   backgroundColor: v
                                       ? AppColors.success
                                       : AppColors.warning,
@@ -377,18 +413,17 @@ class _CompaniesTabState extends State<CompaniesTab> {
                         height: 34,
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
-                          color: on
-                              ? AppColors.primary
-                              : Colors.grey.shade100,
+                          color: on ? AppColors.primary : Colors.grey.shade100,
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: Text('$p',
-                            style: TextStyle(
-                                fontSize: 12.5,
-                                fontWeight: FontWeight.bold,
-                                color: on
-                                    ? Colors.white
-                                    : Colors.grey.shade700)),
+                        child: Text(
+                          '$p',
+                          style: TextStyle(
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.bold,
+                            color: on ? Colors.white : Colors.grey.shade700,
+                          ),
+                        ),
                       ),
                     ),
                   );
@@ -399,11 +434,14 @@ class _CompaniesTabState extends State<CompaniesTab> {
           IconButton(
             tooltip: 'التالي',
             icon: const Icon(Icons.chevron_left),
-            onPressed:
-                _page < totalPages ? () => setState(() => _page++) : null,
+            onPressed: _page < totalPages
+                ? () => setState(() => _page++)
+                : null,
           ),
-          Text('$total',
-              style: TextStyle(fontSize: 11, color: Colors.grey.shade600)),
+          Text(
+            '$total',
+            style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
+          ),
         ],
       ),
     );

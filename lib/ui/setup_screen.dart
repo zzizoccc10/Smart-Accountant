@@ -29,8 +29,10 @@ class _SetupScreenState extends State<SetupScreen> {
 
   void _submit() {
     if (!_formKey.currentState!.validate()) return;
-    Provider.of<ERPProvider>(context, listen: false)
-        .initCompany(_name.text.trim(), _phone.text.trim(), _currency);
+    Provider.of<ERPProvider>(
+      context,
+      listen: false,
+    ).initCompany(_name.text.trim(), _phone.text.trim(), _currency);
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (_) => const HomeShell()),
@@ -105,11 +107,26 @@ class _SetupScreenState extends State<SetupScreen> {
                           prefixIcon: Icon(Icons.attach_money),
                         ),
                         items: const [
-                          DropdownMenuItem(value: 'ر.ي', child: Text('ريال يمني (ر.ي)')),
-                          DropdownMenuItem(value: 'ر.س', child: Text('ريال سعودي (ر.س)')),
-                          DropdownMenuItem(value: 'ج.م', child: Text('جنيه مصري (ج.م)')),
-                          DropdownMenuItem(value: 'د.إ', child: Text('درهم إماراتي (د.إ)')),
-                          DropdownMenuItem(value: 'USD', child: Text('دولار أمريكي (\$)')),
+                          DropdownMenuItem(
+                            value: 'ر.ي',
+                            child: Text('ريال يمني (ر.ي)'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'ر.س',
+                            child: Text('ريال سعودي (ر.س)'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'ج.م',
+                            child: Text('جنيه مصري (ج.م)'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'د.إ',
+                            child: Text('درهم إماراتي (د.إ)'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'USD',
+                            child: Text('دولار أمريكي (\$)'),
+                          ),
                         ],
                         onChanged: (v) => setState(() => _currency = v!),
                       ),

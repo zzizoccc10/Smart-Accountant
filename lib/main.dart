@@ -24,6 +24,7 @@ import 'services/firebase_config.dart';
 import 'services/local_notifications.dart';
 import 'services/operation_service.dart';
 import 'services/push_notifications.dart';
+import 'services/sync_queue.dart';
 import 'services/user_service.dart';
 import 'theme/app_theme.dart';
 import 'ui/lock_screen.dart';
@@ -38,6 +39,13 @@ Future<void> main() async {
   await ControlService.initBoxes();
   await OperationService.initBox();
   await AdminNotificationService.initBox();
+
+  // 1.b) قائمة المزامنة الفورية/المؤجّلة (تعمل مع أي حفظ/حذف في النظام)
+  await SyncQueue.initBox();
+  AppDatabase.onWrite = (box, key, isDelete) {
+    SyncQueue.enqueue(box, key, isDelete: isDelete);
+  };
+  SyncQueue.startAutoFlush();
 
   // 2) Firebase (اختياري — يتخطى بهدوء إن لم تُرفع الإعدادات)
   await _initFirebase();
@@ -80,9 +88,7 @@ Future<void> _initFirebase() async {
     }
     // تسجيل معالج الرسائل في الخلفية
     if (!kIsWeb) {
-      FirebaseMessaging.onBackgroundMessage(
-        firebaseMessagingBackgroundHandler,
-      );
+      FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
     }
     if (kDebugMode) {
       debugPrint('[main] Firebase initialized ✓ (${FirebaseConfig.projectId})');

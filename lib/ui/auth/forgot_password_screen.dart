@@ -85,8 +85,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         details: widget.isSystemOwner
             ? 'طلب تعديل كلمة مرور مالك النظام'
             : (company != null
-                ? 'طلب تعديل كلمة مرور منشأة: ${company.companyName}'
-                : (user != null ? 'طلب تعديل كلمة مرور مستخدم: ${user.name}' : 'طلب غير معروف')),
+                  ? 'طلب تعديل كلمة مرور منشأة: ${company.companyName}'
+                  : (user != null
+                        ? 'طلب تعديل كلمة مرور مستخدم: ${user.name}'
+                        : 'طلب غير معروف')),
       );
       if (!mounted) return;
       _showSuccess(
@@ -111,8 +113,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     showDialog(
       context: context,
       builder: (dlgCtx) => AlertDialog(
-        icon: const Icon(Icons.mark_email_read,
-            color: AppColors.success, size: 42),
+        icon: const Icon(
+          Icons.mark_email_read,
+          color: AppColors.success,
+          size: 42,
+        ),
         title: const Text('تم'),
         content: Text(msg),
         actions: [
@@ -146,21 +151,28 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      const Icon(Icons.lock_reset,
-                          size: 52, color: AppColors.primary),
+                      const Icon(
+                        Icons.lock_reset,
+                        size: 52,
+                        color: AppColors.primary,
+                      ),
                       const SizedBox(height: 12),
                       const Text(
                         'هل نسيت كلمة المرور؟',
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       const SizedBox(height: 6),
                       Text(
                         'أدخل اسم المستخدم أو البريد الإلكتروني، واختر طريقة الاستعادة.',
                         textAlign: TextAlign.center,
-                        style:
-                            TextStyle(color: Colors.grey.shade600, fontSize: 13),
+                        style: TextStyle(
+                          color: Colors.grey.shade600,
+                          fontSize: 13,
+                        ),
                       ),
                       const SizedBox(height: 18),
                       TextField(
@@ -180,7 +192,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                   width: 18,
                                   height: 18,
                                   child: CircularProgressIndicator(
-                                      strokeWidth: 2, color: Colors.white),
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
                                 )
                               : const Icon(Icons.email_outlined),
                           label: const Text('إرسال رابط إعادة التعيين بالبريد'),
@@ -198,7 +212,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                           'ملاحظة: إعادة التعيين عبر البريد تحتاج تفعيل السحابة. '
                           'يمكنك استخدام «طلب تعديل من الإدارة» محلياً.',
                           style: TextStyle(
-                              fontSize: 11, color: Colors.grey.shade600),
+                            fontSize: 11,
+                            color: Colors.grey.shade600,
+                          ),
                           textAlign: TextAlign.center,
                         ),
                       ],

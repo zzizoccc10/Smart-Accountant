@@ -80,8 +80,11 @@ class _GoogleTabState extends State<GoogleTab> {
           padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Row(
             children: [
-              BadgeChip('${all.length} حساب', AppColors.danger,
-                  icon: Icons.g_mobiledata),
+              BadgeChip(
+                '${all.length} حساب',
+                AppColors.danger,
+                icon: Icons.g_mobiledata,
+              ),
             ],
           ),
         ),
@@ -119,20 +122,23 @@ class _GoogleTabState extends State<GoogleTab> {
             CircleAvatar(
               radius: 21,
               backgroundColor: AppColors.danger.withValues(alpha: 0.85),
-              backgroundImage:
-                  g.photoUrl.isNotEmpty ? NetworkImage(g.photoUrl) : null,
+              backgroundImage: g.photoUrl.isNotEmpty
+                  ? NetworkImage(g.photoUrl)
+                  : null,
               child: g.photoUrl.isNotEmpty
                   ? null
                   : Text(
                       (g.displayName.isNotEmpty
                               ? g.displayName
                               : g.email.isNotEmpty
-                                  ? g.email
-                                  : '?')
+                              ? g.email
+                              : '?')
                           .substring(0, 1)
                           .toUpperCase(),
                       style: const TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.bold),
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
             ),
             const SizedBox(width: 12),
@@ -145,39 +151,63 @@ class _GoogleTabState extends State<GoogleTab> {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
-                        fontSize: 13.5, fontWeight: FontWeight.bold),
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   if (g.email.isNotEmpty && g.displayName.isNotEmpty)
-                    Text(g.email,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                            fontSize: 11, color: Colors.grey.shade600)),
+                    Text(
+                      g.email,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
                   const SizedBox(height: 6),
                   Wrap(
                     spacing: 6,
                     runSpacing: 6,
                     children: [
-                      BadgeChip(platformLabel(g.platform), AppColors.info,
-                          icon: platformIcon(g.platform)),
-                      if (g.model.isNotEmpty)
-                        BadgeChip(g.model, AppColors.purple,
-                            icon: Icons.phone_android),
                       BadgeChip(
-                          g.country.isEmpty ? 'غير معروف' : g.country,
-                          AppColors.teal,
-                          icon: Icons.public),
-                      BadgeChip('${g.loginCount} دخول', AppColors.indigo,
-                          icon: Icons.login),
+                        platformLabel(g.platform),
+                        AppColors.info,
+                        icon: platformIcon(g.platform),
+                      ),
+                      if (g.model.isNotEmpty)
+                        BadgeChip(
+                          g.model,
+                          AppColors.purple,
+                          icon: Icons.phone_android,
+                        ),
+                      BadgeChip(
+                        g.country.isEmpty ? 'غير معروف' : g.country,
+                        AppColors.teal,
+                        icon: Icons.public,
+                      ),
+                      BadgeChip(
+                        '${g.loginCount} دخول',
+                        AppColors.indigo,
+                        icon: Icons.login,
+                      ),
                     ],
                   ),
                   const SizedBox(height: 7),
-                  Text('أول دخول: ${fmtDay(g.firstSeenAt)}',
-                      style: TextStyle(
-                          fontSize: 10.5, color: Colors.grey.shade600)),
-                  Text('آخر دخول: ${timeAgo(g.lastSeenAt)}',
-                      style: TextStyle(
-                          fontSize: 10.5, color: Colors.grey.shade600)),
+                  Text(
+                    'أول دخول: ${fmtDay(g.firstSeenAt)}',
+                    style: TextStyle(
+                      fontSize: 10.5,
+                      color: Colors.grey.shade600,
+                    ),
+                  ),
+                  Text(
+                    'آخر دخول: ${timeAgo(g.lastSeenAt)}',
+                    style: TextStyle(
+                      fontSize: 10.5,
+                      color: Colors.grey.shade600,
+                    ),
+                  ),
                   if (co != null)
                     InkWell(
                       onTap: () async {
@@ -194,14 +224,20 @@ class _GoogleTabState extends State<GoogleTab> {
                         padding: const EdgeInsets.only(top: 4),
                         child: Row(
                           children: [
-                            const Icon(Icons.business,
-                                size: 13, color: AppColors.primary),
+                            const Icon(
+                              Icons.business,
+                              size: 13,
+                              color: AppColors.primary,
+                            ),
                             const SizedBox(width: 4),
-                            Text('المنشأة: ${co.companyName}',
-                                style: const TextStyle(
-                                    fontSize: 11,
-                                    color: AppColors.primary,
-                                    fontWeight: FontWeight.w600)),
+                            Text(
+                              'المنشأة: ${co.companyName}',
+                              style: const TextStyle(
+                                fontSize: 11,
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -221,11 +257,13 @@ class _GoogleTabState extends State<GoogleTab> {
                     content: const Text('هل تريد حذف هذا السجل؟'),
                     actions: [
                       TextButton(
-                          onPressed: () => Navigator.pop(dlgCtx, false),
-                          child: const Text('إلغاء')),
+                        onPressed: () => Navigator.pop(dlgCtx, false),
+                        child: const Text('إلغاء'),
+                      ),
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.danger),
+                          backgroundColor: AppColors.danger,
+                        ),
                         onPressed: () => Navigator.pop(dlgCtx, true),
                         child: const Text('حذف'),
                       ),
@@ -258,12 +296,15 @@ class _GoogleTabState extends State<GoogleTab> {
             icon: const Icon(Icons.chevron_right),
             onPressed: _page > 1 ? () => setState(() => _page--) : null,
           ),
-          Text('صفحة $_page من $totalPages • $total حساب',
-              style: const TextStyle(fontSize: 12)),
+          Text(
+            'صفحة $_page من $totalPages • $total حساب',
+            style: const TextStyle(fontSize: 12),
+          ),
           IconButton(
             icon: const Icon(Icons.chevron_left),
-            onPressed:
-                _page < totalPages ? () => setState(() => _page++) : null,
+            onPressed: _page < totalPages
+                ? () => setState(() => _page++)
+                : null,
           ),
         ],
       ),

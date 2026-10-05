@@ -15,6 +15,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 import '../data/app_database.dart';
 import '../models/control_models.dart';
+import 'device_service.dart';
 import 'firebase_config.dart';
 import 'security_service.dart';
 
@@ -25,8 +26,10 @@ class ControlService {
   static const boxDevices = 'devices'; // سجل الأجهزة
   static const boxGuests = 'guest_accounts'; // الزوار (دخول بدون حساب)
   static const boxGoogle = 'google_accounts'; // حسابات Google
+  static const boxOwnerConfig = 'owner_config'; // إعدادات/صلاحيات لوحة المالك
 
   static const String _ownerKey = 'owner';
+  static const String _ownerConfigKey = 'config';
   static const String _activeCompanyKey = 'activeCompanyId';
 
   static Box get _companies => Hive.box(boxCompanies);
@@ -34,6 +37,7 @@ class ControlService {
   static Box get _devices => Hive.box(boxDevices);
   static Box get _guests => Hive.box(boxGuests);
   static Box get _google => Hive.box(boxGoogle);
+  static Box get _ownerCfg => Hive.box(boxOwnerConfig);
 
   static FirebaseFirestore? get _db {
     if (!FirebaseConfig.isConfigured) return null;
@@ -53,6 +57,7 @@ class ControlService {
     if (!Hive.isBoxOpen(boxDevices)) await Hive.openBox(boxDevices);
     if (!Hive.isBoxOpen(boxGuests)) await Hive.openBox(boxGuests);
     if (!Hive.isBoxOpen(boxGoogle)) await Hive.openBox(boxGoogle);
+    if (!Hive.isBoxOpen(boxOwnerConfig)) await Hive.openBox(boxOwnerConfig);
   }
 
   // ==========================================================================
@@ -69,13 +74,18 @@ class ControlService {
     return null;
   }
 
-  /// إنشاء حساب مالك النظام الأول (username + password)
+  /// إنشاء حساب مالك النظام الأول (username + password).
+  /// يُسمح بالإنشاء مرة واحدة فقط — ما لم يُسمح بإعادة الإنشاء صراحةً.
   static Future<SystemOwner> createSystemOwner({
     required String name,
     required String username,
     required String password,
     String email = '',
+    bool force = false,
   }) async {
+    if (hasSystemOwner && !force) {
+      return systemOwner!;
+    }
     final cred = SecurityService.createPassword(password);
     final owner = SystemOwner(
       name: name.trim().isEmpty ? 'مالك النظام' : name.trim(),
@@ -85,14 +95,58 @@ class ControlService {
       passwordSalt: cred.salt,
     );
     await _ownerBox.put(_ownerKey, owner.toMap());
+    // سجّل الجهاز الأول الذي أنشأ حساب المالك (المصرّح له)
+    final cfg = ownerConfig;
+    await _saveOwnerConfig(cfg.copyWith(ownerDeviceId: DeviceService.deviceId));
     _pushSystemOwnerToCloud(owner);
+    _pushOwnerConfigToCloud(ownerConfig);
     return owner;
   }
 
-  /// تعديل بيانات مالك النظام
+  /// تعديل بيانات مالك النظام (اسم/بريد)
   static Future<void> updateSystemOwner(SystemOwner owner) async {
     await _ownerBox.put(_ownerKey, owner.toMap());
     _pushSystemOwnerToCloud(owner);
+  }
+
+  /// تعديل اسم مستخدم مالك النظام (مع التحقق من عدم التكرار)
+  static Future<bool> changeSystemOwnerUsername(String newUsername) async {
+    final owner = systemOwner;
+    if (owner == null) return false;
+    final u = newUsername.trim();
+    if (u.length < 3) return false;
+    final updated = SystemOwner(
+      name: owner.name,
+      username: u,
+      email: owner.email,
+      passwordHash: owner.passwordHash,
+      passwordSalt: owner.passwordSalt,
+      mustChangePassword: owner.mustChangePassword,
+      createdAt: owner.createdAt,
+      lastLoginAt: owner.lastLoginAt,
+    );
+    await updateSystemOwner(updated);
+    return true;
+  }
+
+  /// تحديث الاسم/البريد لمالك النظام
+  static Future<void> updateSystemOwnerProfile({
+    String? name,
+    String? email,
+  }) async {
+    final owner = systemOwner;
+    if (owner == null) return;
+    final updated = SystemOwner(
+      name: (name ?? owner.name).trim().isEmpty ? owner.name : name!.trim(),
+      username: owner.username,
+      email: (email ?? owner.email).trim(),
+      passwordHash: owner.passwordHash,
+      passwordSalt: owner.passwordSalt,
+      mustChangePassword: owner.mustChangePassword,
+      createdAt: owner.createdAt,
+      lastLoginAt: owner.lastLoginAt,
+    );
+    await updateSystemOwner(updated);
   }
 
   /// تغيير كلمة مرور مالك النظام
@@ -103,7 +157,10 @@ class ControlService {
     final owner = systemOwner;
     if (owner == null) return false;
     if (!SecurityService.verify(
-        oldPassword, owner.passwordHash, owner.passwordSalt)) {
+      oldPassword,
+      owner.passwordHash,
+      owner.passwordSalt,
+    )) {
       return false;
     }
     final cred = SecurityService.createPassword(newPassword);
@@ -129,7 +186,10 @@ class ControlService {
       return false;
     }
     return SecurityService.verify(
-        password, owner.passwordHash, owner.passwordSalt);
+      password,
+      owner.passwordHash,
+      owner.passwordSalt,
+    );
   }
 
   /// تحديث وقت آخر دخول لمالك النظام
@@ -150,17 +210,128 @@ class ControlService {
   }
 
   // ==========================================================================
+  // ====================== إعدادات/صلاحيات لوحة المالك ======================
+  // ==========================================================================
+
+  /// إعدادات الوصول إلى لوحة المالك (محلياً).
+  static OwnerConfig get ownerConfig {
+    final m = _ownerCfg.get(_ownerConfigKey);
+    if (m is Map) return OwnerConfig.fromMap(Map<String, dynamic>.from(m));
+    return OwnerConfig();
+  }
+
+  /// هل هذا الجهاز هو «الجهاز الأول» الذي أُنشئ عليه حساب المالك؟
+  static bool get isPrimaryOwnerDevice {
+    final cfg = ownerConfig;
+    if (cfg.ownerDeviceId.isEmpty) return false;
+    return cfg.ownerDeviceId == DeviceService.deviceId;
+  }
+
+  /// حفظ إعدادات المالك محلياً + بثّها سحابياً.
+  static Future<void> _saveOwnerConfig(OwnerConfig cfg) async {
+    await _ownerCfg.put(_ownerConfigKey, cfg.toMap());
+    _pushOwnerConfigToCloud(cfg);
+  }
+
+  /// بدء/تحديث جلسة مالك النظام (تجعلها فعّالة على كل الأجهزة).
+  static Future<void> activateOwnerSession() async {
+    final cfg = ownerConfig.copyWith(
+      sessionActive: true,
+      sessionDeviceId: DeviceService.deviceId,
+      lastActiveAt: DateTime.now().toIso8601String(),
+    );
+    await _saveOwnerConfig(cfg);
+  }
+
+  /// تحديث نبضة النشاط لجلسة المالك (تبقى فعّالة).
+  static Future<void> heartbeatOwnerSession() async {
+    final cfg = ownerConfig;
+    if (!cfg.sessionActive) return;
+    if (cfg.sessionDeviceId != DeviceService.deviceId) return;
+    await _ownerCfg.put(
+      _ownerConfigKey,
+      cfg.copyWith(lastActiveAt: DateTime.now().toIso8601String()).toMap(),
+    );
+  }
+
+  /// إنهاء جلسة مالك النظام (تظهر إمكانية الدخول للأجهزة المصرّح لها).
+  static Future<void> endOwnerSession() async {
+    final cfg = ownerConfig.copyWith(sessionActive: false, sessionDeviceId: '');
+    await _saveOwnerConfig(cfg);
+  }
+
+  /// (المالك) السماح لأجهزة أخرى بإظهار قسم الدخول إلى اللوحة.
+  static Future<void> setAllowDeviceEntry(bool allow) async {
+    await _saveOwnerConfig(ownerConfig.copyWith(allowDeviceEntry: allow));
+  }
+
+  /// (المالك) ربط «أول منشأة» لتتمكّن من فتح لوحة المالك من داخل التطبيق.
+  static Future<void> setAllowCompanyEntry(
+    bool allow, {
+    String? companyId,
+  }) async {
+    await _saveOwnerConfig(
+      ownerConfig.copyWith(
+        allowCompanyEntry: allow,
+        linkedCompanyId: companyId ?? ownerConfig.linkedCompanyId,
+      ),
+    );
+  }
+
+  /// هل يُسمح لهذا الجهاز بإظهار قسم دخول المالك؟
+  ///   • الجهاز الأول (المُنشئ) → دائماً.
+  ///   • غيره → فقط إن سمح المالك صراحةً.
+  static bool get canShowOwnerEntryOnDevice {
+    if (isPrimaryOwnerDevice) return true;
+    return ownerConfig.allowDeviceEntry;
+  }
+
+  /// هل يُسمح للمنشأة المرتبطة بفتح اللوحة من داخل التطبيق؟
+  static bool canCompanyOpenOwnerPanel(String companyId) {
+    final cfg = ownerConfig;
+    if (!cfg.allowCompanyEntry) return false;
+    if (cfg.linkedCompanyId.isEmpty) return false;
+    return cfg.linkedCompanyId == companyId;
+  }
+
+  /// هل جلسة المالك فعّالة الآن (وتُخفي قسم الدخول عن الجميع)؟
+  static bool get isOwnerSessionActive => ownerConfig.isSessionFresh;
+
+  /// دمج إعدادات المالك القادمة من السحابة (بدون دهس نبضة أحدث محلياً).
+  static Future<void> applyCloudOwnerConfig(OwnerConfig remote) async {
+    final local = ownerConfig;
+    // نبضة أحدث محلياً (نفس الجهاز) → لا نتراجع
+    final localAt = DateTime.tryParse(local.lastActiveAt);
+    final remoteAt = DateTime.tryParse(remote.lastActiveAt);
+    if (local.sessionDeviceId == DeviceService.deviceId &&
+        local.sessionActive &&
+        localAt != null &&
+        (remoteAt == null || localAt.isAfter(remoteAt))) {
+      // حدّث فقط الحقول الإدارية (allowDeviceEntry / linkedCompany)
+      final merged = remote.copyWith(
+        sessionActive: local.sessionActive,
+        sessionDeviceId: local.sessionDeviceId,
+        lastActiveAt: local.lastActiveAt,
+      );
+      await _ownerCfg.put(_ownerConfigKey, merged.toMap());
+      return;
+    }
+    await _ownerCfg.put(_ownerConfigKey, remote.toMap());
+  }
+
+  // ==========================================================================
   // ============================ حسابات المنشآت ============================
   // ==========================================================================
 
   /// كل المنشآت (مرتّبة بالأحدث)
   static List<CompanyAccount> allCompanies() {
     try {
-      final list = _companies.values
-          .whereType<Map>()
-          .map((m) => CompanyAccount.fromMap(Map<String, dynamic>.from(m)))
-          .toList()
-        ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      final list =
+          _companies.values
+              .whereType<Map>()
+              .map((m) => CompanyAccount.fromMap(Map<String, dynamic>.from(m)))
+              .toList()
+            ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
       return list;
     } catch (_) {
       return [];
@@ -215,9 +386,7 @@ class ControlService {
       phone: phone.trim(),
       isActive: true,
       plan: CompanyPlan.free,
-      privileges: CompanyPrivileges(
-        granted: CompanyPrivileges.allKeys.toSet(),
-      ),
+      privileges: CompanyPrivileges(granted: CompanyPrivileges.allKeys.toSet()),
       deviceId: deviceId,
       createdVia: createdVia,
       appVersion: appVersion,
@@ -261,21 +430,25 @@ class ControlService {
 
   /// تحديث خطة/امتيازات منشأة بالكامل
   static Future<void> updatePrivileges(
-      String id, CompanyPrivileges privileges) async {
+    String id,
+    CompanyPrivileges privileges,
+  ) async {
     final c = companyById(id);
     if (c == null) return;
     await updateCompany(c.copyWith(privileges: privileges));
   }
 
   /// تغيير كلمة مرور منشأة (من لوحة مالك النظام)
-  static Future<void> resetCompanyPassword(String id, String newPassword) async {
+  static Future<void> resetCompanyPassword(
+    String id,
+    String newPassword,
+  ) async {
     final c = companyById(id);
     if (c == null) return;
     final cred = SecurityService.createPassword(newPassword);
-    await updateCompany(c.copyWith(
-      passwordHash: cred.hash,
-      passwordSalt: cred.salt,
-    ));
+    await updateCompany(
+      c.copyWith(passwordHash: cred.hash, passwordSalt: cred.salt),
+    );
   }
 
   /// حذف منشأة
@@ -302,8 +475,12 @@ class ControlService {
     if (c == null) return;
     await _companies.put(
       id,
-      c.copyWith(lastLoginAt: DateTime.now().toIso8601String(),
-              synced: false).toMap(),
+      c
+          .copyWith(
+            lastLoginAt: DateTime.now().toIso8601String(),
+            synced: false,
+          )
+          .toMap(),
     );
   }
 
@@ -334,11 +511,12 @@ class ControlService {
 
   static List<DeviceRegistry> allDevices() {
     try {
-      final list = _devices.values
-          .whereType<Map>()
-          .map((m) => DeviceRegistry.fromMap(Map<String, dynamic>.from(m)))
-          .toList()
-        ..sort((a, b) => b.lastSeenAt.compareTo(a.lastSeenAt));
+      final list =
+          _devices.values
+              .whereType<Map>()
+              .map((m) => DeviceRegistry.fromMap(Map<String, dynamic>.from(m)))
+              .toList()
+            ..sort((a, b) => b.lastSeenAt.compareTo(a.lastSeenAt));
       return list;
     } catch (_) {
       return [];
@@ -467,11 +645,12 @@ class ControlService {
 
   static List<GuestAccount> allGuests() {
     try {
-      final list = _guests.values
-          .whereType<Map>()
-          .map((m) => GuestAccount.fromMap(Map<String, dynamic>.from(m)))
-          .toList()
-        ..sort((a, b) => b.lastSeenAt.compareTo(a.lastSeenAt));
+      final list =
+          _guests.values
+              .whereType<Map>()
+              .map((m) => GuestAccount.fromMap(Map<String, dynamic>.from(m)))
+              .toList()
+            ..sort((a, b) => b.lastSeenAt.compareTo(a.lastSeenAt));
       return list;
     } catch (_) {
       return [];
@@ -521,7 +700,9 @@ class ControlService {
 
   /// تعليم أن زائراً تحوّل إلى حساب منشأة
   static Future<void> markGuestConverted(
-      String deviceId, String companyId) async {
+    String deviceId,
+    String companyId,
+  ) async {
     final id = 'guest_$deviceId';
     final g = guestById(id);
     if (g == null) return;
@@ -547,11 +728,12 @@ class ControlService {
 
   static List<GoogleAccount> allGoogleAccounts() {
     try {
-      final list = _google.values
-          .whereType<Map>()
-          .map((m) => GoogleAccount.fromMap(Map<String, dynamic>.from(m)))
-          .toList()
-        ..sort((a, b) => b.lastSeenAt.compareTo(a.lastSeenAt));
+      final list =
+          _google.values
+              .whereType<Map>()
+              .map((m) => GoogleAccount.fromMap(Map<String, dynamic>.from(m)))
+              .toList()
+            ..sort((a, b) => b.lastSeenAt.compareTo(a.lastSeenAt));
       return list;
     } catch (_) {
       return [];
@@ -681,17 +863,52 @@ class ControlService {
     final db = _db;
     if (db == null) return;
     try {
-      await db.collection('app_admin').doc('system_owner').set(
-        {
-          'name': owner.name,
-          'username': owner.username,
-          'email': owner.email,
-          'updatedAt': FieldValue.serverTimestamp(),
-        },
-        SetOptions(merge: true),
-      );
+      await db.collection('app_admin').doc('system_owner').set({
+        'name': owner.name,
+        'username': owner.username,
+        'email': owner.email,
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
     } catch (e) {
       if (kDebugMode) debugPrint('[ControlService] owner push fail: $e');
+    }
+  }
+
+  /// بثّ إعدادات الوصول إلى لوحة المالك لكل الأجهزة المتصلة.
+  static Future<void> _pushOwnerConfigToCloud(OwnerConfig cfg) async {
+    final db = _db;
+    if (db == null) return;
+    try {
+      await db.collection('app_admin').doc('owner_config').set({
+        'ownerDeviceId': cfg.ownerDeviceId,
+        'sessionActive': cfg.sessionActive,
+        'sessionDeviceId': cfg.sessionDeviceId,
+        'lastActiveAt': cfg.lastActiveAt,
+        'allowDeviceEntry': cfg.allowDeviceEntry,
+        'allowCompanyEntry': cfg.allowCompanyEntry,
+        'linkedCompanyId': cfg.linkedCompanyId,
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+      await _ownerCfg.put(_ownerConfigKey, cfg.copyWith(synced: true).toMap());
+    } catch (e) {
+      if (kDebugMode) debugPrint('[ControlService] ownerConfig push fail: $e');
+    }
+  }
+
+  /// جلب إعدادات المالك + حساب المالك من السحابة (لتفعيل التوجيه الموحّد).
+  static Future<void> pullOwnerConfigFromCloud() async {
+    final db = _db;
+    if (db == null) return;
+    try {
+      final doc = await db.collection('app_admin').doc('owner_config').get();
+      final data = doc.data();
+      if (data != null) {
+        final map = Map<String, dynamic>.from(data);
+        map.remove('updatedAt');
+        await applyCloudOwnerConfig(OwnerConfig.fromMap(map));
+      }
+    } catch (e) {
+      if (kDebugMode) debugPrint('[ControlService] ownerConfig pull fail: $e');
     }
   }
 
@@ -699,26 +916,23 @@ class ControlService {
     final db = _db;
     if (db == null) return;
     try {
-      await db.collection('tenant_registry').doc(acc.id).set(
-        {
-          'id': acc.id,
-          'companyName': acc.companyName,
-          'ownerName': acc.ownerName,
-          'username': acc.username,
-          'email': acc.email,
-          'phone': acc.phone,
-          'isActive': acc.isActive,
-          'plan': acc.plan.name,
-          'privileges': acc.privileges.toMap(),
-          'lastLoginAt': acc.lastLoginAt,
-          'deviceId': acc.deviceId,
-          'createdVia': acc.createdVia,
-          'appVersion': acc.appVersion,
-          'createdAt': acc.createdAt,
-          'updatedAt': FieldValue.serverTimestamp(),
-        },
-        SetOptions(merge: true),
-      );
+      await db.collection('tenant_registry').doc(acc.id).set({
+        'id': acc.id,
+        'companyName': acc.companyName,
+        'ownerName': acc.ownerName,
+        'username': acc.username,
+        'email': acc.email,
+        'phone': acc.phone,
+        'isActive': acc.isActive,
+        'plan': acc.plan.name,
+        'privileges': acc.privileges.toMap(),
+        'lastLoginAt': acc.lastLoginAt,
+        'deviceId': acc.deviceId,
+        'createdVia': acc.createdVia,
+        'appVersion': acc.appVersion,
+        'createdAt': acc.createdAt,
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
       await _companies.put(acc.id, acc.copyWith(synced: true).toMap());
     } catch (e) {
       if (kDebugMode) debugPrint('[ControlService] company push fail: $e');
@@ -729,23 +943,20 @@ class ControlService {
     final db = _db;
     if (db == null) return;
     try {
-      await db.collection('devices').doc(dev.deviceId).set(
-        {
-          'deviceId': dev.deviceId,
-          'platform': dev.platform,
-          'appVersion': dev.appVersion,
-          'model': dev.model,
-          'firstSeenAt': dev.firstSeenAt,
-          'lastSeenAt': dev.lastSeenAt,
-          'launchCount': dev.launchCount,
-          'companyId': dev.companyId,
-          'userId': dev.userId,
-          'userName': dev.userName,
-          'accountCreated': dev.accountCreated,
-          'updatedAt': FieldValue.serverTimestamp(),
-        },
-        SetOptions(merge: true),
-      );
+      await db.collection('devices').doc(dev.deviceId).set({
+        'deviceId': dev.deviceId,
+        'platform': dev.platform,
+        'appVersion': dev.appVersion,
+        'model': dev.model,
+        'firstSeenAt': dev.firstSeenAt,
+        'lastSeenAt': dev.lastSeenAt,
+        'launchCount': dev.launchCount,
+        'companyId': dev.companyId,
+        'userId': dev.userId,
+        'userName': dev.userName,
+        'accountCreated': dev.accountCreated,
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
       await _devices.put(dev.deviceId, dev.copyWith(synced: true).toMap());
     } catch (e) {
       if (kDebugMode) debugPrint('[ControlService] device push fail: $e');
@@ -783,23 +994,20 @@ class ControlService {
     final db = _db;
     if (db == null) return;
     try {
-      await db.collection('guest_accounts').doc(g.id).set(
-        {
-          'id': g.id,
-          'deviceId': g.deviceId,
-          'platform': g.platform,
-          'model': g.model,
-          'country': g.country,
-          'countryCode': g.countryCode,
-          'firstSeenAt': g.firstSeenAt,
-          'lastSeenAt': g.lastSeenAt,
-          'visits': g.visits,
-          'converted': g.converted,
-          'convertedToCompanyId': g.convertedToCompanyId,
-          'updatedAt': FieldValue.serverTimestamp(),
-        },
-        SetOptions(merge: true),
-      );
+      await db.collection('guest_accounts').doc(g.id).set({
+        'id': g.id,
+        'deviceId': g.deviceId,
+        'platform': g.platform,
+        'model': g.model,
+        'country': g.country,
+        'countryCode': g.countryCode,
+        'firstSeenAt': g.firstSeenAt,
+        'lastSeenAt': g.lastSeenAt,
+        'visits': g.visits,
+        'converted': g.converted,
+        'convertedToCompanyId': g.convertedToCompanyId,
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
       await _guests.put(g.id, g.copyWith(synced: true).toMap());
     } catch (e) {
       if (kDebugMode) debugPrint('[ControlService] guest push fail: $e');
@@ -810,25 +1018,22 @@ class ControlService {
     final db = _db;
     if (db == null) return;
     try {
-      await db.collection('google_accounts').doc(g.id).set(
-        {
-          'id': g.id,
-          'email': g.email,
-          'displayName': g.displayName,
-          'photoUrl': g.photoUrl,
-          'deviceId': g.deviceId,
-          'platform': g.platform,
-          'model': g.model,
-          'country': g.country,
-          'countryCode': g.countryCode,
-          'firstSeenAt': g.firstSeenAt,
-          'lastSeenAt': g.lastSeenAt,
-          'loginCount': g.loginCount,
-          'companyId': g.companyId,
-          'updatedAt': FieldValue.serverTimestamp(),
-        },
-        SetOptions(merge: true),
-      );
+      await db.collection('google_accounts').doc(g.id).set({
+        'id': g.id,
+        'email': g.email,
+        'displayName': g.displayName,
+        'photoUrl': g.photoUrl,
+        'deviceId': g.deviceId,
+        'platform': g.platform,
+        'model': g.model,
+        'country': g.country,
+        'countryCode': g.countryCode,
+        'firstSeenAt': g.firstSeenAt,
+        'lastSeenAt': g.lastSeenAt,
+        'loginCount': g.loginCount,
+        'companyId': g.companyId,
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
       await _google.put(g.id, g.copyWith(synced: true).toMap());
     } catch (e) {
       if (kDebugMode) debugPrint('[ControlService] google push fail: $e');
@@ -837,10 +1042,12 @@ class ControlService {
 
   static void logStatus() {
     if (kDebugMode) {
-      debugPrint('[ControlService] cloud: $isCloudAvailable, '
-          'companies: ${_companies.length}, '
-          'devices: ${_devices.length}, '
-          'owner: $hasSystemOwner');
+      debugPrint(
+        '[ControlService] cloud: $isCloudAvailable, '
+        'companies: ${_companies.length}, '
+        'devices: ${_devices.length}, '
+        'owner: $hasSystemOwner',
+      );
     }
   }
 }

@@ -133,8 +133,9 @@ class _SubUserFormState extends State<SubUserForm> {
   Widget build(BuildContext context) {
     final session = context.read<SessionProvider>();
     final branches = AppDatabase.branches;
-    final effectivePerms =
-        _role == UserRole.owner ? Perm.all : Perm.defaultsForRole(_role);
+    final effectivePerms = _role == UserRole.owner
+        ? Perm.all
+        : Perm.defaultsForRole(_role);
 
     return Scaffold(
       appBar: AppBar(title: Text(_isEdit ? 'تعديل مستخدم' : 'مستخدم جديد')),
@@ -161,8 +162,9 @@ class _SubUserFormState extends State<SubUserForm> {
                 labelText: 'اسم المستخدم',
                 prefixIcon: Icon(Icons.account_circle_outlined),
               ),
-              validator: (v) =>
-                  (v == null || v.trim().length < 3) ? '3 أحرف على الأقل' : null,
+              validator: (v) => (v == null || v.trim().length < 3)
+                  ? '3 أحرف على الأقل'
+                  : null,
             ),
             const SizedBox(height: 12),
             TextFormField(
@@ -174,7 +176,9 @@ class _SubUserFormState extends State<SubUserForm> {
                     : 'كلمة المرور',
                 prefixIcon: const Icon(Icons.lock_outline),
                 suffixIcon: IconButton(
-                  icon: Icon(_obscure ? Icons.visibility_off : Icons.visibility),
+                  icon: Icon(
+                    _obscure ? Icons.visibility_off : Icons.visibility,
+                  ),
                   onPressed: () => setState(() => _obscure = !_obscure),
                 ),
               ),
@@ -218,7 +222,9 @@ class _SubUserFormState extends State<SubUserForm> {
                 prefixIcon: Icon(Icons.badge_outlined),
               ),
               items: UserRole.values
-                  .map((r) => DropdownMenuItem(value: r, child: Text(r.labelAr)))
+                  .map(
+                    (r) => DropdownMenuItem(value: r, child: Text(r.labelAr)),
+                  )
                   .toList(),
               onChanged: (r) {
                 if (r == null) return;
@@ -231,18 +237,18 @@ class _SubUserFormState extends State<SubUserForm> {
             const SizedBox(height: 12),
             if (branches.isNotEmpty)
               DropdownButtonFormField<String?>(
-                initialValue:
-                    branches.any((b) => b.id == _branchId) ? _branchId : null,
+                initialValue: branches.any((b) => b.id == _branchId)
+                    ? _branchId
+                    : null,
                 decoration: const InputDecoration(
                   labelText: 'الفرع (اختياري)',
                   prefixIcon: Icon(Icons.store_outlined),
                 ),
                 items: [
                   const DropdownMenuItem(value: null, child: Text('بدون فرع')),
-                  ...branches.map((b) => DropdownMenuItem(
-                        value: b.id,
-                        child: Text(b.name),
-                      )),
+                  ...branches.map(
+                    (b) => DropdownMenuItem(value: b.id, child: Text(b.name)),
+                  ),
                 ],
                 onChanged: (v) => setState(() => _branchId = v),
               ),
@@ -276,8 +282,10 @@ class _SubUserFormState extends State<SubUserForm> {
             else ...[
               SwitchListTile(
                 title: const Text('استخدام صلاحيات الدور الافتراضية'),
-                subtitle: Text('${effectivePerms.length} صلاحية مفعّلة افتراضياً',
-                    style: const TextStyle(fontSize: 12)),
+                subtitle: Text(
+                  '${effectivePerms.length} صلاحية مفعّلة افتراضياً',
+                  style: const TextStyle(fontSize: 12),
+                ),
                 value: _useDefaults,
                 activeThumbColor: AppColors.primary,
                 onChanged: (v) {
@@ -309,11 +317,32 @@ class _SubUserFormState extends State<SubUserForm> {
 
   List<Widget> _permissionSections() {
     final groups = <String, List<String>>{
-      'المبيعات': [Perm.salesView, Perm.salesCreate, Perm.salesEdit, Perm.salesDelete],
-      'المشتريات': [Perm.purchasesView, Perm.purchasesCreate, Perm.purchasesEdit, Perm.purchasesDelete],
-      'المخزون': [Perm.inventoryView, Perm.inventoryManage, Perm.inventoryTransfer, Perm.inventoryCount],
+      'المبيعات': [
+        Perm.salesView,
+        Perm.salesCreate,
+        Perm.salesEdit,
+        Perm.salesDelete,
+      ],
+      'المشتريات': [
+        Perm.purchasesView,
+        Perm.purchasesCreate,
+        Perm.purchasesEdit,
+        Perm.purchasesDelete,
+      ],
+      'المخزون': [
+        Perm.inventoryView,
+        Perm.inventoryManage,
+        Perm.inventoryTransfer,
+        Perm.inventoryCount,
+      ],
       'جهات الاتصال': [Perm.contactsView, Perm.contactsManage],
-      'الحسابات والقيود': [Perm.accountsView, Perm.accountsManage, Perm.journalView, Perm.journalCreate, Perm.journalDelete],
+      'الحسابات والقيود': [
+        Perm.accountsView,
+        Perm.accountsManage,
+        Perm.journalView,
+        Perm.journalCreate,
+        Perm.journalDelete,
+      ],
       'الخزينة': [Perm.cashView, Perm.cashManage],
       'التقارير': [Perm.reportsView, Perm.reportsExport],
       'الموارد البشرية': [Perm.hrView, Perm.hrManage],
@@ -328,8 +357,10 @@ class _SubUserFormState extends State<SubUserForm> {
       return Card(
         margin: const EdgeInsets.only(bottom: 8),
         child: ExpansionTile(
-          title: Text(e.key,
-              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+          title: Text(
+            e.key,
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+          ),
           trailing: Checkbox(
             value: allSelected,
             onChanged: (v) {
@@ -345,8 +376,10 @@ class _SubUserFormState extends State<SubUserForm> {
           children: e.value.map((p) {
             return CheckboxListTile(
               dense: true,
-              title: Text(Perm.labelsAr[p] ?? p,
-                  style: const TextStyle(fontSize: 13)),
+              title: Text(
+                Perm.labelsAr[p] ?? p,
+                style: const TextStyle(fontSize: 13),
+              ),
               value: _permissions.contains(p),
               activeColor: AppColors.primary,
               onChanged: (v) {
@@ -367,10 +400,7 @@ class _SubUserFormState extends State<SubUserForm> {
 
   void _snack(String msg, {bool error = false}) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(msg),
-        backgroundColor: error ? Colors.red : null,
-      ),
+      SnackBar(content: Text(msg), backgroundColor: error ? Colors.red : null),
     );
   }
 }
@@ -388,9 +418,10 @@ class _Head extends StatelessWidget {
         children: [
           Icon(icon, size: 18, color: AppColors.primary),
           const SizedBox(width: 8),
-          Text(text,
-              style:
-                  const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+          Text(
+            text,
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+          ),
         ],
       ),
     );

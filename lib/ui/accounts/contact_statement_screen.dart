@@ -69,7 +69,12 @@ class ContactStatementScreen extends StatelessWidget {
 
     // صفوف التصدير
     final exportRows = <List<String>>[
-      [opening >= 0 ? 'رصيد افتتاحي' : 'رصيد افتتاحي (دائن)', '—', '—', Fmt.num(opening)],
+      [
+        opening >= 0 ? 'رصيد افتتاحي' : 'رصيد افتتاحي (دائن)',
+        '—',
+        '—',
+        Fmt.num(opening),
+      ],
       for (final e in entries)
         [
           e['desc'] as String,
@@ -114,8 +119,10 @@ class ContactStatementScreen extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      const Text('الرصيد الحالي',
-                          style: TextStyle(color: Colors.grey)),
+                      const Text(
+                        'الرصيد الحالي',
+                        style: TextStyle(color: Colors.grey),
+                      ),
                       const Spacer(),
                       Text(
                         Fmt.money(balance.abs(), curr),
@@ -146,7 +153,9 @@ class ContactStatementScreen extends StatelessWidget {
                             context,
                             MaterialPageRoute(
                               builder: (_) => VoucherForm(
-                                  type: 'receipt', contactId: contactId),
+                                type: 'receipt',
+                                contactId: contactId,
+                              ),
                             ),
                           ),
                           icon: const Icon(Icons.call_received, size: 18),
@@ -160,7 +169,9 @@ class ContactStatementScreen extends StatelessWidget {
                             context,
                             MaterialPageRoute(
                               builder: (_) => VoucherForm(
-                                  type: 'payment', contactId: contactId),
+                                type: 'payment',
+                                contactId: contactId,
+                              ),
                             ),
                           ),
                           icon: const Icon(Icons.call_made, size: 18),
@@ -187,21 +198,33 @@ class ContactStatementScreen extends StatelessWidget {
                     child: const Row(
                       children: [
                         Expanded(
-                            flex: 3,
-                            child: Text('البيان',
-                                style: TextStyle(fontWeight: FontWeight.bold))),
+                          flex: 3,
+                          child: Text(
+                            'البيان',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
                         Expanded(
-                            child: Text('مدين',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(fontWeight: FontWeight.bold))),
+                          child: Text(
+                            'مدين',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
                         Expanded(
-                            child: Text('دائن',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(fontWeight: FontWeight.bold))),
+                          child: Text(
+                            'دائن',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
                         Expanded(
-                            child: Text('الرصيد',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(fontWeight: FontWeight.bold))),
+                          child: Text(
+                            'الرصيد',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -209,28 +232,40 @@ class ContactStatementScreen extends StatelessWidget {
                   Container(
                     color: Colors.grey.withValues(alpha: 0.06),
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 8),
+                      horizontal: 10,
+                      vertical: 8,
+                    ),
                     child: Row(
                       children: [
                         const Expanded(
                           flex: 3,
-                          child: Text('رصيد افتتاحي',
-                              style: TextStyle(fontSize: 12)),
+                          child: Text(
+                            'رصيد افتتاحي',
+                            style: TextStyle(fontSize: 12),
+                          ),
                         ),
                         const Expanded(
-                            child: Text('-',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(fontSize: 12))),
+                          child: Text(
+                            '-',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 12),
+                          ),
+                        ),
                         const Expanded(
-                            child: Text('-',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(fontSize: 12))),
+                          child: Text(
+                            '-',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 12),
+                          ),
+                        ),
                         Expanded(
                           child: Text(
                             Fmt.num(opening),
                             textAlign: TextAlign.center,
                             style: const TextStyle(
-                                fontSize: 12, fontWeight: FontWeight.bold),
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ],
@@ -239,7 +274,9 @@ class ContactStatementScreen extends StatelessWidget {
                   for (final e in entries)
                     Padding(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 8),
+                        horizontal: 10,
+                        vertical: 8,
+                      ),
                       child: Row(
                         children: [
                           Expanded(
@@ -247,12 +284,17 @@ class ContactStatementScreen extends StatelessWidget {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(e['desc'] as String,
-                                    style: const TextStyle(fontSize: 12)),
-                                Text(e['date'] as String,
-                                    style: TextStyle(
-                                        fontSize: 10,
-                                        color: Colors.grey.shade600)),
+                                Text(
+                                  e['desc'] as String,
+                                  style: const TextStyle(fontSize: 12),
+                                ),
+                                Text(
+                                  e['date'] as String,
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    color: Colors.grey.shade600,
+                                  ),
+                                ),
                               ],
                             ),
                           ),
@@ -293,37 +335,38 @@ class ContactStatementScreen extends StatelessWidget {
                   // الإجماليات
                   Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 10),
+                      horizontal: 10,
+                      vertical: 10,
+                    ),
                     color: AppColors.primary.withValues(alpha: 0.06),
                     child: Row(
                       children: [
                         const Expanded(
                           flex: 3,
-                          child: Text('الإجمالي',
-                              style: TextStyle(fontWeight: FontWeight.bold)),
+                          child: Text(
+                            'الإجمالي',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
                         ),
                         Expanded(
                           child: Text(
                             Fmt.num(totalDebit),
                             textAlign: TextAlign.center,
-                            style:
-                                const TextStyle(fontWeight: FontWeight.bold),
+                            style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
                         Expanded(
                           child: Text(
                             Fmt.num(totalCredit),
                             textAlign: TextAlign.center,
-                            style:
-                                const TextStyle(fontWeight: FontWeight.bold),
+                            style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
                         Expanded(
                           child: Text(
                             Fmt.num(balance),
                             textAlign: TextAlign.center,
-                            style:
-                                const TextStyle(fontWeight: FontWeight.bold),
+                            style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
                       ],

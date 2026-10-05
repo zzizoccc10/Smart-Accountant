@@ -89,9 +89,7 @@ class ExportButton extends StatelessWidget {
               break;
           }
         } catch (e) {
-          messenger.showSnackBar(
-            SnackBar(content: Text('فشل التصدير: $e')),
-          );
+          messenger.showSnackBar(SnackBar(content: Text('فشل التصدير: $e')));
         }
       },
       itemBuilder: (_) => const [

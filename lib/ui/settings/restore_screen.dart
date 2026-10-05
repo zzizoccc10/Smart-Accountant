@@ -81,8 +81,9 @@ class _RestoreScreenState extends State<RestoreScreen> {
   }
 
   void _snack(String msg, Color color) {
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(msg), backgroundColor: color));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(msg), backgroundColor: color));
   }
 
   @override
@@ -102,7 +103,11 @@ class _RestoreScreenState extends State<RestoreScreen> {
             ),
             child: Row(
               children: [
-                const Icon(Icons.folder_special, color: AppColors.info, size: 20),
+                const Icon(
+                  Icons.folder_special,
+                  color: AppColors.info,
+                  size: 20,
+                ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
@@ -117,7 +122,8 @@ class _RestoreScreenState extends State<RestoreScreen> {
                           final ok = await Navigator.push<bool>(
                             context,
                             MaterialPageRoute(
-                                builder: (_) => const BackupLocationScreen()),
+                              builder: (_) => const BackupLocationScreen(),
+                            ),
                           );
                           if (ok == true) _load();
                         },
@@ -130,36 +136,37 @@ class _RestoreScreenState extends State<RestoreScreen> {
             child: _loading
                 ? const Center(child: CircularProgressIndicator())
                 : _files.isEmpty
-                    ? const EmptyState(
-                        message:
-                            'لا توجد ملفات نسخ احتياطية في المكان المختار.\nيمكنك تصفّح ملف آخر يدوياً.',
-                        icon: Icons.folder_off_outlined,
-                      )
-                    : ListView.separated(
-                        itemCount: _files.length,
-                        separatorBuilder: (_, __) =>
-                            const Divider(height: 1),
-                        itemBuilder: (ctx, i) {
-                          final f = _files[i];
-                          return ListTile(
-                            leading: const Icon(Icons.description,
-                                color: AppColors.info),
-                            title: Text(
-                              _fileName(f),
-                              style: const TextStyle(fontSize: 13),
-                            ),
-                            subtitle: Text(
-                              f,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(fontSize: 10),
-                            ),
-                            trailing: const Icon(Icons.restore),
-                            enabled: !_busy,
-                            onTap: () => _restoreFrom(f),
-                          );
-                        },
-                      ),
+                ? const EmptyState(
+                    message:
+                        'لا توجد ملفات نسخ احتياطية في المكان المختار.\nيمكنك تصفّح ملف آخر يدوياً.',
+                    icon: Icons.folder_off_outlined,
+                  )
+                : ListView.separated(
+                    itemCount: _files.length,
+                    separatorBuilder: (_, __) => const Divider(height: 1),
+                    itemBuilder: (ctx, i) {
+                      final f = _files[i];
+                      return ListTile(
+                        leading: const Icon(
+                          Icons.description,
+                          color: AppColors.info,
+                        ),
+                        title: Text(
+                          _fileName(f),
+                          style: const TextStyle(fontSize: 13),
+                        ),
+                        subtitle: Text(
+                          f,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(fontSize: 10),
+                        ),
+                        trailing: const Icon(Icons.restore),
+                        enabled: !_busy,
+                        onTap: () => _restoreFrom(f),
+                      );
+                    },
+                  ),
           ),
           SafeArea(
             child: Padding(
@@ -182,7 +189,10 @@ class _RestoreScreenState extends State<RestoreScreen> {
                               width: 18,
                               height: 18,
                               child: CircularProgressIndicator(
-                                  strokeWidth: 2, color: Colors.white))
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
                           : const Icon(Icons.folder_open),
                       label: const Text('تصفّح ملفاً'),
                     ),

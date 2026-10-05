@@ -152,9 +152,13 @@ class DeviceService {
   static void _detectCountry() {
     try {
       final locales = ui.PlatformDispatcher.instance.locales;
-      final loc = locales.isNotEmpty ? locales.first : const ui.Locale('ar', 'EG');
+      final loc = locales.isNotEmpty
+          ? locales.first
+          : const ui.Locale('ar', 'EG');
       _countryCode = (loc.countryCode ?? '').toUpperCase();
-      _country = _countryNameAr(_countryCode) ?? (_countryCode.isEmpty ? 'غير معروف' : _countryCode);
+      _country =
+          _countryNameAr(_countryCode) ??
+          (_countryCode.isEmpty ? 'غير معروف' : _countryCode);
     } catch (_) {
       _countryCode = '';
       _country = 'غير معروف';
@@ -191,7 +195,8 @@ class DeviceService {
     'IN': 'الهند',
   };
 
-  static String? _countryNameAr(String code) => _countryNames[code.toUpperCase()];
+  static String? _countryNameAr(String code) =>
+      _countryNames[code.toUpperCase()];
 
   /// تحديث بيانات البلد (يُستدعى من الواجهة إن أردنا قراءة locale الحقيقي)
   static Future<void> setLocaleCountry(String code) async {
@@ -224,7 +229,9 @@ class DeviceService {
 
   /// تعليم أن هذا الجهاز أنشأ حساباً
   static Future<void> markAccountCreated(
-      String companyId, String userName) async {
+    String companyId,
+    String userName,
+  ) async {
     try {
       await ControlService.linkDeviceToUser(
         deviceId: deviceId,

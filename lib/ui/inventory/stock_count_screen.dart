@@ -69,16 +69,15 @@ class _StockCountScreenState extends State<StockCountScreen> {
                 prefixIcon: Icon(Icons.warehouse),
               ),
               items: prov.warehouses
-                  .map((w) =>
-                      DropdownMenuItem(value: w.id, child: Text(w.name)))
+                  .map(
+                    (w) => DropdownMenuItem(value: w.id, child: Text(w.name)),
+                  )
                   .toList(),
               onChanged: (v) => setState(() => _warehouseId = v ?? 'wh_main'),
             ),
           ),
           if (items.isEmpty)
-            const Expanded(
-              child: EmptyState(message: 'لا توجد أصناف للجرد'),
-            )
+            const Expanded(child: EmptyState(message: 'لا توجد أصناف للجرد'))
           else
             Expanded(
               child: ListView.builder(
@@ -86,11 +85,14 @@ class _StockCountScreenState extends State<StockCountScreen> {
                 itemCount: items.length,
                 itemBuilder: (_, i) {
                   final it = items[i];
-                  final bookQty =
-                      AppDatabase.balanceOf(it.id, _warehouseId).quantity;
+                  final bookQty = AppDatabase.balanceOf(
+                    it.id,
+                    _warehouseId,
+                  ).quantity;
                   final ctrl = _controllers.putIfAbsent(
                     it.id,
-                    () => TextEditingController(text: bookQty.toStringAsFixed(0)),
+                    () =>
+                        TextEditingController(text: bookQty.toStringAsFixed(0)),
                   );
                   final actual = double.tryParse(ctrl.text) ?? bookQty;
                   final diff = actual - bookQty;
@@ -106,14 +108,19 @@ class _StockCountScreenState extends State<StockCountScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(it.name,
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold)),
+                                Text(
+                                  it.name,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                                 const SizedBox(height: 2),
                                 Text(
                                   'دفترية: ${Fmt.num(bookQty)}',
                                   style: const TextStyle(
-                                      fontSize: 12, color: Colors.grey),
+                                    fontSize: 12,
+                                    color: Colors.grey,
+                                  ),
                                 ),
                               ],
                             ),
@@ -137,15 +144,17 @@ class _StockCountScreenState extends State<StockCountScreen> {
                             child: Text(
                               diff == 0
                                   ? '0'
-                                  : (diff > 0 ? '+${Fmt.num(diff)}' : Fmt.num(diff)),
+                                  : (diff > 0
+                                        ? '+${Fmt.num(diff)}'
+                                        : Fmt.num(diff)),
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: diff == 0
                                     ? AppColors.success
                                     : (diff > 0
-                                        ? AppColors.info
-                                        : AppColors.danger),
+                                          ? AppColors.info
+                                          : AppColors.danger),
                               ),
                             ),
                           ),

@@ -174,16 +174,17 @@ class _BranchFormState extends State<BranchForm> {
               icon: Icons.warehouse,
               trailing: Text(
                 '${_warehouseIds.length} محدد',
-                style: const TextStyle(
-                    fontSize: 12, color: AppColors.primary),
+                style: const TextStyle(fontSize: 12, color: AppColors.primary),
               ),
             ),
             if (warehouses.isEmpty)
               const Card(
                 child: Padding(
                   padding: EdgeInsets.all(16),
-                  child: Text('لا توجد مخازن — أضفها من شاشة المخازن',
-                      style: TextStyle(color: Colors.grey, fontSize: 12)),
+                  child: Text(
+                    'لا توجد مخازن — أضفها من شاشة المخازن',
+                    style: TextStyle(color: Colors.grey, fontSize: 12),
+                  ),
                 ),
               )
             else
@@ -201,14 +202,21 @@ class _BranchFormState extends State<BranchForm> {
                             _warehouseIds.remove(w.id);
                           }
                         }),
-                        secondary: const Icon(Icons.warehouse,
-                            color: AppColors.purple, size: 20),
-                        title: Text(w.name,
-                            style: const TextStyle(fontSize: 13)),
+                        secondary: const Icon(
+                          Icons.warehouse,
+                          color: AppColors.purple,
+                          size: 20,
+                        ),
+                        title: Text(
+                          w.name,
+                          style: const TextStyle(fontSize: 13),
+                        ),
                         subtitle: w.location.isEmpty
                             ? null
-                            : Text(w.location,
-                                style: const TextStyle(fontSize: 11)),
+                            : Text(
+                                w.location,
+                                style: const TextStyle(fontSize: 11),
+                              ),
                       ),
                   ],
                 ),
@@ -222,16 +230,17 @@ class _BranchFormState extends State<BranchForm> {
               icon: Icons.account_balance_wallet,
               trailing: Text(
                 '${_cashboxIds.length} محدد',
-                style: const TextStyle(
-                    fontSize: 12, color: AppColors.primary),
+                style: const TextStyle(fontSize: 12, color: AppColors.primary),
               ),
             ),
             if (cashboxes.isEmpty)
               const Card(
                 child: Padding(
                   padding: EdgeInsets.all(16),
-                  child: Text('لا توجد صناديق — أضفها من شاشة الصناديق',
-                      style: TextStyle(color: Colors.grey, fontSize: 12)),
+                  child: Text(
+                    'لا توجد صناديق — أضفها من شاشة الصناديق',
+                    style: TextStyle(color: Colors.grey, fontSize: 12),
+                  ),
                 ),
               )
             else
@@ -250,13 +259,18 @@ class _BranchFormState extends State<BranchForm> {
                           }
                         }),
                         secondary: const Icon(
-                            Icons.account_balance_wallet,
-                            color: AppColors.teal, size: 20),
-                        title: Text(cb.name,
-                            style: const TextStyle(fontSize: 13)),
+                          Icons.account_balance_wallet,
+                          color: AppColors.teal,
+                          size: 20,
+                        ),
+                        title: Text(
+                          cb.name,
+                          style: const TextStyle(fontSize: 13),
+                        ),
                         subtitle: Text(
-                            'الرصيد: ${Fmt.num(cb.currentBalance)}',
-                            style: const TextStyle(fontSize: 11)),
+                          'الرصيد: ${Fmt.num(cb.currentBalance)}',
+                          style: const TextStyle(fontSize: 11),
+                        ),
                       ),
                   ],
                 ),
@@ -270,8 +284,7 @@ class _BranchFormState extends State<BranchForm> {
               icon: Icons.people_alt,
               trailing: Text(
                 '${_userNames.length} مستخدم',
-                style: const TextStyle(
-                    fontSize: 12, color: AppColors.primary),
+                style: const TextStyle(fontSize: 12, color: AppColors.primary),
               ),
             ),
             Row(
@@ -299,8 +312,10 @@ class _BranchFormState extends State<BranchForm> {
               const Card(
                 child: Padding(
                   padding: EdgeInsets.all(16),
-                  child: Text('لم يُضف مستخدمون للفرع بعد',
-                      style: TextStyle(color: Colors.grey, fontSize: 12)),
+                  child: Text(
+                    'لم يُضف مستخدمون للفرع بعد',
+                    style: TextStyle(color: Colors.grey, fontSize: 12),
+                  ),
                 ),
               )
             else
@@ -310,13 +325,21 @@ class _BranchFormState extends State<BranchForm> {
                     for (int i = 0; i < _userNames.length; i++)
                       ListTile(
                         dense: true,
-                        leading: const Icon(Icons.person,
-                            color: AppColors.indigo, size: 20),
-                        title: Text(_userNames[i],
-                            style: const TextStyle(fontSize: 13)),
+                        leading: const Icon(
+                          Icons.person,
+                          color: AppColors.indigo,
+                          size: 20,
+                        ),
+                        title: Text(
+                          _userNames[i],
+                          style: const TextStyle(fontSize: 13),
+                        ),
                         trailing: IconButton(
-                          icon: const Icon(Icons.close,
-                              color: AppColors.danger, size: 18),
+                          icon: const Icon(
+                            Icons.close,
+                            color: AppColors.danger,
+                            size: 18,
+                          ),
                           onPressed: () =>
                               setState(() => _userNames.removeAt(i)),
                         ),

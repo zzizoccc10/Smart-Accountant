@@ -54,9 +54,7 @@ class SyncScreen extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              cloud
-                                  ? 'السحابة مُفعّلة'
-                                  : 'السحابة غير مُفعّلة',
+                              cloud ? 'السحابة مُفعّلة' : 'السحابة غير مُفعّلة',
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
@@ -91,7 +89,9 @@ class SyncScreen extends StatelessWidget {
                       width: 20,
                       height: 20,
                       child: CircularProgressIndicator(
-                          strokeWidth: 2, color: Colors.white),
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
                     )
                   : const Icon(Icons.sync),
               label: Text(
@@ -115,8 +115,10 @@ class SyncScreen extends StatelessWidget {
           _infoCard(context, session),
 
           const SizedBox(height: 16),
-          const Text('تشخيص الاتصال',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+          const Text(
+            'تشخيص الاتصال',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+          ),
           const SizedBox(height: 8),
           _diagRow('إعدادات Firebase', cloud),
           _diagRow('مصادقة Firebase', AuthService.isCloudAvailable),
@@ -132,9 +134,10 @@ class SyncScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: const [
-                  Text('كيف تُفعّل المزامنة؟',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 15)),
+                  Text(
+                    'كيف تُفعّل المزامنة؟',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                  ),
                   SizedBox(height: 8),
                   Text(
                     '1. أنشئ مشروع Firebase وأضف تطبيق أندرويد بمعرّف:\n'
@@ -199,13 +202,20 @@ class SyncScreen extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         children: [
-          Icon(ok ? Icons.check_circle : Icons.cancel,
-              size: 18, color: ok ? Colors.green : Colors.red),
+          Icon(
+            ok ? Icons.check_circle : Icons.cancel,
+            size: 18,
+            color: ok ? Colors.green : Colors.red,
+          ),
           const SizedBox(width: 8),
           Expanded(child: Text(label, style: const TextStyle(fontSize: 13))),
-          Text(ok ? 'متاح' : 'غير متاح',
-              style: TextStyle(
-                  fontSize: 12, color: ok ? Colors.green : Colors.red)),
+          Text(
+            ok ? 'متاح' : 'غير متاح',
+            style: TextStyle(
+              fontSize: 12,
+              color: ok ? Colors.green : Colors.red,
+            ),
+          ),
         ],
       ),
     );

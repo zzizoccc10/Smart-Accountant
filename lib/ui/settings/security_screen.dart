@@ -53,9 +53,9 @@ class _SecurityScreenState extends State<SecurityScreen> {
   }
 
   void _snack(String msg, Color c) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(msg), backgroundColor: c),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(msg), backgroundColor: c));
   }
 
   @override
@@ -71,8 +71,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
               onChanged: (v) => setState(() => _enabled = v),
               title: const Text('تفعيل قفل التطبيق'),
               subtitle: const Text('طلب رمز PIN عند فتح التطبيق'),
-              secondary:
-                  const Icon(Icons.lock, color: AppColors.primary),
+              secondary: const Icon(Icons.lock, color: AppColors.primary),
             ),
           ),
           if (_enabled) ...[

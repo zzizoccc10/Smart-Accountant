@@ -32,16 +32,16 @@ class _ItemLedgerScreenState extends State<ItemLedgerScreen> {
   }
 
   String _movLabel(String t) => switch (t) {
-        'purchase' => 'شراء',
-        'sale' => 'بيع',
-        'return_in' => 'مرتجع وارد',
-        'return_out' => 'مرتجع صادر',
-        'transfer_in' => 'تحويل وارد',
-        'transfer_out' => 'تحويل صادر',
-        'adjustment' => 'تسوية',
-        'opening' => 'رصيد افتتاحي',
-        _ => t,
-      };
+    'purchase' => 'شراء',
+    'sale' => 'بيع',
+    'return_in' => 'مرتجع وارد',
+    'return_out' => 'مرتجع صادر',
+    'transfer_in' => 'تحويل وارد',
+    'transfer_out' => 'تحويل صادر',
+    'adjustment' => 'تسوية',
+    'opening' => 'رصيد افتتاحي',
+    _ => t,
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -49,10 +49,11 @@ class _ItemLedgerScreenState extends State<ItemLedgerScreen> {
     final curr = prov.currency;
     final items = prov.items;
 
-    final moves = _itemId == null
-        ? <InventoryMovement>[]
-        : prov.movements.where((m) => m.itemId == _itemId).toList()
-      ..sort((a, b) => a.date.compareTo(b.date));
+    final moves =
+        _itemId == null
+              ? <InventoryMovement>[]
+              : prov.movements.where((m) => m.itemId == _itemId).toList()
+          ..sort((a, b) => a.date.compareTo(b.date));
 
     final totalIn = moves.fold(0.0, (s, m) => s + m.quantityIn);
     final totalOut = moves.fold(0.0, (s, m) => s + m.quantityOut);
@@ -65,7 +66,8 @@ class _ItemLedgerScreenState extends State<ItemLedgerScreen> {
         actions: [
           if (moves.isNotEmpty)
             ExportButton(
-              title: 'كارت صنف - ${items.where((i) => i.id == _itemId).firstOrNull?.name ?? ''}',
+              title:
+                  'كارت صنف - ${items.where((i) => i.id == _itemId).firstOrNull?.name ?? ''}',
               companyName: prov.companyName,
               filename: 'item_ledger',
               headers: const [
@@ -101,18 +103,19 @@ class _ItemLedgerScreenState extends State<ItemLedgerScreen> {
           Padding(
             padding: const EdgeInsets.all(12),
             child: DropdownButtonFormField<String>(
-              initialValue:
-                  items.any((it) => it.id == _itemId) ? _itemId : null,
+              initialValue: items.any((it) => it.id == _itemId)
+                  ? _itemId
+                  : null,
               isExpanded: true,
               decoration: const InputDecoration(
                 labelText: 'اختر الصنف',
                 prefixIcon: Icon(Icons.inventory_2),
               ),
               items: items
-                  .map((it) => DropdownMenuItem(
-                        value: it.id,
-                        child: Text(it.name),
-                      ))
+                  .map(
+                    (it) =>
+                        DropdownMenuItem(value: it.id, child: Text(it.name)),
+                  )
                   .toList(),
               onChanged: (v) => setState(() => _itemId = v),
             ),
@@ -122,14 +125,21 @@ class _ItemLedgerScreenState extends State<ItemLedgerScreen> {
             child: Row(
               children: [
                 Expanded(
-                  child: _statCard('الرصيد الحالي', Fmt.num(currentQty),
-                      Icons.warehouse, AppColors.primary),
+                  child: _statCard(
+                    'الرصيد الحالي',
+                    Fmt.num(currentQty),
+                    Icons.warehouse,
+                    AppColors.primary,
+                  ),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: _statCard('قيمة المخزون',
-                      Fmt.money(currentQty * avgCost, curr),
-                      Icons.attach_money, AppColors.success),
+                  child: _statCard(
+                    'قيمة المخزون',
+                    Fmt.money(currentQty * avgCost, curr),
+                    Icons.attach_money,
+                    AppColors.success,
+                  ),
                 ),
               ],
             ),
@@ -151,21 +161,28 @@ class _ItemLedgerScreenState extends State<ItemLedgerScreen> {
                         margin: const EdgeInsets.only(bottom: 8),
                         child: ListTile(
                           leading: CircleAvatar(
-                            backgroundColor: (isIn
-                                    ? AppColors.success
-                                    : AppColors.danger)
-                                .withValues(alpha: 0.12),
+                            backgroundColor:
+                                (isIn ? AppColors.success : AppColors.danger)
+                                    .withValues(alpha: 0.12),
                             child: Icon(
                               isIn ? Icons.arrow_downward : Icons.arrow_upward,
                               size: 18,
-                              color: isIn ? AppColors.success : AppColors.danger,
+                              color: isIn
+                                  ? AppColors.success
+                                  : AppColors.danger,
                             ),
                           ),
-                          title: Text(_movLabel(m.movementType),
-                              style: const TextStyle(fontSize: 13)),
-                          subtitle: Text(m.date,
-                              style: TextStyle(
-                                  fontSize: 11, color: Colors.grey.shade600)),
+                          title: Text(
+                            _movLabel(m.movementType),
+                            style: const TextStyle(fontSize: 13),
+                          ),
+                          subtitle: Text(
+                            m.date,
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: Colors.grey.shade600,
+                            ),
+                          ),
                           trailing: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.end,
@@ -175,12 +192,15 @@ class _ItemLedgerScreenState extends State<ItemLedgerScreen> {
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 13,
-                                  color:
-                                      isIn ? AppColors.success : AppColors.danger,
+                                  color: isIn
+                                      ? AppColors.success
+                                      : AppColors.danger,
                                 ),
                               ),
-                              Text('رصيد: ${Fmt.num(m.balanceAfter)}',
-                                  style: const TextStyle(fontSize: 10)),
+                              Text(
+                                'رصيد: ${Fmt.num(m.balanceAfter)}',
+                                style: const TextStyle(fontSize: 10),
+                              ),
                             ],
                           ),
                         ),
@@ -205,11 +225,17 @@ class _ItemLedgerScreenState extends State<ItemLedgerScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title,
-                      style: const TextStyle(fontSize: 10, color: Colors.grey)),
-                  Text(value,
-                      style: const TextStyle(
-                          fontSize: 13, fontWeight: FontWeight.bold)),
+                  Text(
+                    title,
+                    style: const TextStyle(fontSize: 10, color: Colors.grey),
+                  ),
+                  Text(
+                    value,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ],
               ),
             ),

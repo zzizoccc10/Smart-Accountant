@@ -15,8 +15,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
+import '../models/control_models.dart';
 import 'admin_notification_service.dart';
+import 'control_service.dart';
 import 'firebase_config.dart';
+import 'sync_queue.dart';
 import 'sync_service.dart';
 
 class RealtimeService {
@@ -117,7 +120,57 @@ class RealtimeService {
       _subs.add(sub);
     } catch (_) {}
 
+    // 4) إعدادات الوصول إلى لوحة المالك (توجيه موحّد لكل الأجهزة)
+    try {
+      final sub = db
+          .collection('app_admin')
+          .doc('owner_config')
+          .snapshots()
+          .listen(
+            (doc) {
+              final data = doc.data();
+              if (data == null) return;
+              final map = Map<String, dynamic>.from(data);
+              map.remove('updatedAt');
+              ControlService.applyCloudOwnerConfig(OwnerConfig.fromMap(map));
+              _emit();
+            },
+            onError: (e) => debugPrint('[Realtime] owner_config error: $e'),
+            cancelOnError: false,
+          );
+      _subs.add(sub);
+    } catch (e) {
+      debugPrint('[Realtime] owner_config subscribe fail: $e');
+    }
+
     debugPrint('[Realtime] started for $companyId (${_subs.length} channels)');
+  }
+
+  /// مراقبة إعدادات المالك فقط (لمالك النظام — بلا منشأة).
+  static Future<void> startOwnerConfigWatch() async {
+    final db = _db;
+    if (db == null) return;
+    if (_subs.isNotEmpty) return;
+    _running = true;
+    try {
+      final sub = db
+          .collection('app_admin')
+          .doc('owner_config')
+          .snapshots()
+          .listen(
+            (doc) {
+              final data = doc.data();
+              if (data == null) return;
+              final map = Map<String, dynamic>.from(data);
+              map.remove('updatedAt');
+              ControlService.applyCloudOwnerConfig(OwnerConfig.fromMap(map));
+              _emit();
+            },
+            onError: (e) => debugPrint('[Realtime] owner_config error: $e'),
+            cancelOnError: false,
+          );
+      _subs.add(sub);
+    } catch (_) {}
   }
 
   /// إيقاف كل القنوات
@@ -139,6 +192,8 @@ class RealtimeService {
     QuerySnapshot<Map<String, dynamic>> snap,
   ) async {
     try {
+      // وصول بيانات من السحابة ⇒ الجهاز متصل ⇒ أفرِغ قائمة المزامنة المعلّقة.
+      SyncQueue.markOnline();
       if (!Hive.isBoxOpen(boxKey)) return;
       final box = Hive.box(boxKey);
       var changed = false;
