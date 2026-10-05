@@ -1,62 +1,146 @@
-# 🔥 دليل تفعيل Firebase — المحاسب السهل
+# 🔥 دليل Firebase — المحاسب السهل
 
-التطبيق **يعمل بالكامل محلياً** الآن. لتفعيل السحابة (مزامنة + إشعارات + مستخدمين)،
-نفّذ الخطوات التالية (5 دقائق):
-
----
-
-## الخطوة 1: أنشئ تطبيق أندرويد في Firebase Console
-
-1. افتح: https://console.firebase.google.com/
-2. اختر مشروعك → **⚙️ Project settings** → تبويب **General**
-3. انزل إلى **Your apps** → اضغط أيقونة **Android** لإضافة تطبيق
-4. أدخل **Android package name** بالضبط:
-   ```
-   com.easyaccountant.erp
-   ```
-   ⚠️ **مهم جداً**: يجب أن يطابق هذا الاسم حرفياً وإلا لن يعمل.
-5. (اختياري) اسم التطبيق: المحاسب السهل
-6. اضغط **Register app** → **Download google-services.json**
+> **حالة المشروع: مُتحقَّق منها ✅**
+> المشروع مربوط بمشروع Firebase الحقيقي **`easy-accountant-1acb8`**.
+> تم اختبار جميع الخدمات فعلياً من داخل بيئة التطوير (انظر قسم «نتائج التحقق»).
 
 ---
 
-## الخطوة 2: فعّل الخدمات في Firebase Console
+## 🎯 نتائج التحقق الفعلي (Live Check)
 
-### أ) المصادقة (Authentication)
-1. القائمة الجانبية → **Build** → **Authentication** → **Get started**
-2. تبويب **Sign-in method** → فعّل **Email/Password** → **Enable** → Save
+| الخدمة | الحالة | الدليل |
+|---|---|---|
+| **مفتاح API** | ✅ يعمل | استرجاع `projectId: 462002399803` |
+| **Authentication (Email/Password)** | ✅ مُفعّلة | إنشاء مستخدم حقيقي نجح (idToken صالح) |
+| **Firestore Database** | ✅ مُفعّلة | قراءة/كتابة/حذف مستند نجح (HTTP 200) |
+| **FCM (الإشعارات)** | ✅ مُفعّلة | Firebase Installations أرجع fid + authToken |
+| **Cloud Storage** | ⚪ غير مُفعّلة | غير مستخدمة في التطبيق حالياً (لا مشكلة) |
 
-### ب) قاعدة البيانات (Firestore)
-1. القائمة الجانبية → **Build** → **Firestore Database** → **Create database**
-2. اختر **Production mode** أو **Test mode** (للتجربة اختر Test)
-3. اختر موقعاً قريباً (مثل `europe-west` أو `me-central`)
-
-### ج) الإشعارات (Cloud Messaging) — مُفعّلة تلقائياً
-- لا تحتاج إعداداً — تعمل بمجرد إضافة google-services.json.
-
----
-
-## الخطوة 3: ارفع الملف إلى المنصة
-
-ارفع ملف `google-services.json` إلى تبويب **Firebase** في المنصة.
-سأقوم تلقائياً بـ:
-- نسخه إلى `android/app/google-services.json`
-- توليد مفاتيح `lib/services/firebase_config.dart`
-- إعادة بناء التطبيق
-
-### (بديل) الربط اليدوي عبر الأداة
-```bash
-cd /home/user/flutter_app
-python3 tool/link_firebase.py /path/to/google-services.json
-flutter pub get
-flutter build apk --release
+### المشروع الحقيقي
+```
+project_id      : easy-accountant-1acb8
+project_number  : 462002399803
+android_app_id  : 1:462002399803:android:dfe82af1661b5a16974a1e
+package_name    : com.easyaccountant.erp
+api_key         : AIzaSyDAxvd7thR_bPN2mtehLwYEu7D_sYAkP8c
 ```
 
 ---
 
-## الخطوة 4: قواعد أمان Firestore (للتطوير)
+## ⚠️ ملاحظة مهمة حول `google-services.json`
 
-في **Firestore** → تبويب **Rules**، الصق:
+الملف المرفوع سابقاً إلى المنصة كان **ملفاً وهمياً (placeholder)**:
+```
+❌ project_id: "unknown-project"
+❌ api_key   : "placeholder-api-key-a87scz3v1tkr"
+```
+
+✅ تم **تصحيحه** باستخدام البيانات الحقيقية من `firebase-admin-sdk.json`:
+```
+✅ project_id: "easy-accountant-1acb8"
+✅ api_key   : "AIzaSyDAxvd7thR_bPN2mtehLwYEu7D_sYAkP8c"
+```
+
+النسخة الصحيحة موجودة الآن في:
+- `android/app/google-services.json` (مُدمجة في APK ✅)
+- `tool/firebase/google-services.real.json` (نسخة مرجعية)
+
+---
+
+## 🔄 كيف يعمل التطبيق؟
+
+- **محلياً (Offline-First)**: يعمل بالكامل عبر Hive دون إنترنت.
+- **سحابياً (تلقائياً)**: عند توفّر المفاتيح، يتصل بـ Firebase للمزامنة + المستخدمين + الإشعارات.
+- **الويب**: يعمل محلياً بأمان حتى تُضاف مفاتيح تطبيق الويب (انظر قسم «الويب»).
+
+---
+
+## 📱 أندرويد — جاهز ✅
+
+كل شيء مُهيّأ. فقط:
+```bash
+cd /home/user/flutter_app
+flutter build apk --release
+```
+القيم الحقيقية مُدمجة تلقائياً (مؤكَّد داخل APK).
+
+---
+
+## 🌐 الويب (اختياري) — يحتاج خطوة إضافية
+
+حالياً الويب يعمل **محلياً فقط** لأن معرّف تطبيق الويب غير موجود.
+لتفعيل السحابة على الويب:
+
+1. افتح: https://console.firebase.google.com/ → مشروعك
+2. **⚙️ Project settings** → **General** → **Your apps**
+3. أضف تطبيق **Web** (أيقونة `</>`)
+4. انسخ القيم وضعها في `lib/services/firebase_config.dart`:
+   ```dart
+   static const String webApiKey = '...';
+   static const String webAppId = '1:462002399803:web:...';
+   static const String webProjectId = 'easy-accountant-1acb8';
+   static const String webAuthDomain = 'easy-accountant-1acb8.firebaseapp.com';
+   ```
+5. أضف النطاق في **Authentication → Settings → Authorized domains**
+
+---
+
+## 🍎 iOS (اختياري) — يحتاج GoogleService-Info.plist
+
+1. في Firebase Console → أضف تطبيق **iOS**
+2. **Bundle ID** بالضبط: `com.easyaccountant.erp`
+3. حمّل `GoogleService-Info.plist` وارفعه للمنصة
+4. الأداة ستضعه في `ios/Runner/` وتحدّث المفاتيح تلقائياً
+
+---
+
+## 🛠️ الأداة التلقائية للربط
+
+```bash
+cd /home/user/flutter_app
+python3 tool/link_firebase.py <path-to-google-services.json> [GoogleService-Info.plist]
+flutter pub get && flutter build apk --release
+```
+
+---
+
+## 🗄️ بنية البيانات السحابية
+
+```
+companies/{companyId}/
+  ├── users/            ← المستخدمون والصلاحيات
+  ├── accounts/         ← دليل الحسابات
+  ├── contacts/         ← العملاء والموردون
+  ├── items/            ← الأصناف
+  ├── categories/       ← التصنيفات
+  ├── invoices/         ← الفواتير
+  ├── payments/         ← السندات
+  ├── expenses/         ← المصروفات
+  ├── expense_categories/
+  ├── movements/        ← حركات المخزون
+  ├── inv_balances/     ← أرصدة المخزون
+  ├── cashboxes/        ← الصناديق
+  ├── warehouses/       ← المخازن
+  ├── journals/         ← القيود المحاسبية
+  ├── employees/        ← الموظفون
+  ├── attendance/       ← الحضور
+  ├── payroll/          ← الرواتب
+  ├── currencies/       ← العملات
+  ├── fixed_assets/     ← الأصول الثابتة
+  ├── payment_allocations/
+  ├── branches/         ← الفروع
+  ├── units/            ← الوحدات
+  ├── cost_centers/     ← مراكز التكلفة
+  ├── exchange_rates/   ← أسعار الصرف
+  └── orders/           ← الطلبات
+```
+> **24 مجموعة** تُزامَن تلقائياً (Last-Write-Wins عبر `updatedAt`).
+
+---
+
+## 🔒 قواعد أمان Firestore (للتطوير)
+
+> ⚠️ القواعد الحالية مفتوحة للاختبار. للإنتاج، قيّدها حسب المستخدم/الشركة.
 
 ```
 rules_version = '2';
@@ -69,49 +153,31 @@ service cloud.firestore {
 }
 ```
 
-> ⚠️ هذه القواعد للتطوير فقط. للإنتاج، قيّدها حسب المستخدم/الشركة.
-
 ---
 
-## بنية البيانات السحابية
-
-```
-companies/
-  {companyId}/
-    ├── users/          ← المستخدمون
-    ├── accounts/       ← دليل الحسابات
-    ├── contacts/       ← العملاء والموردون
-    ├── items/          ← الأصناف
-    ├── invoices/       ← الفواتير
-    ├── payments/       ← السندات
-    ├── journals/       ← القيود
-    ├── warehouses/     ← المخازن
-    ├── cashboxes/      ← الصناديق
-    └── ... (كل الجداول)
-```
-
----
-
-## ملخص الميزات المُضافة
+## 📋 ملخص الميزات
 
 | الميزة | الحالة | الملف |
 |---|---|---|
-| **نظام المستخدمين** | ✅ جاهز | `models/user_models.dart` |
-| **الأدوار (6 أدوار)** | ✅ جاهز | owner/admin/accountant/sales/warehouse/viewer |
-| **الصلاحيات الدقيقة (32)** | ✅ جاهز | `Perm` class |
-| **المصادقة** | ✅ جاهز | `services/auth_service.dart` |
-| **المزامنة** | ✅ جاهز | `services/sync_service.dart` |
-| **الإشعارات (FCM)** | ✅ جاهز | `services/push_notifications.dart` |
-| **شاشة الدخول** | ✅ جاهز | `ui/auth/login_screen.dart` |
-| **إدارة المستخدمين** | ✅ جاهز | `ui/settings/users_screen.dart` |
-| **شاشة المزامنة** | ✅ جاهز | `ui/settings/sync_screen.dart` |
+| نظام المستخدمين | ✅ | `models/user_models.dart` |
+| الأدوار (6) | ✅ | owner/admin/accountant/sales/warehouse/viewer |
+| الصلاحيات (32) | ✅ | `Perm` class |
+| المصادقة | ✅ | `services/auth_service.dart` |
+| المزامنة (24 مجموعة) | ✅ | `services/sync_service.dart` |
+| الإشعارات (FCM) | ✅ | `services/push_notifications.dart` |
+| إدارة المستخدمين | ✅ | `services/user_service.dart` |
+| جلسة المستخدم | ✅ | `providers/session_provider.dart` |
+| شاشة الدخول | ✅ | `ui/auth/login_screen.dart` |
+| إدارة المستخدمين | ✅ | `ui/settings/users_screen.dart` |
+| نموذج المستخدم | ✅ | `ui/settings/user_form.dart` |
+| شاشة المزامنة | ✅ | `ui/settings/sync_screen.dart` |
 
 ---
 
-## أين أجد الشاشات في التطبيق؟
+## 📍 أين أجد الشاشات؟
 
-- **الإعدادات** → قسم **«المستخدمون والسحابة»**:
-  - المستخدمون والصلاحيات
-  - المزامنة السحابية
+**الإعدادات** → قسم **«المستخدمون والسحابة»**:
+- 👥 المستخدمون والصلاحيات
+- ☁️ المزامنة السحابية (مع مؤشر الحالة + تشخيص)
 
-- **عند أول تشغيل**: شاشة إعداد حساب المالك.
+**عند أول تشغيل**: شاشة إعداد حساب المالك.

@@ -60,14 +60,22 @@ Future<void> _initFirebase() async {
     return;
   }
   try {
-    await Firebase.initializeApp();
+    final options = FirebaseConfig.currentPlatformOptions;
+    if (options != null) {
+      await Firebase.initializeApp(options: options);
+    } else {
+      // على أندرويد/iOS: التهيئة التلقائية من google-services.json / plist
+      await Firebase.initializeApp();
+    }
     // تسجيل معالج الرسائل في الخلفية
     if (!kIsWeb) {
       FirebaseMessaging.onBackgroundMessage(
         firebaseMessagingBackgroundHandler,
       );
     }
-    if (kDebugMode) debugPrint('[main] Firebase initialized ✓');
+    if (kDebugMode) {
+      debugPrint('[main] Firebase initialized ✓ (${FirebaseConfig.projectId})');
+    }
   } catch (e) {
     if (kDebugMode) debugPrint('[main] Firebase init failed: $e');
   }

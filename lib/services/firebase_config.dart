@@ -1,30 +1,33 @@
 // ============================================================================
 // إعدادات Firebase — المحاسب السهل
 // ----------------------------------------------------------------------------
-// ⚠️ مهم: هذا الملف يحتوي على مفاتيح المشروع. عند رفع google-services.json
-//    سنُحدّث هذه القيم تلقائياً. حالياً القيم فارغة => يعمل التطبيق محلياً
-//    بالكامل (Offline-First) دون أي خطأ.
+// هذا الملف يحتوي على مفاتيح المشروع الحقيقية (مشروع easy-accountant-1acb8).
+// تُحدَّث القيم تلقائياً عند تشغيل:  python3 tool/link_firebase.py <json>
+//
+// ملاحظة معمارية: التطبيق يعمل «محلياً بالكامل» (Offline-First) عبر Hive،
+//   ويُفعِّل السحابة تلقائياً عند توفّر مفاتيح المنصّة الصحيحة.
 // ============================================================================
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 
 /// إعدادات Firebase لمنصات مختلفة.
-/// تُقرأ القيم من ملف google-services.json / GoogleService-Info.plist بعد رفعها.
 class FirebaseConfig {
-  // -------- Android --------
-  static const String androidApiKey = '';
-  static const String androidAppId = '';
-  static const String androidMessagingSenderId = '';
-  static const String androidProjectId = '';
+  // -------- Android (مُهيّأ من google-services.json) --------
+  static const String androidApiKey = 'AIzaSyDAxvd7thR_bPN2mtehLwYEu7D_sYAkP8c';
+  static const String androidAppId = '1:462002399803:android:dfe82af1661b5a16974a1e';
+  static const String androidMessagingSenderId = '462002399803';
+  static const String androidProjectId = 'easy-accountant-1acb8';
+  static const String androidStorageBucket = 'easy-accountant-1acb8.firebasestorage.app';
 
-  // -------- Web --------
+  // -------- Web (يُملأ بعد إنشاء «تطبيق ويب» في Firebase Console) --------
   static const String webApiKey = '';
   static const String webAppId = '';
   static const String webMessagingSenderId = '';
   static const String webProjectId = '';
   static const String webAuthDomain = '';
   static const String webStorageBucket = '';
-  static const String webMeasurementId = '';
 
-  // -------- iOS --------
+  // -------- iOS (يُملأ بعد رفع GoogleService-Info.plist) --------
   static const String iosApiKey = '';
   static const String iosAppId = '';
   static const String iosMessagingSenderId = '';
@@ -32,22 +35,79 @@ class FirebaseConfig {
   static const String iosStorageBucket = '';
   static const String iosBundleId = 'com.easyaccountant.erp';
 
-  /// هل تم إعداد مفاتيح Firebase؟ (يُتحقق منه لتشغيل/إيقاف السحابة)
+  // --------------------------------------------------------------------------
+  // تحقّقات صلاحية الإعداد لكل منصّة (نتجنّب أي معرّف غير مطابق)
+  // --------------------------------------------------------------------------
+  static bool get androidConfigured =>
+      androidApiKey.isNotEmpty &&
+      androidProjectId.isNotEmpty &&
+      androidAppId.contains(':android:');
+
+  static bool get iosConfigured =>
+      iosApiKey.isNotEmpty &&
+      iosProjectId.isNotEmpty &&
+      iosAppId.contains(':ios:');
+
+  static bool get webConfigured =>
+      webApiKey.isNotEmpty &&
+      webProjectId.isNotEmpty &&
+      webAppId.contains(':web:');
+
+  /// هل السحابة مُهيّأة للمنصّة الحالية؟
   static bool get isConfigured {
-    // يكفي وجود المفاتيح الأساسية للوحة (Android + Web)
-    final hasAndroid = androidApiKey.isNotEmpty &&
-        androidAppId.isNotEmpty &&
-        androidProjectId.isNotEmpty;
-    final hasWeb = webApiKey.isNotEmpty &&
-        webAppId.isNotEmpty &&
-        webProjectId.isNotEmpty;
-    return hasAndroid || hasWeb;
+    if (kIsWeb) return webConfigured;
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      return iosConfigured || androidConfigured;
+    }
+    return androidConfigured;
   }
 
   /// اسم مشروع Firebase (يُستخدم في مسارات Firestore)
   static String get projectId {
-    if (webProjectId.isNotEmpty) return webProjectId;
+    if (kIsWeb && webProjectId.isNotEmpty) return webProjectId;
     if (androidProjectId.isNotEmpty) return androidProjectId;
-    return iosProjectId;
+    if (iosProjectId.isNotEmpty) return iosProjectId;
+    return webProjectId;
+  }
+
+  /// خيارات التهيئة حسب المنصّة — تُعيد null إن لم تكن المنصّة مُهيّأة.
+  ///
+  /// ملاحظة: على أندرويد/iOS يمكن أيضاً استخدام `Firebase.initializeApp()`
+  /// بدون خيارات لأنَّ التهيئة تُقرأ من google-services.json / plist، لكننا
+  /// نمرّل الخيارات صراحةً لتوحيد السلوك ودعم الويب.
+  static FirebaseOptions? get currentPlatformOptions {
+    if (kIsWeb) {
+      if (!webConfigured) return null;
+      return FirebaseOptions(
+        apiKey: webApiKey,
+        appId: webAppId,
+        messagingSenderId: webMessagingSenderId,
+        projectId: webProjectId,
+        authDomain: webAuthDomain.isEmpty
+            ? '$webProjectId.firebaseapp.com'
+            : webAuthDomain,
+        storageBucket: webStorageBucket,
+      );
+    }
+    if (defaultTargetPlatform == TargetPlatform.iOS && iosConfigured) {
+      return FirebaseOptions(
+        apiKey: iosApiKey,
+        appId: iosAppId,
+        messagingSenderId: iosMessagingSenderId,
+        projectId: iosProjectId,
+        storageBucket: iosStorageBucket,
+        iosBundleId: iosBundleId,
+      );
+    }
+    if (androidConfigured) {
+      return FirebaseOptions(
+        apiKey: androidApiKey,
+        appId: androidAppId,
+        messagingSenderId: androidMessagingSenderId,
+        projectId: androidProjectId,
+        storageBucket: androidStorageBucket,
+      );
+    }
+    return null;
   }
 }

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "462002399803",
+    "project_id": "easy-accountant-1acb8",
+    "storage_bucket": "easy-accountant-1acb8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:462002399803:android:dfe82af1661b5a16974a1e",
+        "android_client_info": {
+          "package_name": "com.easyaccountant.erp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDAxvd7thR_bPN2mtehLwYEu7D_sYAkP8c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
