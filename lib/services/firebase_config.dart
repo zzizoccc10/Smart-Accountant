@@ -19,13 +19,14 @@ class FirebaseConfig {
   static const String androidProjectId = 'easy-accountant-1acb8';
   static const String androidStorageBucket = 'easy-accountant-1acb8.firebasestorage.app';
 
-  // -------- Web (يُملأ بعد إنشاء «تطبيق ويب» في Firebase Console) --------
-  static const String webApiKey = '';
-  static const String webAppId = '';
-  static const String webMessagingSenderId = '';
-  static const String webProjectId = '';
-  static const String webAuthDomain = '';
-  static const String webStorageBucket = '';
+  // -------- Web (مُفعّل — نفس مشروع easy-accountant-1acb8) --------
+  // ✅ تم اختبار Auth + Firestore على الويب بنجاح مع هذه القيم.
+  static const String webApiKey = 'AIzaSyDAxvd7thR_bPN2mtehLwYEu7D_sYAkP8c';
+  static const String webAppId = '1:462002399803:web:dfe82af1661b5a16974a1e';
+  static const String webMessagingSenderId = '462002399803';
+  static const String webProjectId = 'easy-accountant-1acb8';
+  static const String webAuthDomain = 'easy-accountant-1acb8.firebaseapp.com';
+  static const String webStorageBucket = 'easy-accountant-1acb8.firebasestorage.app';
 
   // -------- iOS (يُملأ بعد رفع GoogleService-Info.plist) --------
   static const String iosApiKey = '';
