@@ -16,6 +16,7 @@ import 'package:provider/provider.dart';
 import 'data/app_database.dart';
 import 'providers/erp_provider.dart';
 import 'providers/session_provider.dart';
+import 'services/admin_notification_service.dart';
 import 'services/auth_service.dart';
 import 'services/control_service.dart';
 import 'services/device_service.dart';
@@ -36,6 +37,7 @@ Future<void> main() async {
   await UserService.initBoxes();
   await ControlService.initBoxes();
   await OperationService.initBox();
+  await AdminNotificationService.initBox();
 
   // 2) Firebase (اختياري — يتخطى بهدوء إن لم تُرفع الإعدادات)
   await _initFirebase();

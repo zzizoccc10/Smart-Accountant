@@ -19,6 +19,7 @@ import '../../theme/app_theme.dart';
 import 'companies_tab.dart';
 import 'google_tab.dart';
 import 'guests_tab.dart';
+import 'notifications_tab.dart';
 import 'operations_tab.dart';
 import 'widgets.dart';
 
@@ -37,7 +38,7 @@ class _SystemOwnerDashboardState extends State<SystemOwnerDashboard>
   @override
   void initState() {
     super.initState();
-    _tabs = TabController(length: 5, vsync: this);
+    _tabs = TabController(length: 6, vsync: this);
     _syncCloud();
   }
 
@@ -106,6 +107,7 @@ class _SystemOwnerDashboardState extends State<SystemOwnerDashboard>
             Tab(text: 'العمليات', icon: Icon(Icons.history, size: 19)),
             Tab(text: 'الزوار', icon: Icon(Icons.person_outline, size: 19)),
             Tab(text: 'Google', icon: Icon(Icons.g_mobiledata, size: 22)),
+            Tab(text: 'الإشعارات', icon: Icon(Icons.campaign, size: 19)),
           ],
         ),
       ),
@@ -117,6 +119,7 @@ class _SystemOwnerDashboardState extends State<SystemOwnerDashboard>
           const OperationsTab(),
           const GuestsTab(),
           const GoogleTab(),
+          const NotificationsTab(),
         ],
       ),
     );

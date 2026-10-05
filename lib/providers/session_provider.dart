@@ -12,12 +12,14 @@ import 'package:flutter/foundation.dart';
 import '../data/app_database.dart';
 import '../models/control_models.dart';
 import '../models/user_models.dart';
+import '../services/admin_notification_service.dart';
 import '../services/auth_service.dart';
 import '../services/control_service.dart';
 import '../services/device_service.dart';
 import '../services/firebase_config.dart';
 import '../services/operation_service.dart';
 import '../services/push_notifications.dart';
+import '../services/realtime_service.dart';
 import '../services/sync_service.dart';
 import '../services/user_service.dart';
 
@@ -43,12 +45,31 @@ class SessionProvider extends ChangeNotifier {
       ? _systemOwner != null
       : _currentUser != null;
 
-  bool get isSystemOwner => _mode == AuthMode.systemOwner && _systemOwner != null;
+  bool get isSystemOwner =>
+      _mode == AuthMode.systemOwner && _systemOwner != null;
   bool get isGuest => _mode == AuthMode.guest;
   bool get isCompanyMode => _mode == AuthMode.companyUser;
 
   bool get isOwner => _currentUser?.isOwner ?? false;
   bool get cloudEnabled => FirebaseConfig.isConfigured;
+
+  /// الصلاحيات الفعّالة للمستخدم الحالي (null = غير محدود/غير معروف)
+  Set<String>? get permissions => _currentUser?.effectivePermissions;
+
+  /// هل الكتابة السحابية متاحة؟ (الزائر = محلي فقط)
+  bool get canWriteCloud => !isGuest && FirebaseConfig.isConfigured;
+
+  /// وصف الوضع الحالي (للعرض في الواجهة)
+  String get modeLabelAr {
+    switch (_mode) {
+      case AuthMode.guest:
+        return 'وضع الزائر (محلي)';
+      case AuthMode.systemOwner:
+        return 'مالك النظام';
+      case AuthMode.companyUser:
+        return _activeCompany?.companyName ?? 'مستخدم منشأة';
+    }
+  }
 
   String get currentCompanyId =>
       _activeCompany?.id ??
@@ -157,16 +178,20 @@ class SessionProvider extends ChangeNotifier {
       }
     }
     // إن لم يوجد مستخدم داخلي، أنشئ مالكاً افتراضياً مرتبطاً بالمنشأة
-    owner ??= await UserService.create(AppUser(
-      id: UserService.newId(),
-      name: company.ownerName.isEmpty ? company.companyName : company.ownerName,
-      email: company.email,
-      username: company.username,
-      phone: company.phone,
-      role: UserRole.owner,
-      companyId: company.id,
-      useRoleDefaults: true,
-    ));
+    owner ??= await UserService.create(
+      AppUser(
+        id: UserService.newId(),
+        name: company.ownerName.isEmpty
+            ? company.companyName
+            : company.ownerName,
+        email: company.email,
+        username: company.username,
+        phone: company.phone,
+        role: UserRole.owner,
+        companyId: company.id,
+        useRoleDefaults: true,
+      ),
+    );
     _currentUser = owner;
     await _afterLogin(owner);
   }
@@ -240,24 +265,55 @@ class SessionProvider extends ChangeNotifier {
   // ============================ الدخول كزائر ============================
   // ==========================================================================
 
-  /// الدخول بدون حساب (وضع تجريبي محلي)
+  /// الدخول بدون حساب (وضع تجريبي محلي كامل).
+  /// يمنح صلاحيات المالك محلياً ويقوم بتهيئة «منشأة تجريبية» تلقائياً
+  /// حتى يستطيع الزائر العمل فوراً في كل أجزاء النظام دون أي إعداد.
   Future<void> continueAsGuest() async {
     _mode = AuthMode.guest;
     _activeCompany = null;
-    // مستخدم زائر افتراضي بصلاحيات مشاهدة موسّعة للاستكشاف
+
+    // 1) هيّئ التطبيق تلقائياً للزائر (منشأة تجريبية محلية)
+    _ensureGuestWorkspace();
+
+    // 2) مستخدم زائر افتراضي بصلاحيات المالك الكاملة (محلي فقط — لا كتابة سحابية)
     var guest = UserService.byEmail('guest@local');
-    guest ??= await UserService.create(AppUser(
-      id: 'guest_local',
-      name: 'زائر',
-      email: 'guest@local',
-      role: UserRole.owner, // للاستكشاف الكامل، دون كتابة سحابية
-      useRoleDefaults: true,
-    ));
+    guest ??= await UserService.create(
+      AppUser(
+        id: 'guest_local',
+        name: 'زائر',
+        email: 'guest@local',
+        username: 'guest',
+        role: UserRole.owner,
+        companyId: 'guest_local',
+        useRoleDefaults: true,
+      ),
+    );
     _currentUser = guest;
+
     // سجّل الزائر في لوحة مالك النظام (قائمة الزوار)
     await DeviceService.recordGuestVisit();
-    await OperationService.log(action: 'guest_login');
+    await OperationService.log(
+      action: 'guest_login',
+      companyId: 'guest_local',
+      userId: guest.id,
+      userName: 'زائر',
+    );
     notifyListeners();
+  }
+
+  /// تهيئة مساحة عمل محلية جاهزة للزائر (بلا أي خطوات إعداد).
+  static void _ensureGuestWorkspace() {
+    if (!AppDatabase.getSettingBool('isInit', false)) {
+      AppDatabase.setSetting('isInit', 'true');
+    }
+    if (AppDatabase.getSetting('companyName', '').isEmpty ||
+        AppDatabase.getSetting('companyName', '') == 'شركتي') {
+      AppDatabase.setSetting('companyName', 'منشأة تجريبية (وضع الزائر)');
+    }
+    if (AppDatabase.getSetting('currency', '').isEmpty) {
+      AppDatabase.setSetting('currency', 'ر.ي');
+    }
+    AppDatabase.setSetting('companyId', 'guest_local');
   }
 
   // ==========================================================================
@@ -357,7 +413,9 @@ class SessionProvider extends ChangeNotifier {
           companyName: name,
           ownerName: name,
           username: email.split('@').first,
-          password: AuthService.currentUid ?? 'google_${DateTime.now().millisecondsSinceEpoch}',
+          password:
+              AuthService.currentUid ??
+              'google_${DateTime.now().millisecondsSinceEpoch}',
           email: email,
           deviceId: DeviceService.deviceId,
           createdVia: 'google',
@@ -425,8 +483,23 @@ class SessionProvider extends ChangeNotifier {
         await PushNotifications.subscribe('branch_${user.branchId}');
       }
     } catch (_) {}
+    // ابدأ المزامنة الفورية (real-time) لكل المستخدمين المتصلين
+    _startRealtime(user.companyId);
     notifyListeners();
   }
+
+  // ---------------------------- المزامنة الفورية ----------------------------
+  /// تبدأ قنوات Firestore الفورية للمنشأة الحالية (إن كانت السحابة متاحة).
+  void _startRealtime(String companyId) {
+    if (!RealtimeService.isAvailable || companyId.isEmpty) return;
+    // لا ننتظر — تجري في الخلفية
+    RealtimeService.start(companyId).catchError((_) {});
+    // جلب أولي للإشعارات الإدارية
+    AdminNotificationService.pullFromCloud().catchError((_) => 0);
+  }
+
+  /// إيقاف المزامنة الفورية (عند الخروج)
+  Future<void> _stopRealtime() => RealtimeService.stop();
 
   Future<void> _pushTokenToUser() async {
     final tok = PushNotifications.token;
@@ -445,6 +518,7 @@ class SessionProvider extends ChangeNotifier {
         action: 'logout',
       );
     }
+    await _stopRealtime();
     await AuthService.signOut();
     _currentUser = null;
     _activeCompany = null;
@@ -478,7 +552,9 @@ class SessionProvider extends ChangeNotifier {
   }
 
   void logStatus() {
-    debugPrint('[Session] mode: ${_mode.name}, '
-        'user: ${_currentUser?.name}, cloud: $cloudEnabled');
+    debugPrint(
+      '[Session] mode: ${_mode.name}, '
+      'user: ${_currentUser?.name}, cloud: $cloudEnabled',
+    );
   }
 }
