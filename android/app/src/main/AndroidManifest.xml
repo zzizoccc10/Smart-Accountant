@@ -34,7 +34,7 @@
     <!-- الكاميرا (لتصوير المستندات / مسح الباركود) -->
     <uses-permission android:name="android.permission.CAMERA"/>
     <application
-        android:label="المحاسب السهل"
+        android:label="@string/app_name"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
@@ -94,6 +94,7 @@
         </intent>
     </queries>
 </manifest>
+
 
 
 
