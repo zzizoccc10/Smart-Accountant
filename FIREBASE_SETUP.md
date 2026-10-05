@@ -16,6 +16,23 @@
 | **FCM (الإشعارات)** | ✅ مُفعّلة | Firebase Installations أرجع fid + authToken |
 | **Cloud Storage** | ⚪ غير مُفعّلة | غير مستخدمة في التطبيق حالياً (لا مشكلة) |
 
+### 🌐 التحقق على الويب (E2E عبر متصفح حقيقي)
+
+تم تشغيل التطبيق فعلياً في متصفح Chrome والتحقق من:
+
+| الفحص | النتيجة |
+|---|---|
+| تحميل Firebase SDK من gstatic (v11.9.1) | ✅ app/auth/firestore/messaging/storage |
+| تهيئة Firebase بدون أخطاء | ✅ `Initializing Firebase firebase_core/auth/firestore` |
+| إنشاء حساب المالك على الويب | ✅ نجح وانتقل لشاشة تهيئة النظام |
+| الكتابة الفعلية في Firestore | ✅ `companies/default_company/users/<id>` |
+| قراءة البيانات من Firestore | ✅ Write/Listen channels تعمل (HTTP 200) |
+
+> **ملاحظة تقنية مهمة**: كان هناك عطل دقيق — البناء كان يُعيد استخدام ملف
+> `web_plugin_registrant.dart` قديم لا يتضمّن Firebase، فيُستبعَد كود الويب
+> بالكامل. الحل: `flutter clean` قبل البناء. **دائماً نفّذ `flutter clean`
+> عند تغيير إعدادات Firebase.**
+
 ### المشروع الحقيقي
 ```
 project_id      : easy-accountant-1acb8
