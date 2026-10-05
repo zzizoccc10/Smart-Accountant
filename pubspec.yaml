@@ -68,6 +68,7 @@ dependencies:
   firebase_messaging: 15.1.3      # الإشعارات السحابية (FCM)
   firebase_storage: 12.3.2        # تخزين الملفات (المرفقات)
   google_sign_in: ^7.2.0
+  device_info_plus: ^12.4.0
 
 dev_dependencies:
   flutter_test:

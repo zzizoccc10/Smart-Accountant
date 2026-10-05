@@ -1,20 +1,24 @@
 // ============================================================================
 // تفاصيل منشأة (لوحة مالك النظام) — CompanyDetailScreen
 // ----------------------------------------------------------------------------
-// • تعديل البيانات الأساسية.
-// • تفعيل/إيقاف.
-// • منح/سحب الصلاحيات والامتيازات.
-// • إعادة تعيين كلمة المرور.
-// • عرض مستخدمي المنشأة وحذفها.
+// • تفعيل/إيقاف المنشأة + تعديل البيانات + إعادة تعيين كلمة المرور + حذف.
+// • عدّادات: العمليات / المستخدمون / الأجهزة.
+// • نوع الهاتف + الدولة التي يُفتح منها التطبيق.
+// • المستخدم الرئيسي (أعلى) ثم المستخدمون الفرعيون (تحته).
+// • كل مستخدم يعرض عدّاد عملياته، وبالضغط عليه تُفتح شاشة صلاحياته
+//   لتفعيل/إيقاف أي صلاحية، ومع ذلك يمكن تفعيل/إيقاف المستخدم مباشرة.
 // ============================================================================
 import 'package:flutter/material.dart';
 
 import '../../models/control_models.dart';
 import '../../models/user_models.dart';
 import '../../services/control_service.dart';
-import '../../services/security_service.dart';
+import '../../services/operation_service.dart';
+import '../../services/stats_service.dart';
 import '../../services/user_service.dart';
 import '../../theme/app_theme.dart';
+import 'user_permissions_screen.dart';
+import 'widgets.dart';
 
 class CompanyDetailScreen extends StatefulWidget {
   final String companyId;
@@ -34,6 +38,7 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
   }
 
   void _reload() {
+    if (!mounted) return;
     setState(() => _company = ControlService.companyById(widget.companyId));
   }
 
@@ -48,6 +53,14 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
     }
 
     final users = UserService.ofCompany(c.id);
+    final mainUser = users.where((u) => u.isOwner).toList();
+    final subUsers = users.where((u) => !u.isOwner).toList()
+      ..sort((a, b) => OperationService.countOfUser(b.id)
+          .compareTo(OperationService.countOfUser(a.id)));
+
+    final ops = StatsService.opsOfCompany(c.id);
+    final devices = ControlService.devicesOfCompany(c.id);
+    final device = ControlService.lastDeviceOfCompany(c.id);
 
     return Scaffold(
       appBar: AppBar(
@@ -56,6 +69,11 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
         foregroundColor: Colors.white,
         actions: [
           IconButton(
+            tooltip: 'تحديث',
+            icon: const Icon(Icons.refresh),
+            onPressed: _reload,
+          ),
+          IconButton(
             tooltip: 'حذف المنشأة',
             icon: const Icon(Icons.delete_outline),
             onPressed: _confirmDelete,
@@ -63,9 +81,9 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
         ],
       ),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(14),
         children: [
-          // الحالة + التفعيل
+          // ------- الحالة + الخطة -------
           Card(
             child: Column(
               children: [
@@ -105,32 +123,89 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
               ],
             ),
           ),
+          const SizedBox(height: 14),
+
+          // ------- العدّادات -------
+          Row(
+            children: [
+              Expanded(
+                child: MiniStat(
+                  label: 'عملية',
+                  value: '$ops',
+                  color: AppColors.indigo,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: MiniStat(
+                  label: 'مستخدم',
+                  value: '${users.length}',
+                  color: AppColors.teal,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: MiniStat(
+                  label: 'جهاز',
+                  value: '${devices.length}',
+                  color: AppColors.purple,
+                ),
+              ),
+            ],
+          ),
           const SizedBox(height: 16),
 
-          // معلومات
-          const _SectionTitle('المعلومات الأساسية', Icons.info_outline),
+          // ------- المعلومات الأساسية -------
+          const SectionTitle('المعلومات الأساسية', Icons.info_outline),
           Card(
             child: Padding(
               padding: const EdgeInsets.all(14),
               child: Column(
                 children: [
-                  _kv('اسم المنشأة', c.companyName),
-                  _kv('صاحب المنشأة', c.ownerName.isEmpty ? '—' : c.ownerName),
-                  _kv('اسم المستخدم', '@${c.username}'),
-                  _kv('البريد', c.email.isEmpty ? '—' : c.email),
-                  _kv('الهاتف', c.phone.isEmpty ? '—' : c.phone),
-                  _kv('أُنشئ في', _fmt(c.createdAt)),
-                  _kv('آخر دخول', c.lastLoginAt.isEmpty ? 'لم يدخل بعد' : _fmt(c.lastLoginAt)),
-                  _kv('طريقة الإنشاء', _viaLabel(c.createdVia)),
-                  _kv('معرّف الجهاز', c.deviceId.isEmpty ? '—' : c.deviceId),
+                  KvRow('اسم المنشأة', c.companyName,
+                      icon: Icons.business),
+                  KvRow('صاحب المنشأة', c.ownerName,
+                      icon: Icons.person),
+                  KvRow('اسم المستخدم', '@${c.username}',
+                      icon: Icons.account_circle_outlined),
+                  KvRow('البريد', c.email, icon: Icons.email_outlined),
+                  KvRow('الهاتف', c.phone, icon: Icons.phone_outlined),
+                  KvRow('أُنشئ في', fmtDate(c.createdAt),
+                      icon: Icons.event),
+                  KvRow('آخر دخول',
+                      c.lastLoginAt.isEmpty
+                          ? 'لم يدخل بعد'
+                          : fmtDate(c.lastLoginAt),
+                      icon: Icons.schedule),
+                  KvRow('طريقة الإنشاء', _viaLabel(c.createdVia),
+                      icon: Icons.input),
+                  KvRow('نوع الهاتف',
+                      device == null
+                          ? 'غير مسجّل'
+                          : (device.deviceLabel.isEmpty
+                              ? platformLabel(device.platform)
+                              : device.deviceLabel),
+                      icon: device == null
+                          ? Icons.smartphone
+                          : platformIcon(device.platform)),
+                  KvRow('نظام الجهاز', device?.osVersion ?? '',
+                      icon: Icons.memory),
+                  KvRow('الدولة',
+                      device == null || device.country.isEmpty
+                          ? 'غير معروف'
+                          : device.country,
+                      icon: Icons.public),
+                  KvRow('معرّف الجهاز',
+                      c.deviceId.isEmpty ? '—' : c.deviceId,
+                      icon: Icons.fingerprint),
                 ],
               ),
             ),
           ),
           const SizedBox(height: 16),
 
-          // الصلاحيات
-          const _SectionTitle('الصلاحيات والامتيازات', Icons.tune),
+          // ------- الصلاحيات -------
+          const SectionTitle('صلاحيات المنشأة والامتيازات', Icons.tune),
           Card(
             child: Column(
               children: [
@@ -192,16 +267,15 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
           ),
           const SizedBox(height: 16),
 
-          // إجراءات
-          const _SectionTitle('إجراءات', Icons.settings),
+          // ------- إجراءات -------
+          const SectionTitle('إجراءات', Icons.settings),
           Card(
             child: Column(
               children: [
                 ListTile(
-                  leading: const Icon(Icons.password, color: AppColors.warning),
-                  title: const Text('إعادة تعيين كلمة المرور'),
-                  subtitle:
-                      const Text('تعيين كلمة مرور جديدة لدخول المنشأة'),
+                  leading: const Icon(Icons.password,
+                      color: AppColors.warning),
+                  title: const Text('إعادة تعيين كلمة مرور المنشأة'),
                   trailing: const Icon(Icons.chevron_left),
                   onTap: _resetPasswordDialog,
                 ),
@@ -217,64 +291,180 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
           ),
           const SizedBox(height: 16),
 
-          // مستخدمو المنشأة
-          _SectionTitle('مستخدمو المنشأة (${users.length})', Icons.people_outline),
-          Card(
-            child: users.isEmpty
-                ? const ListTile(
-                    leading: Icon(Icons.info_outline),
-                    title: Text('لا يوجد مستخدمون فرعيون'),
-                    subtitle: Text('يُضافون من داخل الحساب الرئيسي للمنشأة'),
-                  )
-                : Column(
-                    children: users
-                        .map((u) => ListTile(
-                              leading: CircleAvatar(
-                                backgroundColor: u.isActive
-                                    ? AppColors.teal
-                                    : Colors.grey,
-                                child: Text(u.initials,
-                                    style: const TextStyle(color: Colors.white)),
-                              ),
-                              title: Text(u.name),
-                              subtitle: Text(
-                                  '${u.role.labelAr}${u.username.isNotEmpty ? ' • @${u.username}' : ''}'),
-                              trailing: Switch(
-                                value: u.isActive,
-                                activeThumbColor: AppColors.success,
-                                onChanged: (v) async {
-                                  await UserService.update(
-                                      u.copyWith(isActive: v));
-                                  _reload();
-                                },
-                              ),
-                            ))
-                        .toList(),
-                  ),
-          ),
-          const SizedBox(height: 24),
+          // ------- المستخدم الرئيسي -------
+          SectionTitle('المستخدم الرئيسي', Icons.star,
+              trailing: BadgeChip('${mainUser.length}', AppColors.purple)),
+          if (mainUser.isEmpty)
+            Card(
+              child: ListTile(
+                leading: const Icon(Icons.info_outline),
+                title: const Text('لا يوجد مستخدم رئيسي مسجّل محلياً',
+                    style: TextStyle(fontSize: 13)),
+                subtitle: Text(
+                    'اسم المستخدم: @${c.username}', 
+                    style: const TextStyle(fontSize: 11)),
+              ),
+            )
+          else
+            ...mainUser.map((u) => _userCard(u, isMain: true)),
+
+          const SizedBox(height: 16),
+
+          // ------- المستخدمون الفرعيون -------
+          SectionTitle('المستخدمون الفرعيون (${subUsers.length})',
+              Icons.people_outline),
+          if (subUsers.isEmpty)
+            const Card(
+              child: ListTile(
+                leading: Icon(Icons.info_outline),
+                title: Text('لا يوجد مستخدمون فرعيون',
+                    style: TextStyle(fontSize: 13)),
+                subtitle: Text('يُضافون من داخل الحساب الرئيسي للمنشأة',
+                    style: TextStyle(fontSize: 11)),
+              ),
+            )
+          else
+            ...subUsers.map((u) => _userCard(u, isMain: false)),
+
+          const SizedBox(height: 30),
         ],
       ),
     );
   }
 
-  Widget _kv(String k, String v) => Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4),
-        child: Row(
-          children: [
-            SizedBox(
-              width: 130,
-              child: Text(k,
-                  style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
+  // --------------------------------------------------------------------------
+  /// بطاقة مستخدم: عدّاد العمليات + تفعيل/إيقاف + فتح الصلاحيات
+  Widget _userCard(AppUser u, {required bool isMain}) {
+    final ops = OperationService.countOfUser(u.id);
+    final device = ControlService.lastDeviceOfUser(u.id);
+    final granted = u.effectivePermissions.length;
+
+    return Card(
+      margin: const EdgeInsets.only(bottom: 10),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: () async {
+          await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => UserPermissionsScreen(userId: u.id),
             ),
-            Expanded(
-              child: Text(v,
-                  style: const TextStyle(
-                      fontSize: 13, fontWeight: FontWeight.w500)),
-            ),
-          ],
+          );
+          _reload();
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  CircleAvatar(
+                    radius: 20,
+                    backgroundColor: u.isActive
+                        ? (isMain ? AppColors.purple : AppColors.teal)
+                        : Colors.grey.shade400,
+                    child: Text(u.initials,
+                        style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold)),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(u.name,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                      fontSize: 13.5,
+                                      fontWeight: FontWeight.bold)),
+                            ),
+                            if (isMain)
+                              const BadgeChip('رئيسي', AppColors.purple,
+                                  icon: Icons.star),
+                          ],
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          '${u.role.labelAr}'
+                          '${u.username.isNotEmpty ? " • @${u.username}" : ""}',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                              fontSize: 11, color: Colors.grey.shade600),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Switch(
+                    value: u.isActive,
+                    activeThumbColor: AppColors.success,
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    onChanged: (v) async {
+                      await UserService.update(u.copyWith(isActive: v));
+                      _reload();
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(v
+                                ? 'تم تفعيل «${u.name}»'
+                                : 'تم إيقاف «${u.name}»'),
+                            backgroundColor:
+                                v ? AppColors.success : AppColors.warning,
+                          ),
+                        );
+                      }
+                    },
+                  ),
+                ],
+              ),
+              const SizedBox(height: 9),
+              Wrap(
+                spacing: 6,
+                runSpacing: 6,
+                children: [
+                  BadgeChip('$ops عملية', AppColors.indigo,
+                      icon: Icons.sync_alt),
+                  BadgeChip('$granted/${Perm.all.length} صلاحية',
+                      AppColors.info, icon: Icons.tune),
+                  if (device != null)
+                    BadgeChip(
+                        device.deviceLabel.isEmpty
+                            ? platformLabel(device.platform)
+                            : device.deviceLabel,
+                        AppColors.purple,
+                        icon: platformIcon(device.platform)),
+                  if (device != null)
+                    BadgeChip(
+                        device.country.isEmpty ? 'غير معروف' : device.country,
+                        AppColors.teal,
+                        icon: Icons.public),
+                ],
+              ),
+              const SizedBox(height: 4),
+              Align(
+                alignment: AlignmentDirectional.centerEnd,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text('اضغط لإدارة الصلاحيات',
+                        style: TextStyle(
+                            fontSize: 10.5, color: Colors.grey.shade600)),
+                    const Icon(Icons.chevron_left,
+                        size: 16, color: AppColors.primary),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
-      );
+      ),
+    );
+  }
 
   String _viaLabel(String via) {
     switch (via) {
@@ -287,15 +477,6 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
       default:
         return via;
     }
-  }
-
-  String _fmt(String iso) {
-    final d = DateTime.tryParse(iso);
-    if (d == null) return iso;
-    return '${d.year}/${d.month.toString().padLeft(2, '0')}/'
-        '${d.day.toString().padLeft(2, '0')} '
-        '${d.hour.toString().padLeft(2, '0')}:'
-        '${d.minute.toString().padLeft(2, '0')}';
   }
 
   // --------------------------------------------------------------------------
@@ -360,7 +541,8 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
             children: [
               TextField(
                   controller: name,
-                  decoration: const InputDecoration(labelText: 'اسم المنشأة')),
+                  decoration:
+                      const InputDecoration(labelText: 'اسم المنشأة')),
               TextField(
                   controller: owner,
                   decoration:
@@ -370,8 +552,8 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
                   decoration: const InputDecoration(labelText: 'الهاتف')),
               TextField(
                   controller: email,
-                  decoration:
-                      const InputDecoration(labelText: 'البريد الإلكتروني')),
+                  decoration: const InputDecoration(
+                      labelText: 'البريد الإلكتروني')),
             ],
           ),
         ),
@@ -409,7 +591,8 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
               onPressed: () => Navigator.pop(dlgCtx, false),
               child: const Text('إلغاء')),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.danger),
+            style:
+                ElevatedButton.styleFrom(backgroundColor: AppColors.danger),
             onPressed: () => Navigator.pop(dlgCtx, true),
             child: const Text('حذف'),
           ),
@@ -422,29 +605,3 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
     }
   }
 }
-
-class _SectionTitle extends StatelessWidget {
-  final String text;
-  final IconData icon;
-  const _SectionTitle(this.text, this.icon);
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8, top: 4),
-      child: Row(
-        children: [
-          Icon(icon, size: 18, color: AppColors.primary),
-          const SizedBox(width: 8),
-          Text(text,
-              style:
-                  const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-        ],
-      ),
-    );
-  }
-}
-
-// إشارة لتفادي تحذير الاستيراد غير المستخدم
-// ignore: unused_element
-final _unused = SecurityService.generateSalt;

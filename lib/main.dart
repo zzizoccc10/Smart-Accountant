@@ -21,6 +21,7 @@ import 'services/control_service.dart';
 import 'services/device_service.dart';
 import 'services/firebase_config.dart';
 import 'services/local_notifications.dart';
+import 'services/operation_service.dart';
 import 'services/push_notifications.dart';
 import 'services/user_service.dart';
 import 'theme/app_theme.dart';
@@ -34,6 +35,7 @@ Future<void> main() async {
   await AppDatabase.init();
   await UserService.initBoxes();
   await ControlService.initBoxes();
+  await OperationService.initBox();
 
   // 2) Firebase (اختياري — يتخطى بهدوء إن لم تُرفع الإعدادات)
   await _initFirebase();

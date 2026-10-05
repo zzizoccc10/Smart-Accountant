@@ -1,23 +1,26 @@
 // ============================================================================
 // لوحة تحكم مالك النظام — SystemOwnerDashboard
 // ----------------------------------------------------------------------------
-// مركز التحকّم الشامل:
-//   • نظرة عامة: إحصائيات المنشآت/المستخدمين/الأجهزة.
-//   • المنشآت: عرض، تفعيل/إيقاف، منح الصلاحيات، إعادة تعيين كلمة المرور، حذف.
-//   • المستخدمون: كل من أنشأ حساباً (من كل المنشآت).
-//   • الأجهزة: كل من حمّل التطبيق (تنزيلات + آخر ظهور + هل أنشأ حساباً).
+// خمس واجهات:
+//   1) الداشبورد الرئيسية : ملخص عام عن كل شيء + رسوم بيانية بسيطة.
+//   2) المنشآت            : بحث + فلتر + ترقيم (20/صفحة) + عدّاد عمليات.
+//   3) العمليات           : كل عملية تحصل في الأجهزة/المنشآت المحدّدة.
+//   4) الزوار             : من دخلوا بدون حساب.
+//   5) حسابات Google      : من دخلوا عبر مصادقة Google.
 // ============================================================================
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../models/control_models.dart';
-import '../../models/user_models.dart';
 import '../../providers/session_provider.dart';
 import '../../services/control_service.dart';
 import '../../services/device_service.dart';
-import '../../services/user_service.dart';
+import '../../services/stats_service.dart';
 import '../../theme/app_theme.dart';
-import 'company_detail_screen.dart';
+import 'companies_tab.dart';
+import 'google_tab.dart';
+import 'guests_tab.dart';
+import 'operations_tab.dart';
+import 'widgets.dart';
 
 class SystemOwnerDashboard extends StatefulWidget {
   const SystemOwnerDashboard({super.key});
@@ -29,17 +32,22 @@ class SystemOwnerDashboard extends StatefulWidget {
 class _SystemOwnerDashboardState extends State<SystemOwnerDashboard>
     with SingleTickerProviderStateMixin {
   late final TabController _tabs;
+  bool _syncing = false;
 
   @override
   void initState() {
     super.initState();
-    _tabs = TabController(length: 4, vsync: this);
-    // زامن من السحابة عند الفتح (لو متاحة)
-    if (ControlService.isCloudAvailable) {
-      ControlService.pullCompaniesFromCloud().then((_) {
-        if (mounted) setState(() {});
-      });
-    }
+    _tabs = TabController(length: 5, vsync: this);
+    _syncCloud();
+  }
+
+  Future<void> _syncCloud() async {
+    if (!ControlService.isCloudAvailable) return;
+    setState(() => _syncing = true);
+    try {
+      await ControlService.pullCompaniesFromCloud();
+    } catch (_) {}
+    if (mounted) setState(() => _syncing = false);
   }
 
   @override
@@ -51,9 +59,6 @@ class _SystemOwnerDashboardState extends State<SystemOwnerDashboard>
   @override
   Widget build(BuildContext context) {
     final session = context.watch<SessionProvider>();
-    final companies = ControlService.allCompanies();
-    final devices = ControlService.allDevices();
-    final users = UserService.all();
 
     return Scaffold(
       appBar: AppBar(
@@ -61,22 +66,30 @@ class _SystemOwnerDashboardState extends State<SystemOwnerDashboard>
         backgroundColor: AppColors.purple,
         foregroundColor: Colors.white,
         actions: [
-          IconButton(
-            tooltip: 'تحديث',
-            icon: const Icon(Icons.refresh),
-            onPressed: () {
-              ControlService.pullCompaniesFromCloud();
-              setState(() {});
-            },
-          ),
+          if (_syncing)
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 14),
+              child: Center(
+                child: SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(
+                      strokeWidth: 2, color: Colors.white),
+                ),
+              ),
+            )
+          else
+            IconButton(
+              tooltip: 'تحديث',
+              icon: const Icon(Icons.refresh),
+              onPressed: _syncCloud,
+            ),
           IconButton(
             tooltip: 'خروج',
             icon: const Icon(Icons.logout),
             onPressed: () async {
               await session.signOut();
-              if (context.mounted) {
-                Navigator.of(context).pop(true);
-              }
+              if (context.mounted) Navigator.of(context).pop(true);
             },
           ),
         ],
@@ -84,58 +97,120 @@ class _SystemOwnerDashboardState extends State<SystemOwnerDashboard>
           controller: _tabs,
           isScrollable: true,
           indicatorColor: Colors.white,
+          indicatorWeight: 3,
           labelColor: Colors.white,
           unselectedLabelColor: Colors.white70,
           tabs: const [
-            Tab(text: 'نظرة عامة', icon: Icon(Icons.insights, size: 20)),
-            Tab(text: 'المنشآت', icon: Icon(Icons.business, size: 20)),
-            Tab(text: 'المستخدمون', icon: Icon(Icons.people, size: 20)),
-            Tab(text: 'الأجهزة', icon: Icon(Icons.devices, size: 20)),
+            Tab(text: 'الداشبورد', icon: Icon(Icons.dashboard, size: 19)),
+            Tab(text: 'المنشآت', icon: Icon(Icons.business, size: 19)),
+            Tab(text: 'العمليات', icon: Icon(Icons.history, size: 19)),
+            Tab(text: 'الزوار', icon: Icon(Icons.person_outline, size: 19)),
+            Tab(text: 'Google', icon: Icon(Icons.g_mobiledata, size: 22)),
           ],
         ),
       ),
       body: TabBarView(
         controller: _tabs,
         children: [
-          _overviewTab(companies, users.length, devices),
-          _companiesTab(companies),
-          _usersTab(users),
-          _devicesTab(devices),
+          _HomeDashboard(onRefresh: _syncCloud),
+          const CompaniesTab(),
+          const OperationsTab(),
+          const GuestsTab(),
+          const GoogleTab(),
+        ],
+      ),
+    );
+  }
+}
+
+// ============================================================================
+// التبويب 1 — الداشبورد الرئيسية
+// ============================================================================
+class _HomeDashboard extends StatefulWidget {
+  final Future<void> Function() onRefresh;
+  const _HomeDashboard({required this.onRefresh});
+
+  @override
+  State<_HomeDashboard> createState() => _HomeDashboardState();
+}
+
+class _HomeDashboardState extends State<_HomeDashboard> {
+  @override
+  Widget build(BuildContext context) {
+    return RefreshIndicator(
+      onRefresh: () async {
+        await widget.onRefresh();
+        if (mounted) setState(() {});
+      },
+      child: ListView(
+        padding: const EdgeInsets.all(14),
+        children: [
+          _cloudBanner(),
+          const SizedBox(height: 12),
+          _summaryGrid(),
+          const SizedBox(height: 18),
+          _opsChart(),
+          const SizedBox(height: 18),
+          _topCompanies(),
+          const SizedBox(height: 18),
+          _recentOps(),
+          const SizedBox(height: 18),
+          _platformDistribution(),
+          const SizedBox(height: 18),
+          _topCountries(),
+          const SizedBox(height: 30),
         ],
       ),
     );
   }
 
-  // --------------------------------------------------------------------------
-  // نظرة عامة
-  // --------------------------------------------------------------------------
-  Widget _overviewTab(
-      List<CompanyAccount> companies, int userCount, List<DeviceRegistry> devices) {
-    final active = companies.where((c) => c.isActive).length;
-    final stopped = companies.length - active;
-    final createdAccounts = devices.where((d) => d.accountCreated).length;
+  Widget _cloudBanner() {
+    final ok = ControlService.isCloudAvailable;
+    return Card(
+      color: ok
+          ? AppColors.success.withValues(alpha: 0.08)
+          : Colors.orange.withValues(alpha: 0.10),
+      child: ListTile(
+        leading: Icon(ok ? Icons.cloud_done : Icons.cloud_off,
+            color: ok ? AppColors.success : Colors.orange),
+        title: Text(
+          ok ? 'متصل بـ Firebase — المزامنة مُفعّلة' : 'غير متصل — بيانات محلية',
+          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+        ),
+        subtitle: Text(
+          'معرّف جهازك: ${DeviceService.deviceId} • '
+          '${DeviceService.platform} • ${DeviceService.country}',
+          style: const TextStyle(fontSize: 10.5),
+        ),
+      ),
+    );
+  }
 
-    return ListView(
-      padding: const EdgeInsets.all(16),
+  Widget _summaryGrid() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        const SectionTitle('ملخص عام', Icons.insights),
         Row(
           children: [
             Expanded(
-              child: _statCard(
-                'المنشآت',
-                '${companies.length}',
-                Icons.business,
-                AppColors.primary,
-                subtitle: '$active نشطة • $stopped موقوفة',
+              child: StatCard(
+                label: 'المنشآت',
+                value: '${StatsService.companiesCount}',
+                icon: Icons.business,
+                color: AppColors.primary,
+                subtitle: '${StatsService.activeCompaniesCount} نشطة • '
+                    '${StatsService.stoppedCompaniesCount} موقوفة',
               ),
             ),
             const SizedBox(width: 10),
             Expanded(
-              child: _statCard(
-                'المستخدمون',
-                '$userCount',
-                Icons.people,
-                AppColors.teal,
+              child: StatCard(
+                label: 'المستخدمون',
+                value: '${StatsService.usersCount}',
+                icon: Icons.people,
+                color: AppColors.teal,
+                subtitle: '${StatsService.activeUsersCount} نشط',
               ),
             ),
           ],
@@ -144,295 +219,271 @@ class _SystemOwnerDashboardState extends State<SystemOwnerDashboard>
         Row(
           children: [
             Expanded(
-              child: _statCard(
-                'الأجهزة',
-                '${devices.length}',
-                Icons.devices,
-                AppColors.indigo,
+              child: StatCard(
+                label: 'العمليات',
+                value: '${StatsService.operationsCount}',
+                icon: Icons.sync_alt,
+                color: AppColors.indigo,
+                subtitle: 'اليوم: ${StatsService.operationsToday}',
               ),
             ),
             const SizedBox(width: 10),
             Expanded(
-              child: _statCard(
-                'أنشأوا حساباً',
-                '$createdAccounts',
-                Icons.how_to_reg,
-                AppColors.success,
+              child: StatCard(
+                label: 'الأجهزة',
+                value: '${StatsService.devicesCount}',
+                icon: Icons.devices,
+                color: AppColors.purple,
+                subtitle: '${StatsService.accountsCreatedCount} أنشأوا حساباً',
               ),
             ),
           ],
         ),
-        const SizedBox(height: 18),
-        const Text('حالة الاتصال بالسحابة',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-        const SizedBox(height: 8),
-        Card(
-          child: ListTile(
-            leading: Icon(
-              ControlService.isCloudAvailable ? Icons.cloud_done : Icons.cloud_off,
-              color: ControlService.isCloudAvailable
-                  ? AppColors.success
-                  : Colors.orange,
+        const SizedBox(height: 10),
+        Row(
+          children: [
+            Expanded(
+              child: StatCard(
+                label: 'الزوار',
+                value: '${StatsService.guestsCount}',
+                icon: Icons.person_outline,
+                color: AppColors.warning,
+                subtitle: '${StatsService.guestsConverted} تحوّلوا لحساب',
+              ),
             ),
-            title: Text(ControlService.isCloudAvailable
-                ? 'متصل بـ Firebase — المزامنة مُفعّلة'
-                : 'غير متصل — البيانات محلية فقط'),
-            subtitle: Text(
-              'معرّف الجهاز الحالي: ${DeviceService.deviceId}',
-              style: const TextStyle(fontSize: 11),
+            const SizedBox(width: 10),
+            Expanded(
+              child: StatCard(
+                label: 'حسابات Google',
+                value: '${StatsService.googleCount}',
+                icon: Icons.g_mobiledata,
+                color: AppColors.danger,
+                subtitle: 'دخلوا عبر Google',
+              ),
             ),
-          ),
+          ],
         ),
-        const SizedBox(height: 18),
-        const Text('أحدث المنشآت',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-        const SizedBox(height: 8),
-        if (companies.isEmpty)
-          const Card(
-            child: ListTile(
-              leading: Icon(Icons.info_outline),
-              title: Text('لا توجد منشآت بعد'),
-              subtitle: Text('ستظهر المنشآت التي تُنشئ حسابات من التطبيق'),
-            ),
-          )
-        else
-          ...companies.take(5).map((c) => _companyTile(c)),
       ],
     );
   }
 
-  Widget _statCard(String label, String value, IconData icon, Color color,
-      {String? subtitle}) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(14),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                CircleAvatar(
-                  radius: 16,
-                  backgroundColor: color.withValues(alpha: 0.14),
-                  child: Icon(icon, color: color, size: 18),
-                ),
-                const Spacer(),
-                Text(value,
-                    style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: color)),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
-            if (subtitle != null)
-              Text(subtitle,
-                  style: TextStyle(fontSize: 11, color: Colors.grey.shade600)),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // --------------------------------------------------------------------------
-  // المنشآت
-  // --------------------------------------------------------------------------
-  Widget _companiesTab(List<CompanyAccount> companies) {
-    if (companies.isEmpty) {
-      return const Center(
-        child: Padding(
-          padding: EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.business_outlined, size: 56, color: Colors.grey),
-              SizedBox(height: 12),
-              Text('لا توجد منشآت بعد'),
-              SizedBox(height: 6),
-              Text(
-                'عندما ينشئ مستخدم حساب منشأة من شاشة الدخول، ستظهر هنا '
-                'لتتحكم بتفعيلها وصلاحياتها.',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 12, color: Colors.grey),
+  Widget _opsChart() {
+    final data = StatsService.opsByDay(days: 7);
+    final maxV = data.fold<int>(1, (m, e) => e.value > m ? e.value : m);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SectionTitle('العمليات خلال 7 أيام', Icons.bar_chart),
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(12, 16, 12, 10),
+            child: SizedBox(
+              height: 130,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: data.map((e) {
+                  final h = maxV == 0 ? 0.0 : (e.value / maxV) * 90;
+                  final day = e.key.split('-').last;
+                  return Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Text('${e.value}',
+                            style: const TextStyle(
+                                fontSize: 10, fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 4),
+                        Container(
+                          height: h < 3 ? 3 : h,
+                          margin: const EdgeInsets.symmetric(horizontal: 4),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withValues(alpha: 0.75),
+                            borderRadius: const BorderRadius.vertical(
+                                top: Radius.circular(6)),
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(day,
+                            style: TextStyle(
+                                fontSize: 10, color: Colors.grey.shade600)),
+                      ],
+                    ),
+                  );
+                }).toList(),
               ),
-            ],
+            ),
           ),
         ),
-      );
-    }
-    return ListView.builder(
-      padding: const EdgeInsets.all(12),
-      itemCount: companies.length,
-      itemBuilder: (context, i) => _companyTile(companies[i]),
+      ],
     );
   }
 
-  Widget _companyTile(CompanyAccount c) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 10),
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: c.isActive ? AppColors.primary : Colors.grey,
-          child: Text(c.initials, style: const TextStyle(color: Colors.white)),
-        ),
-        title: Text(c.companyName,
-            maxLines: 1, overflow: TextOverflow.ellipsis),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('@${c.username} • ${c.plan.labelAr}',
-                style: const TextStyle(fontSize: 12)),
-            const SizedBox(height: 4),
-            Row(
-              children: [
-                _badge(c.isActive ? 'نشطة' : 'موقوفة',
-                    c.isActive ? AppColors.success : AppColors.danger),
-                const SizedBox(width: 6),
-                _badge('${c.privileges.granted.length} صلاحية', AppColors.info),
-              ],
+  Widget _topCompanies() {
+    final list = StatsService.topCompaniesByOps(limit: 5);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SectionTitle('أكثر المنشآت نشاطاً', Icons.leaderboard),
+        if (list.isEmpty)
+          const Card(
+            child: ListTile(
+              leading: Icon(Icons.info_outline),
+              title: Text('لا توجد منشآت بعد', style: TextStyle(fontSize: 13)),
             ),
-          ],
-        ),
-        trailing: Switch(
-          value: c.isActive,
-          activeThumbColor: AppColors.success,
-          onChanged: (v) async {
-            await ControlService.setCompanyActive(c.id, v);
-            setState(() {});
-            if (mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(v
-                      ? 'تم تفعيل «${c.companyName}»'
-                      : 'تم إيقاف «${c.companyName}»'),
-                  backgroundColor: v ? AppColors.success : AppColors.warning,
-                ),
-              );
-            }
-          },
-        ),
-        onTap: () async {
-          await Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => CompanyDetailScreen(companyId: c.id),
+          )
+        else
+          Card(
+            child: Column(
+              children: list.map((c) {
+                final ops = StatsService.opsOfCompany(c.id);
+                final us = StatsService.usersOfCompany(c.id);
+                return ListTile(
+                  dense: true,
+                  leading: CircleAvatar(
+                    radius: 16,
+                    backgroundColor:
+                        c.isActive ? AppColors.primary : Colors.grey,
+                    child: Text(c.initials,
+                        style: const TextStyle(
+                            color: Colors.white, fontSize: 13)),
+                  ),
+                  title: Text(c.companyName,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(fontSize: 13)),
+                  subtitle: Text('$us مستخدم • $ops عملية',
+                      style: const TextStyle(fontSize: 11)),
+                  trailing: BadgeChip('$ops', AppColors.indigo,
+                      icon: Icons.sync_alt),
+                );
+              }).toList(),
             ),
-          );
-          if (mounted) setState(() {});
-        },
-      ),
-    );
-  }
-
-  // --------------------------------------------------------------------------
-  // المستخدمون
-  // --------------------------------------------------------------------------
-  Widget _usersTab(List<AppUser> users) {
-    if (users.isEmpty) {
-      return const Center(child: Text('لا يوجد مستخدمون'));
-    }
-    return ListView.builder(
-      padding: const EdgeInsets.all(12),
-      itemCount: users.length,
-      itemBuilder: (context, i) {
-        final u = users[i];
-        final company = ControlService.companyById(u.companyId);
-        return Card(
-          margin: const EdgeInsets.only(bottom: 10),
-          child: ListTile(
-            leading: CircleAvatar(
-              backgroundColor: u.isActive ? AppColors.teal : Colors.grey,
-              child: Text(u.initials,
-                  style: const TextStyle(color: Colors.white)),
-            ),
-            title: Text(u.name),
-            subtitle: Text(
-              '${u.role.labelAr} • ${company?.companyName ?? (u.companyId.isEmpty ? "محلي/قديم" : u.companyId)}\n'
-              '${u.username.isNotEmpty ? "@${u.username}" : (u.email.isNotEmpty ? u.email : "")}',
-              style: const TextStyle(fontSize: 12),
-            ),
-            isThreeLine: true,
-            trailing: _badge(u.isActive ? 'نشط' : 'معطّل',
-                u.isActive ? AppColors.success : Colors.grey),
           ),
-        );
-      },
+      ],
     );
   }
 
-  // --------------------------------------------------------------------------
-  // الأجهزة
-  // --------------------------------------------------------------------------
-  Widget _devicesTab(List<DeviceRegistry> devices) {
-    if (devices.isEmpty) {
-      return const Center(child: Text('لا توجد أجهزة مسجّلة'));
-    }
-    return ListView.builder(
-      padding: const EdgeInsets.all(12),
-      itemCount: devices.length,
-      itemBuilder: (context, i) {
-        final d = devices[i];
-        return Card(
-          margin: const EdgeInsets.only(bottom: 10),
-          child: ListTile(
-            leading: CircleAvatar(
-              backgroundColor:
-                  d.accountCreated ? AppColors.success : Colors.blueGrey,
-              child: Icon(_deviceIcon(d.platform),
-                  color: Colors.white, size: 20),
+  Widget _recentOps() {
+    final ops = StatsService.recentOperations(limit: 8);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SectionTitle('أحدث العمليات', Icons.history),
+        if (ops.isEmpty)
+          const Card(
+            child: ListTile(
+              leading: Icon(Icons.info_outline),
+              title: Text('لا توجد عمليات مسجّلة',
+                  style: TextStyle(fontSize: 13)),
             ),
-            title: Text('${d.platform} • ${d.model}',
-                style: const TextStyle(fontSize: 14)),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('المعرّف: ${d.deviceId}',
-                    style: const TextStyle(fontSize: 11)),
-                Text('فتحات: ${d.launchCount} • آخر ظهور: ${_fmt(d.lastSeenAt)}',
-                    style: const TextStyle(fontSize: 11)),
-                if (d.userName.isNotEmpty)
-                  Text('مرتبط: ${d.userName}', style: const TextStyle(fontSize: 11)),
-              ],
+          )
+        else
+          Card(
+            child: Column(
+              children: ops.map((o) {
+                final co = ControlService.companyById(o.companyId);
+                return ListTile(
+                  dense: true,
+                  leading: CircleAvatar(
+                    radius: 15,
+                    backgroundColor: AppColors.indigo.withValues(alpha: 0.14),
+                    child: const Icon(Icons.bolt,
+                        size: 15, color: AppColors.indigo),
+                  ),
+                  title: Text(o.actionLabelAr,
+                      style: const TextStyle(fontSize: 12.5)),
+                  subtitle: Text(
+                    '${o.userName.isEmpty ? "—" : o.userName}'
+                    '${co != null ? " • ${co.companyName}" : ""}',
+                    style: const TextStyle(fontSize: 10.5),
+                  ),
+                  trailing: Text(timeAgo(o.createdAt),
+                      style: TextStyle(
+                          fontSize: 10, color: Colors.grey.shade600)),
+                );
+              }).toList(),
             ),
-            isThreeLine: true,
-            trailing: d.accountCreated
-                ? _badge('أنشأ حساباً', AppColors.success)
-                : _badge('حمّل فقط', Colors.blueGrey),
           ),
-        );
-      },
+      ],
     );
   }
 
-  IconData _deviceIcon(String platform) {
-    switch (platform) {
-      case 'android':
-        return Icons.android;
-      case 'ios':
-        return Icons.phone_iphone;
-      case 'web':
-        return Icons.language;
-      default:
-        return Icons.devices_other;
-    }
+  Widget _platformDistribution() {
+    final map = StatsService.devicesByPlatform;
+    if (map.isEmpty) return const SizedBox.shrink();
+    final total = map.values.fold<int>(0, (a, b) => a + b);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SectionTitle('توزيع الأجهزة حسب النظام', Icons.phone_android),
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(14),
+            child: Column(
+              children: map.entries.map((e) {
+                final ratio = total == 0 ? 0.0 : e.value / total;
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 6),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(platformIcon(e.key),
+                              size: 16, color: AppColors.primary),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: Text(platformLabel(e.key),
+                                style: const TextStyle(fontSize: 12.5)),
+                          ),
+                          Text('${e.value}',
+                              style: const TextStyle(
+                                  fontSize: 12, fontWeight: FontWeight.bold)),
+                        ],
+                      ),
+                      const SizedBox(height: 5),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(6),
+                        child: LinearProgressIndicator(
+                          value: ratio,
+                          minHeight: 7,
+                          backgroundColor: Colors.grey.shade200,
+                          valueColor: const AlwaysStoppedAnimation(
+                              AppColors.primary),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
-  Widget _badge(String text, Color color) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.12),
-          borderRadius: BorderRadius.circular(8),
+  Widget _topCountries() {
+    final list = StatsService.topCountries(limit: 6);
+    if (list.isEmpty) return const SizedBox.shrink();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SectionTitle('أكثر الدول استخداماً', Icons.public),
+        Card(
+          child: Column(
+            children: list
+                .map((e) => ListTile(
+                      dense: true,
+                      leading: const Icon(Icons.flag,
+                          size: 18, color: AppColors.teal),
+                      title: Text(e.key,
+                          style: const TextStyle(fontSize: 13)),
+                      trailing: BadgeChip('${e.value}', AppColors.teal),
+                    ))
+                .toList(),
+          ),
         ),
-        child: Text(text, style: TextStyle(fontSize: 10, color: color)),
-      );
-
-  String _fmt(String iso) {
-    final d = DateTime.tryParse(iso);
-    if (d == null) return iso;
-    return '${d.year}/${d.month.toString().padLeft(2, '0')}/'
-        '${d.day.toString().padLeft(2, '0')} '
-        '${d.hour.toString().padLeft(2, '0')}:'
-        '${d.minute.toString().padLeft(2, '0')}';
+      ],
+    );
   }
 }

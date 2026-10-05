@@ -1,9 +1,14 @@
 // ============================================================================
 // خدمة الجهاز — DeviceService
 // ----------------------------------------------------------------------------
-// تُنشئ معرّفاً فريداً ثابتاً للجهاز، وتتتبّع كل جهاز حَمّل التطبيق.
-// تُخزَّن محلياً (shared_preferences / Hive) وترتبط بـ ControlService.DeviceRegistry.
+// تُنشئ معرّفاً فريداً ثابتاً للجهاز، وتتتبّع كل جهاز حَمّل التطبيق:
+//   • نوع الهاتف (الشركة + الطراز) + إصدار النظام.
+//   • البلد (من رمز الدولة للجهاز / لغة النظام).
+//   • سجلات الزوار (دخول بدون حساب) وحسابات Google.
 // ============================================================================
+import 'dart:ui' as ui;
+
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
@@ -16,21 +21,34 @@ class DeviceService {
 
   static Box? _box;
 
-  /// معرّف الجهاز الحالي (يُنشأ مرة واحدة ويثبت)
+  // بيانات الجهاز الحالي (تُملأ في init)
+  static String _platform = '';
+  static String _model = '';
+  static String _brand = '';
+  static String _osVersion = '';
+  static String _country = '';
+  static String _countryCode = '';
+
+  static String get platform => _platform;
+  static String get model => _model;
+  static String get brand => _brand;
+  static String get osVersion => _osVersion;
+  static String get country => _country;
+  static String get countryCode => _countryCode;
+
+  /// معرّف الجهاز الحالي
   static String get deviceId {
     try {
-      if (_box == null) return _fallbackId();
+      if (_box == null) return 'dev_unknown';
       final id = _box!.get(_kDeviceId);
       if (id is String && id.isNotEmpty) return id;
-      return _fallbackId();
+      return 'dev_unknown';
     } catch (_) {
-      return _fallbackId();
+      return 'dev_unknown';
     }
   }
 
-  static String _fallbackId() => 'dev_unknown';
-
-  /// تهيئة الخدمة وتسجيل الجهاز (تُستدعى من main)
+  /// تهيئة الخدمة وجمع بيانات الجهاز + تسجيله
   static Future<void> init({String appVersion = '1.0.0'}) async {
     try {
       if (!Hive.isBoxOpen(boxSettings)) {
@@ -43,45 +61,147 @@ class DeviceService {
         id = SecurityService.newDeviceId();
         await _box!.put(_kDeviceId, id);
       }
+
+      await _collectDeviceInfo();
+
       await ControlService.registerDevice(
         deviceId: id,
-        platform: _platform(),
+        platform: _platform,
         appVersion: appVersion,
-        model: _model(),
+        model: _model,
+        brand: _brand,
+        osVersion: _osVersion,
+        country: _country,
+        countryCode: _countryCode,
       );
     } catch (e) {
       if (kDebugMode) debugPrint('[DeviceService] init failed: $e');
     }
   }
 
-  static String _platform() {
-    if (kIsWeb) return 'web';
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return 'android';
-      case TargetPlatform.iOS:
-        return 'ios';
-      case TargetPlatform.windows:
-        return 'windows';
-      case TargetPlatform.macOS:
-        return 'macos';
-      case TargetPlatform.linux:
-        return 'linux';
-      default:
-        return 'unknown';
+  /// جمع معلومات الجهاز (نوع الهاتف + النظام + البلد)
+  static Future<void> _collectDeviceInfo() async {
+    try {
+      if (kIsWeb) {
+        _platform = 'web';
+        final info = DeviceInfoPlugin();
+        try {
+          final w = await info.webBrowserInfo;
+          _webInfo = w;
+          _brand = w.browserName.name.toUpperCase();
+          _model = w.browserName.name;
+          _osVersion = w.platform ?? '';
+        } catch (_) {
+          _brand = _detectBrowser();
+          _model = 'Web Browser';
+          _osVersion = '';
+        }
+      } else {
+        final info = DeviceInfoPlugin();
+        if (defaultTargetPlatform == TargetPlatform.android) {
+          final a = await info.androidInfo;
+          _platform = 'android';
+          _brand = _cap(a.manufacturer);
+          _model = a.model;
+          _osVersion = 'Android ${a.version.release}';
+        } else if (defaultTargetPlatform == TargetPlatform.iOS) {
+          final i = await info.iosInfo;
+          _platform = 'ios';
+          _brand = 'Apple';
+          _model = i.utsname.machine;
+          _osVersion = '${i.systemName} ${i.systemVersion}';
+        } else {
+          _platform = defaultTargetPlatform.name;
+          _model = _platform;
+        }
+      }
+    } catch (e) {
+      if (kDebugMode) debugPrint('[DeviceService] info failed: $e');
+      _platform = kIsWeb ? 'web' : defaultTargetPlatform.name;
+    }
+
+    // البلد من لغة/إعداد النظام
+    _detectCountry();
+  }
+
+  /// اسم المتصفح على الويب (best-effort من معلومات الجهاز)
+  static String _detectBrowser() {
+    if (!kIsWeb) return '';
+    try {
+      final info = _webInfo;
+      if (info == null) return 'Browser';
+      final ua = info.userAgent;
+      if (ua.contains('Edg')) return 'Edge';
+      if (ua.contains('OPR') || ua.contains('Opera')) return 'Opera';
+      if (ua.contains('Chrome')) return 'Chrome';
+      if (ua.contains('Firefox')) return 'Firefox';
+      if (ua.contains('Safari')) return 'Safari';
+      return 'Browser';
+    } catch (_) {
+      return 'Browser';
     }
   }
 
-  static String _model() {
-    if (kIsWeb) return 'Web Browser';
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return 'Android Device';
-      case TargetPlatform.iOS:
-        return 'iOS Device';
-      default:
-        return _platform();
+  /// معلومات المتصفح على الويب (تُملأ في _collectDeviceInfo)
+  static dynamic _webInfo;
+
+  static String _cap(String s) =>
+      s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
+
+  /// تحديد البلد من locale النظام (best-effort محلي بلا إنترنت)
+  static void _detectCountry() {
+    try {
+      final locales = ui.PlatformDispatcher.instance.locales;
+      final loc = locales.isNotEmpty ? locales.first : const ui.Locale('ar', 'EG');
+      _countryCode = (loc.countryCode ?? '').toUpperCase();
+      _country = _countryNameAr(_countryCode) ?? (_countryCode.isEmpty ? 'غير معروف' : _countryCode);
+    } catch (_) {
+      _countryCode = '';
+      _country = 'غير معروف';
     }
+  }
+
+  /// خريطة أسماء الدول العربية الشائعة
+  static const Map<String, String> _countryNames = {
+    'YE': 'اليمن',
+    'SA': 'السعودية',
+    'AE': 'الإمارات',
+    'EG': 'مصر',
+    'OM': 'عُمان',
+    'QA': 'قطر',
+    'KW': 'الكويت',
+    'BH': 'البحرين',
+    'JO': 'الأردن',
+    'IQ': 'العراق',
+    'SY': 'سوريا',
+    'LB': 'لبنان',
+    'PS': 'فلسطين',
+    'SD': 'السودان',
+    'LY': 'ليبيا',
+    'TN': 'تونس',
+    'DZ': 'الجزائر',
+    'MA': 'المغرب',
+    'MR': 'موريتانيا',
+    'SO': 'الصومال',
+    'DJ': 'جيبوتي',
+    'KM': 'جزر القمر',
+    'TR': 'تركيا',
+    'US': 'الولايات المتحدة',
+    'GB': 'المملكة المتحدة',
+    'IN': 'الهند',
+  };
+
+  static String? _countryNameAr(String code) => _countryNames[code.toUpperCase()];
+
+  /// تحديث بيانات البلد (يُستدعى من الواجهة إن أردنا قراءة locale الحقيقي)
+  static Future<void> setLocaleCountry(String code) async {
+    _countryCode = code.toUpperCase();
+    _country = _countryNameAr(_countryCode) ?? _countryCode;
+    await ControlService.updateDeviceInfo(
+      deviceId: deviceId,
+      country: _country,
+      countryCode: _countryCode,
+    );
   }
 
   /// ربط الجهاز بمستخدم/منشأة بعد الدخول
@@ -113,8 +233,61 @@ class DeviceService {
         userName: userName,
         accountCreated: true,
       );
+      // إن كان زائراً سابقاً، علّم أنه تحوّل لحساب
+      await ControlService.markGuestConverted(deviceId, companyId);
     } catch (e) {
-      if (kDebugMode) debugPrint('[DeviceService] markAccountCreated failed: $e');
+      if (kDebugMode) {
+        debugPrint('[DeviceService] markAccountCreated failed: $e');
+      }
     }
+  }
+
+  /// تسجيل دخول زائر
+  static Future<void> recordGuestVisit() async {
+    try {
+      await ControlService.registerGuest(
+        deviceId: deviceId,
+        platform: _platform,
+        model: deviceLabel(),
+        country: _country,
+        countryCode: _countryCode,
+      );
+    } catch (e) {
+      if (kDebugMode) debugPrint('[DeviceService] guest visit failed: $e');
+    }
+  }
+
+  /// تسجيل دخول Google
+  static Future<void> recordGoogleLogin({
+    required String uid,
+    required String email,
+    String displayName = '',
+    String photoUrl = '',
+    String companyId = '',
+  }) async {
+    try {
+      await ControlService.registerGoogleAccount(
+        id: uid.isNotEmpty ? uid : email,
+        email: email,
+        displayName: displayName,
+        photoUrl: photoUrl,
+        deviceId: deviceId,
+        platform: _platform,
+        model: deviceLabel(),
+        country: _country,
+        countryCode: _countryCode,
+        companyId: companyId,
+      );
+    } catch (e) {
+      if (kDebugMode) debugPrint('[DeviceService] google login failed: $e');
+    }
+  }
+
+  /// وصف مختصر للجهاز
+  static String deviceLabel() {
+    if (_brand.isEmpty && _model.isEmpty) return _platform;
+    if (_brand.isEmpty) return _model;
+    if (_model.isEmpty) return _brand;
+    return '$_brand $_model';
   }
 }

@@ -337,6 +337,10 @@ class DeviceRegistry {
   String platform; // android / ios / web
   String appVersion;
   String model; // طراز الجهاز (إن توفر)
+  String brand; // الشركة المصنّعة (Samsung/Xiaomi...)
+  String osVersion; // إصدار نظام التشغيل
+  String country; // البلد (من إعدادات الجهاز / رمز الدولة)
+  String countryCode; // رمز البلد ISO
 
   String firstSeenAt;
   String lastSeenAt;
@@ -355,6 +359,10 @@ class DeviceRegistry {
     this.platform = '',
     this.appVersion = '',
     this.model = '',
+    this.brand = '',
+    this.osVersion = '',
+    this.country = '',
+    this.countryCode = '',
     String? firstSeenAt,
     String? lastSeenAt,
     this.launchCount = 1,
@@ -366,11 +374,23 @@ class DeviceRegistry {
   })  : firstSeenAt = firstSeenAt ?? DateTime.now().toIso8601String(),
         lastSeenAt = lastSeenAt ?? DateTime.now().toIso8601String();
 
+  /// وصف مختصر للجهاز (الشركة + الطراز)
+  String get deviceLabel {
+    if (brand.isEmpty && model.isEmpty) return platform;
+    if (brand.isEmpty) return model;
+    if (model.isEmpty) return brand;
+    return '$brand $model';
+  }
+
   Map<String, dynamic> toMap() => {
         'deviceId': deviceId,
         'platform': platform,
         'appVersion': appVersion,
         'model': model,
+        'brand': brand,
+        'osVersion': osVersion,
+        'country': country,
+        'countryCode': countryCode,
         'firstSeenAt': firstSeenAt,
         'lastSeenAt': lastSeenAt,
         'launchCount': launchCount,
@@ -386,6 +406,10 @@ class DeviceRegistry {
         platform: m['platform'] as String? ?? '',
         appVersion: m['appVersion'] as String? ?? '',
         model: m['model'] as String? ?? '',
+        brand: m['brand'] as String? ?? '',
+        osVersion: m['osVersion'] as String? ?? '',
+        country: m['country'] as String? ?? '',
+        countryCode: m['countryCode'] as String? ?? '',
         firstSeenAt: m['firstSeenAt'] as String?,
         lastSeenAt: m['lastSeenAt'] as String?,
         launchCount: (m['launchCount'] as num?)?.toInt() ?? 1,
@@ -400,6 +424,10 @@ class DeviceRegistry {
     String? platform,
     String? appVersion,
     String? model,
+    String? brand,
+    String? osVersion,
+    String? country,
+    String? countryCode,
     String? lastSeenAt,
     int? launchCount,
     String? companyId,
@@ -413,6 +441,10 @@ class DeviceRegistry {
         platform: platform ?? this.platform,
         appVersion: appVersion ?? this.appVersion,
         model: model ?? this.model,
+        brand: brand ?? this.brand,
+        osVersion: osVersion ?? this.osVersion,
+        country: country ?? this.country,
+        countryCode: countryCode ?? this.countryCode,
         firstSeenAt: firstSeenAt,
         lastSeenAt: lastSeenAt ?? DateTime.now().toIso8601String(),
         launchCount: launchCount ?? this.launchCount,
@@ -420,6 +452,259 @@ class DeviceRegistry {
         userId: userId ?? this.userId,
         userName: userName ?? this.userName,
         accountCreated: accountCreated ?? this.accountCreated,
+        synced: synced ?? this.synced,
+      );
+}
+
+/// سجل عملية (نشاط) — يُستخدم لعدّادات العمليات لكل منشأة/مستخدم
+class OperationLog {
+  final String id;
+  final String companyId; // المنشأة التابع لها
+  final String userId; // المستخدم الذي قام بالعملية
+  final String userName;
+  final String action; // نوع العملية (invoice_create/login/...)
+  final String details;
+  final String createdAt;
+
+  OperationLog({
+    required this.id,
+    this.companyId = '',
+    this.userId = '',
+    this.userName = '',
+    required this.action,
+    this.details = '',
+    String? createdAt,
+  }) : createdAt = createdAt ?? DateTime.now().toIso8601String();
+
+  /// الوصف العربي للعملية
+  String get actionLabelAr {
+    const map = {
+      'login': 'تسجيل دخول',
+      'logout': 'تسجيل خروج',
+      'register_company': 'إنشاء منشأة',
+      'invoice_create': 'إنشاء فاتورة',
+      'invoice_delete': 'حذف فاتورة',
+      'payment_create': 'سند دفع/قبض',
+      'journal_create': 'قيد يومية',
+      'expense_create': 'مصروف',
+      'item_create': 'إضافة صنف',
+      'contact_create': 'إضافة جهة',
+      'user_create': 'إضافة مستخدم',
+      'update_user': 'تعديل مستخدم',
+      'password_reset_request': 'طلب استعادة كلمة مرور',
+      'sync': 'مزامنة',
+      'backup': 'نسخة احتياطية',
+      'guest_login': 'دخول زائر',
+      'google_login': 'دخول Google',
+    };
+    return map[action] ?? action;
+  }
+
+  Map<String, dynamic> toMap() => {
+        'id': id,
+        'companyId': companyId,
+        'userId': userId,
+        'userName': userName,
+        'action': action,
+        'details': details,
+        'createdAt': createdAt,
+      };
+
+  factory OperationLog.fromMap(Map<String, dynamic> m) => OperationLog(
+        id: m['id'].toString(),
+        companyId: m['companyId'] as String? ?? '',
+        userId: m['userId'] as String? ?? '',
+        userName: m['userName'] as String? ?? '',
+        action: m['action'] as String? ?? '',
+        details: m['details'] as String? ?? '',
+        createdAt: m['createdAt'] as String?,
+      );
+}
+
+/// حساب زائر (دخول بدون حساب) — يُسجَّل في قائمة منفصلة لدى مالك النظام
+class GuestAccount {
+  final String id;
+  String deviceId;
+  String platform;
+  String model;
+  String country;
+  String countryCode;
+  String firstSeenAt;
+  String lastSeenAt;
+  int visits;
+  bool converted; // هل أنشأ حساباً لاحقاً
+  String convertedToCompanyId;
+  bool synced;
+
+  GuestAccount({
+    required this.id,
+    this.deviceId = '',
+    this.platform = '',
+    this.model = '',
+    this.country = '',
+    this.countryCode = '',
+    String? firstSeenAt,
+    String? lastSeenAt,
+    this.visits = 1,
+    this.converted = false,
+    this.convertedToCompanyId = '',
+    this.synced = false,
+  })  : firstSeenAt = firstSeenAt ?? DateTime.now().toIso8601String(),
+        lastSeenAt = lastSeenAt ?? DateTime.now().toIso8601String();
+
+  Map<String, dynamic> toMap() => {
+        'id': id,
+        'deviceId': deviceId,
+        'platform': platform,
+        'model': model,
+        'country': country,
+        'countryCode': countryCode,
+        'firstSeenAt': firstSeenAt,
+        'lastSeenAt': lastSeenAt,
+        'visits': visits,
+        'converted': converted,
+        'convertedToCompanyId': convertedToCompanyId,
+        'synced': synced,
+      };
+
+  factory GuestAccount.fromMap(Map<String, dynamic> m) => GuestAccount(
+        id: m['id'].toString(),
+        deviceId: m['deviceId'] as String? ?? '',
+        platform: m['platform'] as String? ?? '',
+        model: m['model'] as String? ?? '',
+        country: m['country'] as String? ?? '',
+        countryCode: m['countryCode'] as String? ?? '',
+        firstSeenAt: m['firstSeenAt'] as String?,
+        lastSeenAt: m['lastSeenAt'] as String?,
+        visits: (m['visits'] as num?)?.toInt() ?? 1,
+        converted: m['converted'] as bool? ?? false,
+        convertedToCompanyId: m['convertedToCompanyId'] as String? ?? '',
+        synced: m['synced'] as bool? ?? false,
+      );
+
+  GuestAccount copyWith({
+    String? platform,
+    String? model,
+    String? country,
+    String? countryCode,
+    String? lastSeenAt,
+    int? visits,
+    bool? converted,
+    String? convertedToCompanyId,
+    bool? synced,
+  }) =>
+      GuestAccount(
+        id: id,
+        deviceId: deviceId,
+        platform: platform ?? this.platform,
+        model: model ?? this.model,
+        country: country ?? this.country,
+        countryCode: countryCode ?? this.countryCode,
+        firstSeenAt: firstSeenAt,
+        lastSeenAt: lastSeenAt ?? DateTime.now().toIso8601String(),
+        visits: visits ?? this.visits,
+        converted: converted ?? this.converted,
+        convertedToCompanyId: convertedToCompanyId ?? this.convertedToCompanyId,
+        synced: synced ?? this.synced,
+      );
+}
+
+/// حساب دخول عبر Google — يُسجَّل في قائمة منفصلة لدى مالك النظام
+class GoogleAccount {
+  final String id; // uid من Firebase أو معرّف البريد
+  String email;
+  String displayName;
+  String photoUrl;
+  String deviceId;
+  String platform;
+  String model;
+  String country;
+  String countryCode;
+  String firstSeenAt;
+  String lastSeenAt;
+  int loginCount;
+  String companyId; // المنشأة المرتبطة (إن وُجدت)
+  bool synced;
+
+  GoogleAccount({
+    required this.id,
+    this.email = '',
+    this.displayName = '',
+    this.photoUrl = '',
+    this.deviceId = '',
+    this.platform = '',
+    this.model = '',
+    this.country = '',
+    this.countryCode = '',
+    String? firstSeenAt,
+    String? lastSeenAt,
+    this.loginCount = 1,
+    this.companyId = '',
+    this.synced = false,
+  })  : firstSeenAt = firstSeenAt ?? DateTime.now().toIso8601String(),
+        lastSeenAt = lastSeenAt ?? DateTime.now().toIso8601String();
+
+  Map<String, dynamic> toMap() => {
+        'id': id,
+        'email': email,
+        'displayName': displayName,
+        'photoUrl': photoUrl,
+        'deviceId': deviceId,
+        'platform': platform,
+        'model': model,
+        'country': country,
+        'countryCode': countryCode,
+        'firstSeenAt': firstSeenAt,
+        'lastSeenAt': lastSeenAt,
+        'loginCount': loginCount,
+        'companyId': companyId,
+        'synced': synced,
+      };
+
+  factory GoogleAccount.fromMap(Map<String, dynamic> m) => GoogleAccount(
+        id: m['id'].toString(),
+        email: m['email'] as String? ?? '',
+        displayName: m['displayName'] as String? ?? '',
+        photoUrl: m['photoUrl'] as String? ?? '',
+        deviceId: m['deviceId'] as String? ?? '',
+        platform: m['platform'] as String? ?? '',
+        model: m['model'] as String? ?? '',
+        country: m['country'] as String? ?? '',
+        countryCode: m['countryCode'] as String? ?? '',
+        firstSeenAt: m['firstSeenAt'] as String?,
+        lastSeenAt: m['lastSeenAt'] as String?,
+        loginCount: (m['loginCount'] as num?)?.toInt() ?? 1,
+        companyId: m['companyId'] as String? ?? '',
+        synced: m['synced'] as bool? ?? false,
+      );
+
+  GoogleAccount copyWith({
+    String? displayName,
+    String? photoUrl,
+    String? deviceId,
+    String? platform,
+    String? model,
+    String? country,
+    String? countryCode,
+    String? lastSeenAt,
+    int? loginCount,
+    String? companyId,
+    bool? synced,
+  }) =>
+      GoogleAccount(
+        id: id,
+        email: email,
+        displayName: displayName ?? this.displayName,
+        photoUrl: photoUrl ?? this.photoUrl,
+        deviceId: deviceId ?? this.deviceId,
+        platform: platform ?? this.platform,
+        model: model ?? this.model,
+        country: country ?? this.country,
+        countryCode: countryCode ?? this.countryCode,
+        firstSeenAt: firstSeenAt,
+        lastSeenAt: lastSeenAt ?? DateTime.now().toIso8601String(),
+        loginCount: loginCount ?? this.loginCount,
+        companyId: companyId ?? this.companyId,
         synced: synced ?? this.synced,
       );
 }

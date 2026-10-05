@@ -23,6 +23,8 @@ class ControlService {
   static const boxCompanies = 'companies'; // حسابات المنشآت
   static const boxSystemOwner = 'system_owner'; // مالك النظام (مفتاح: owner)
   static const boxDevices = 'devices'; // سجل الأجهزة
+  static const boxGuests = 'guest_accounts'; // الزوار (دخول بدون حساب)
+  static const boxGoogle = 'google_accounts'; // حسابات Google
 
   static const String _ownerKey = 'owner';
   static const String _activeCompanyKey = 'activeCompanyId';
@@ -30,6 +32,8 @@ class ControlService {
   static Box get _companies => Hive.box(boxCompanies);
   static Box get _ownerBox => Hive.box(boxSystemOwner);
   static Box get _devices => Hive.box(boxDevices);
+  static Box get _guests => Hive.box(boxGuests);
+  static Box get _google => Hive.box(boxGoogle);
 
   static FirebaseFirestore? get _db {
     if (!FirebaseConfig.isConfigured) return null;
@@ -47,6 +51,8 @@ class ControlService {
     if (!Hive.isBoxOpen(boxCompanies)) await Hive.openBox(boxCompanies);
     if (!Hive.isBoxOpen(boxSystemOwner)) await Hive.openBox(boxSystemOwner);
     if (!Hive.isBoxOpen(boxDevices)) await Hive.openBox(boxDevices);
+    if (!Hive.isBoxOpen(boxGuests)) await Hive.openBox(boxGuests);
+    if (!Hive.isBoxOpen(boxGoogle)) await Hive.openBox(boxGoogle);
   }
 
   // ==========================================================================
@@ -345,6 +351,28 @@ class ControlService {
     return null;
   }
 
+  /// أجهزة مستخدم معيّن
+  static List<DeviceRegistry> devicesOfUser(String userId) =>
+      allDevices().where((d) => d.userId == userId).toList();
+
+  /// آخر جهاز استخدمه مستخدم (لجلب نوع الهاتف/الدولة)
+  static DeviceRegistry? lastDeviceOfUser(String userId) {
+    final list = devicesOfUser(userId);
+    if (list.isEmpty) return null;
+    return list.first;
+  }
+
+  /// أجهزة منشأة معيّنة
+  static List<DeviceRegistry> devicesOfCompany(String companyId) =>
+      allDevices().where((d) => d.companyId == companyId).toList();
+
+  /// آخر جهاز استُخدم لفتح منشأة (لجلب نوع الهاتف/الدولة للمستخدم الرئيسي)
+  static DeviceRegistry? lastDeviceOfCompany(String companyId) {
+    final list = devicesOfCompany(companyId);
+    if (list.isNotEmpty) return list.first;
+    return null;
+  }
+
   /// تسجيل/تحديث جهاز عند كل إقلاع للتطبيق.
   /// يُعيد معرّف الجهاز الحالي.
   static Future<String> registerDevice({
@@ -352,6 +380,10 @@ class ControlService {
     String platform = '',
     String appVersion = '1.0.0',
     String model = '',
+    String brand = '',
+    String osVersion = '',
+    String country = '',
+    String countryCode = '',
   }) async {
     final existing = deviceById(deviceId);
     final DeviceRegistry dev;
@@ -361,12 +393,21 @@ class ControlService {
         platform: platform,
         appVersion: appVersion,
         model: model,
+        brand: brand,
+        osVersion: osVersion,
+        country: country,
+        countryCode: countryCode,
         launchCount: 1,
       );
     } else {
       dev = existing.copyWith(
         platform: platform.isEmpty ? existing.platform : platform,
         appVersion: appVersion,
+        model: model.isEmpty ? existing.model : model,
+        brand: brand.isEmpty ? existing.brand : brand,
+        osVersion: osVersion.isEmpty ? existing.osVersion : osVersion,
+        country: country.isEmpty ? existing.country : country,
+        countryCode: countryCode.isEmpty ? existing.countryCode : countryCode,
         launchCount: existing.launchCount + 1,
         synced: false,
       );
@@ -374,6 +415,27 @@ class ControlService {
     await _devices.put(deviceId, dev.toMap());
     _pushDeviceToCloud(dev);
     return deviceId;
+  }
+
+  /// تحديث معلومات الجهاز (نوع/بلد) — يُستدعى عند توفّر بيانات أدقّ
+  static Future<void> updateDeviceInfo({
+    required String deviceId,
+    String country = '',
+    String countryCode = '',
+    String model = '',
+    String brand = '',
+  }) async {
+    final dev = deviceById(deviceId);
+    if (dev == null) return;
+    final updated = dev.copyWith(
+      country: country.isEmpty ? dev.country : country,
+      countryCode: countryCode.isEmpty ? dev.countryCode : countryCode,
+      model: model.isEmpty ? dev.model : model,
+      brand: brand.isEmpty ? dev.brand : brand,
+      synced: false,
+    );
+    await _devices.put(deviceId, updated.toMap());
+    _pushDeviceToCloud(updated);
   }
 
   /// ربط الجهاز بمنشأة/مستخدم (يُستدعى بعد الدخول)
@@ -398,6 +460,218 @@ class ControlService {
   }
 
   static Future<void> clearDevices() => _devices.clear();
+
+  // ==========================================================================
+  // ============================ الزوار (دخول بدون حساب) ============================
+  // ==========================================================================
+
+  static List<GuestAccount> allGuests() {
+    try {
+      final list = _guests.values
+          .whereType<Map>()
+          .map((m) => GuestAccount.fromMap(Map<String, dynamic>.from(m)))
+          .toList()
+        ..sort((a, b) => b.lastSeenAt.compareTo(a.lastSeenAt));
+      return list;
+    } catch (_) {
+      return [];
+    }
+  }
+
+  static GuestAccount? guestById(String id) {
+    final m = _guests.get(id);
+    if (m is Map) return GuestAccount.fromMap(Map<String, dynamic>.from(m));
+    return null;
+  }
+
+  /// تسجيل زيارة زائر (يُنشئ السجل أول مرة ثم يزيد العدّاد)
+  static Future<void> registerGuest({
+    required String deviceId,
+    String platform = '',
+    String model = '',
+    String country = '',
+    String countryCode = '',
+  }) async {
+    final id = 'guest_$deviceId';
+    final existing = guestById(id);
+    final GuestAccount g;
+    if (existing == null) {
+      g = GuestAccount(
+        id: id,
+        deviceId: deviceId,
+        platform: platform,
+        model: model,
+        country: country,
+        countryCode: countryCode,
+        visits: 1,
+      );
+    } else {
+      g = existing.copyWith(
+        platform: platform.isEmpty ? existing.platform : platform,
+        model: model.isEmpty ? existing.model : model,
+        country: country.isEmpty ? existing.country : country,
+        countryCode: countryCode.isEmpty ? existing.countryCode : countryCode,
+        visits: existing.visits + 1,
+        synced: false,
+      );
+    }
+    await _guests.put(id, g.toMap());
+    _pushGuestToCloud(g);
+  }
+
+  /// تعليم أن زائراً تحوّل إلى حساب منشأة
+  static Future<void> markGuestConverted(
+      String deviceId, String companyId) async {
+    final id = 'guest_$deviceId';
+    final g = guestById(id);
+    if (g == null) return;
+    final updated = g.copyWith(
+      converted: true,
+      convertedToCompanyId: companyId,
+      synced: false,
+    );
+    await _guests.put(id, updated.toMap());
+    _pushGuestToCloud(updated);
+  }
+
+  static Future<void> deleteGuest(String id) async {
+    await _guests.delete(id);
+    try {
+      await _db?.collection('guest_accounts').doc(id).delete();
+    } catch (_) {}
+  }
+
+  // ==========================================================================
+  // ============================ حسابات Google ============================
+  // ==========================================================================
+
+  static List<GoogleAccount> allGoogleAccounts() {
+    try {
+      final list = _google.values
+          .whereType<Map>()
+          .map((m) => GoogleAccount.fromMap(Map<String, dynamic>.from(m)))
+          .toList()
+        ..sort((a, b) => b.lastSeenAt.compareTo(a.lastSeenAt));
+      return list;
+    } catch (_) {
+      return [];
+    }
+  }
+
+  static GoogleAccount? googleById(String id) {
+    final m = _google.get(id);
+    if (m is Map) return GoogleAccount.fromMap(Map<String, dynamic>.from(m));
+    return null;
+  }
+
+  /// تسجيل/تحديث حساب Google
+  static Future<void> registerGoogleAccount({
+    required String id,
+    String email = '',
+    String displayName = '',
+    String photoUrl = '',
+    String deviceId = '',
+    String platform = '',
+    String model = '',
+    String country = '',
+    String countryCode = '',
+    String companyId = '',
+  }) async {
+    final existing = googleById(id);
+    final GoogleAccount g;
+    if (existing == null) {
+      g = GoogleAccount(
+        id: id,
+        email: email,
+        displayName: displayName,
+        photoUrl: photoUrl,
+        deviceId: deviceId,
+        platform: platform,
+        model: model,
+        country: country,
+        countryCode: countryCode,
+        companyId: companyId,
+        loginCount: 1,
+      );
+    } else {
+      g = existing.copyWith(
+        displayName: displayName.isEmpty ? existing.displayName : displayName,
+        photoUrl: photoUrl.isEmpty ? existing.photoUrl : photoUrl,
+        deviceId: deviceId.isEmpty ? existing.deviceId : deviceId,
+        platform: platform.isEmpty ? existing.platform : platform,
+        model: model.isEmpty ? existing.model : model,
+        country: country.isEmpty ? existing.country : country,
+        countryCode: countryCode.isEmpty ? existing.countryCode : countryCode,
+        companyId: companyId.isEmpty ? existing.companyId : companyId,
+        loginCount: existing.loginCount + 1,
+        synced: false,
+      );
+    }
+    await _google.put(id, g.toMap());
+    _pushGoogleToCloud(g);
+  }
+
+  static Future<void> deleteGoogleAccount(String id) async {
+    await _google.delete(id);
+    try {
+      await _db?.collection('google_accounts').doc(id).delete();
+    } catch (_) {}
+  }
+
+  // ==========================================================================
+  // ============================ بحث/فلتر/ترتيب المنشآت ============================
+  // ==========================================================================
+
+  /// بحث المنشآت بالاسم/اسم المستخدم/البريد/الهاتف
+  static List<CompanyAccount> search(String query) {
+    final q = query.trim().toLowerCase();
+    if (q.isEmpty) return allCompanies();
+    return allCompanies().where((c) {
+      return c.companyName.toLowerCase().contains(q) ||
+          c.username.toLowerCase().contains(q) ||
+          c.ownerName.toLowerCase().contains(q) ||
+          c.email.toLowerCase().contains(q) ||
+          c.phone.contains(q);
+    }).toList();
+  }
+
+  /// فلترة + ترتيب المنشآت.
+  /// [sort] : newest | mostOps | mostUsers | oldest
+  /// [withinDays] : عرض المنشآت خلال آخر N أيام (0 = الكل)
+  static List<CompanyAccount> filterAndSort({
+    String query = '',
+    String sort = 'newest',
+    int withinDays = 0,
+    required int Function(String companyId) opsCount,
+    required int Function(String companyId) usersCount,
+  }) {
+    var list = search(query);
+
+    // فلتر الفترة
+    if (withinDays > 0) {
+      final since = DateTime.now().subtract(Duration(days: withinDays));
+      list = list.where((c) {
+        final d = DateTime.tryParse(c.createdAt);
+        return d != null && d.isAfter(since);
+      }).toList();
+    }
+
+    switch (sort) {
+      case 'mostOps':
+        list.sort((a, b) => opsCount(b.id).compareTo(opsCount(a.id)));
+        break;
+      case 'mostUsers':
+        list.sort((a, b) => usersCount(b.id).compareTo(usersCount(a.id)));
+        break;
+      case 'oldest':
+        list.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+        break;
+      case 'newest':
+      default:
+        list.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    }
+    return list;
+  }
 
   // ==========================================================================
   // ============================ السحابة ============================
@@ -503,6 +777,62 @@ class ControlService {
       if (kDebugMode) debugPrint('[ControlService] pull companies fail: $e');
     }
     return count;
+  }
+
+  static Future<void> _pushGuestToCloud(GuestAccount g) async {
+    final db = _db;
+    if (db == null) return;
+    try {
+      await db.collection('guest_accounts').doc(g.id).set(
+        {
+          'id': g.id,
+          'deviceId': g.deviceId,
+          'platform': g.platform,
+          'model': g.model,
+          'country': g.country,
+          'countryCode': g.countryCode,
+          'firstSeenAt': g.firstSeenAt,
+          'lastSeenAt': g.lastSeenAt,
+          'visits': g.visits,
+          'converted': g.converted,
+          'convertedToCompanyId': g.convertedToCompanyId,
+          'updatedAt': FieldValue.serverTimestamp(),
+        },
+        SetOptions(merge: true),
+      );
+      await _guests.put(g.id, g.copyWith(synced: true).toMap());
+    } catch (e) {
+      if (kDebugMode) debugPrint('[ControlService] guest push fail: $e');
+    }
+  }
+
+  static Future<void> _pushGoogleToCloud(GoogleAccount g) async {
+    final db = _db;
+    if (db == null) return;
+    try {
+      await db.collection('google_accounts').doc(g.id).set(
+        {
+          'id': g.id,
+          'email': g.email,
+          'displayName': g.displayName,
+          'photoUrl': g.photoUrl,
+          'deviceId': g.deviceId,
+          'platform': g.platform,
+          'model': g.model,
+          'country': g.country,
+          'countryCode': g.countryCode,
+          'firstSeenAt': g.firstSeenAt,
+          'lastSeenAt': g.lastSeenAt,
+          'loginCount': g.loginCount,
+          'companyId': g.companyId,
+          'updatedAt': FieldValue.serverTimestamp(),
+        },
+        SetOptions(merge: true),
+      );
+      await _google.put(g.id, g.copyWith(synced: true).toMap());
+    } catch (e) {
+      if (kDebugMode) debugPrint('[ControlService] google push fail: $e');
+    }
   }
 
   static void logStatus() {

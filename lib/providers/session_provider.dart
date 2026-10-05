@@ -16,6 +16,7 @@ import '../services/auth_service.dart';
 import '../services/control_service.dart';
 import '../services/device_service.dart';
 import '../services/firebase_config.dart';
+import '../services/operation_service.dart';
 import '../services/push_notifications.dart';
 import '../services/sync_service.dart';
 import '../services/user_service.dart';
@@ -253,6 +254,9 @@ class SessionProvider extends ChangeNotifier {
       useRoleDefaults: true,
     ));
     _currentUser = guest;
+    // سجّل الزائر في لوحة مالك النظام (قائمة الزوار)
+    await DeviceService.recordGuestVisit();
+    await OperationService.log(action: 'guest_login');
     notifyListeners();
   }
 
@@ -364,6 +368,20 @@ class SessionProvider extends ChangeNotifier {
         _error = 'هذه المنشأة موقوفة — تواصل مع مالك النظام';
         return false;
       }
+      // سجّل حساب Google (أو حدّثه) في لوحة مالك النظام
+      await DeviceService.recordGoogleLogin(
+        uid: AuthService.currentUid ?? '',
+        email: email,
+        displayName: res.displayName ?? '',
+        photoUrl: res.photoUrl ?? '',
+        companyId: company.id,
+      );
+      await OperationService.log(
+        action: 'google_login',
+        companyId: company.id,
+        userName: res.displayName ?? email,
+        details: email,
+      );
       await _enterCompany(company);
       return true;
     } catch (e) {
@@ -384,6 +402,14 @@ class SessionProvider extends ChangeNotifier {
       userId: user.id,
       userName: user.name,
       action: 'login',
+      details: _activeCompany?.companyName ?? '',
+    );
+    // سجّل العملية في لوحة مالك النظام (عدّادات المنشآت/المستخدمين)
+    await OperationService.log(
+      action: 'login',
+      companyId: user.companyId,
+      userId: user.id,
+      userName: user.name,
       details: _activeCompany?.companyName ?? '',
     );
     await _pushTokenToUser();
