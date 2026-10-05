@@ -6,7 +6,6 @@ import 'package:provider/provider.dart';
 import '../providers/erp_provider.dart';
 import '../providers/session_provider.dart';
 import '../services/firebase_config.dart';
-import '../services/user_service.dart';
 import '../theme/app_theme.dart';
 import 'auth/login_screen.dart';
 import 'setup_screen.dart';
@@ -32,8 +31,8 @@ class _SplashScreenState extends State<SplashScreen> {
     final prov = Provider.of<ERPProvider>(context, listen: false);
     final session = Provider.of<SessionProvider>(context, listen: false);
 
-    // 1) إن لم يوجد مستخدمون => شاشة إنشاء المالك/الدخول أولاً
-    if (!UserService.hasUsers) {
+    // 1) اعرض شاشة الدخول الرئيسية دائماً (لتتيح الاختيار بين الأوضاع)
+    if (!session.isLoggedIn) {
       await Navigator.push(
         context,
         MaterialPageRoute(builder: (_) => const LoginScreen()),
@@ -41,11 +40,8 @@ class _SplashScreenState extends State<SplashScreen> {
       if (!mounted) return;
     }
 
-    // 2) إعادة تحميل الجلسة بعد الدخول
-    await session.bootstrap();
-
-    // 3) مزامنة تلقائية في الخلفية إن كانت السحابة مُفعّلة
-    if (FirebaseConfig.isConfigured) {
+    // 2) مزامنة تلقائية في الخلفية إن كانت السحابة مُفعّلة
+    if (FirebaseConfig.isConfigured && session.isCompanyMode) {
       // لا ننتظرها — تجري في الخلفية
       session.syncNow();
     }

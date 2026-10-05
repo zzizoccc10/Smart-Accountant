@@ -1,27 +1,43 @@
 // ============================================================================
 // خدمة المصادقة — AuthService
 // ----------------------------------------------------------------------------
-// تدعم وضعين:
-//   1) سحابي (Firebase Auth) عند تفعيل Firebase.
-//   2) محلي (بدون إنترنت) — مستخدم محلي افتراضي "المالك".
-// جميع العمليات تُغلَّف بأمان: إن فشلت السحابة، نكمل محلياً.
+// طبقة موحّدة فوق Firebase Auth (عند توفّر السحابة) مع دعم كامل للعمل المحلي.
+// تُستخدم لكل من: مالك النظام، أصحاب المنشآت، المستخدمين، والزوار.
+//
+// الميزات:
+//   • دخول/إنشاء بالبريد وكلمة المرور.
+//   • الدخول عبر Google (Web: popup، Android/iOS: google_sign_in).
+//   • إعادة تعيين كلمة المرور عبر البريد.
+//   • الدخول المجهول (Anonymous) لتأمين الكتابة السحابية.
+//   • كل العمليات محصّنة — لا تُسقط التطبيق إن فشلت.
 // ============================================================================
 import 'package:firebase_auth/firebase_auth.dart' as fb;
 import 'package:flutter/foundation.dart';
 
 import 'firebase_config.dart';
 
+/// نتيجة عملية مصادقة
 class AuthResult {
   final bool success;
   final String? uid;
   final String? email;
+  final String? displayName;
+  final String? photoUrl;
   final String? error;
+
   const AuthResult({
     required this.success,
     this.uid,
     this.email,
+    this.displayName,
+    this.photoUrl,
     this.error,
   });
+
+  static const AuthResult disabled = AuthResult(
+    success: false,
+    error: 'المصادقة السحابية غير مُفعّلة — سيتم الدخول محلياً',
+  );
 }
 
 class AuthService {
@@ -34,10 +50,8 @@ class AuthService {
     }
   }
 
-  /// هل المصادقة السحابية متاحة؟
   static bool get isCloudAvailable => _auth != null;
 
-  /// المستخدم الحالي (uid) أو null
   static String? get currentUid {
     try {
       return _auth?.currentUser?.uid;
@@ -54,15 +68,22 @@ class AuthService {
     }
   }
 
+  static String? get currentPhotoUrl {
+    try {
+      return _auth?.currentUser?.photoURL;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  // ==========================================================================
+  // ============================ البريد وكلمة المرور ============================
+  // ==========================================================================
+
   /// تسجيل الدخول بالبريد وكلمة المرور
   static Future<AuthResult> signIn(String email, String password) async {
     final auth = _auth;
-    if (auth == null) {
-      return const AuthResult(
-        success: false,
-        error: 'المصادقة السحابية غير مُفعّلة (لم يتم رفع إعدادات Firebase بعد)',
-      );
-    }
+    if (auth == null) return AuthResult.disabled;
     try {
       final cred = await auth.signInWithEmailAndPassword(
         email: email.trim(),
@@ -72,35 +93,41 @@ class AuthService {
         success: true,
         uid: cred.user?.uid,
         email: cred.user?.email,
+        displayName: cred.user?.displayName,
       );
     } on fb.FirebaseAuthException catch (e) {
-      return AuthResult(success: false, error: _mapError(e));
+      return AuthResult(success: false, error: mapError(e));
     } catch (e) {
       return AuthResult(success: false, error: 'فشل تسجيل الدخول: $e');
     }
   }
 
-  /// إنشاء حساب جديد
-  static Future<AuthResult> signUp(String email, String password) async {
+  /// إنشاء حساب جديد بالبريد وكلمة المرور
+  static Future<AuthResult> signUp(
+    String email,
+    String password, {
+    String? displayName,
+  }) async {
     final auth = _auth;
-    if (auth == null) {
-      return const AuthResult(
-        success: false,
-        error: 'المصادقة السحابية غير مُفعّلة',
-      );
-    }
+    if (auth == null) return AuthResult.disabled;
     try {
       final cred = await auth.createUserWithEmailAndPassword(
         email: email.trim(),
         password: password,
       );
+      if (displayName != null && displayName.trim().isNotEmpty) {
+        try {
+          await cred.user?.updateDisplayName(displayName.trim());
+        } catch (_) {}
+      }
       return AuthResult(
         success: true,
         uid: cred.user?.uid,
         email: cred.user?.email,
+        displayName: displayName,
       );
     } on fb.FirebaseAuthException catch (e) {
-      return AuthResult(success: false, error: _mapError(e));
+      return AuthResult(success: false, error: mapError(e));
     } catch (e) {
       return AuthResult(success: false, error: 'فشل إنشاء الحساب: $e');
     }
@@ -110,20 +137,91 @@ class AuthService {
   static Future<AuthResult> sendPasswordReset(String email) async {
     final auth = _auth;
     if (auth == null) {
-      return const AuthResult(success: false, error: 'غير مُفعّل');
+      return const AuthResult(
+        success: false,
+        error: 'إعادة التعيين عبر البريد تحتاج تفعيل السحابة',
+      );
     }
     try {
       await auth.sendPasswordResetEmail(email: email.trim());
       return const AuthResult(success: true);
     } on fb.FirebaseAuthException catch (e) {
-      return AuthResult(success: false, error: _mapError(e));
+      return AuthResult(success: false, error: mapError(e));
+    } catch (e) {
+      return AuthResult(success: false, error: 'تعذّر الإرسال: $e');
     }
   }
 
-  /// تسجيل دخول مجهول (Anonymous) — لتأمين الكتابة في Firestore.
-  /// يُستخدم عندما لا يوجد مستخدم مسجّل، حتى تُفعَّل قواعد الأمان
-  /// (request.auth != null) دون كسر المزامنة.
-  /// يُعيد true عند النجاح (أو عند وجود مستخدم بالفعل).
+  /// تغيير كلمة مرور المستخدم الحالي (يحتاج إعادة مصادقة آمنة)
+  static Future<AuthResult> updatePassword(String newPassword) async {
+    final auth = _auth;
+    final u = auth?.currentUser;
+    if (auth == null || u == null) return AuthResult.disabled;
+    try {
+      await u.updatePassword(newPassword);
+      return const AuthResult(success: true);
+    } on fb.FirebaseAuthException catch (e) {
+      return AuthResult(success: false, error: mapError(e));
+    } catch (e) {
+      return AuthResult(success: false, error: 'تعذّر تغيير كلمة المرور: $e');
+    }
+  }
+
+  // ==========================================================================
+  // ============================ الدخول عبر Google ============================
+  // ==========================================================================
+
+  /// تسجيل الدخول عبر Google.
+  /// • الويب: يستخدم signInWithPopup من firebase_auth.
+  /// • Android/iOS: يتطلّب تهيئة OAuth (SHA-1 + client id) — يُتخطّى بهدوء إن لم تُهيّأ.
+  static Future<AuthResult> signInWithGoogle() async {
+    final auth = _auth;
+    if (auth == null) {
+      return const AuthResult(
+        success: false,
+        error: 'الدخول عبر Google يحتاج تفعيل السحابة',
+      );
+    }
+    try {
+      if (kIsWeb) {
+        final provider = fb.GoogleAuthProvider();
+        provider.setCustomParameters({'prompt': 'select_account'});
+        final cred = await auth.signInWithPopup(provider);
+        return AuthResult(
+          success: true,
+          uid: cred.user?.uid,
+          email: cred.user?.email,
+          displayName: cred.user?.displayName,
+          photoUrl: cred.user?.photoURL,
+        );
+      }
+      // المنصّات الأصلية تتطلّب google_sign_in + تهيئة OAuth في Console.
+      return const AuthResult(
+        success: false,
+        error: 'الدخول عبر Google على الجوال يحتاج تهيئة OAuth في Firebase Console',
+      );
+    } on fb.FirebaseAuthException catch (e) {
+      if (e.code == 'operation-not-allowed') {
+        return const AuthResult(
+          success: false,
+          error: 'يجب تفعيل مزوّد Google من Firebase Console أولاً',
+        );
+      }
+      if (e.code == 'popup-closed-by-user' ||
+          e.code == 'cancelled-popup-request') {
+        return const AuthResult(success: false, error: 'أُلغي الدخول');
+      }
+      return AuthResult(success: false, error: mapError(e));
+    } catch (e) {
+      return AuthResult(success: false, error: 'تعذّر الدخول عبر Google: $e');
+    }
+  }
+
+  // ==========================================================================
+  // ============================ الدخول المجهول ============================
+  // ==========================================================================
+
+  /// تسجيل دخول مجهول (Anonymous) — لتأمين الكتابة في Firestore دون حساب.
   static Future<bool> ensureSignedIn() async {
     final auth = _auth;
     if (auth == null) return false;
@@ -132,20 +230,23 @@ class AuthService {
       await auth.signInAnonymously();
       return true;
     } catch (e) {
-      // قد يكون المزوّد المجهول غير مُفعّل في Firebase Console — نكمل محلياً
-      if (kDebugMode) debugPrint('[AuthService] anonymous sign-in skipped: $e');
+      if (kDebugMode) {
+        debugPrint('[AuthService] anonymous sign-in skipped: $e');
+      }
       return false;
     }
   }
 
-  /// تسجيل الخروج
+  // ==========================================================================
+  // ============================ الخروج والحالة ============================
+  // ==========================================================================
+
   static Future<void> signOut() async {
     try {
       await _auth?.signOut();
     } catch (_) {}
   }
 
-  /// بث تغيّر حالة الدخول
   static Stream<String?> authStateChanges() {
     final auth = _auth;
     if (auth == null) return const Stream.empty();
@@ -153,12 +254,13 @@ class AuthService {
   }
 
   /// ترجمة أخطاء Firebase إلى رسائل عربية
-  static String _mapError(fb.FirebaseAuthException e) {
+  static String mapError(fb.FirebaseAuthException e) {
     switch (e.code) {
       case 'user-not-found':
         return 'لا يوجد مستخدم بهذا البريد';
       case 'wrong-password':
-        return 'كلمة المرور غير صحيحة';
+      case 'invalid-credential':
+        return 'بيانات الدخول غير صحيحة';
       case 'invalid-email':
         return 'البريد الإلكتروني غير صالح';
       case 'user-disabled':
@@ -172,13 +274,14 @@ class AuthService {
       case 'network-request-failed':
         return 'تحقق من اتصال الإنترنت';
       case 'operation-not-allowed':
-        return 'طريقة الدخول بالبريد غير مُفعّلة في Firebase Console';
+        return 'طريقة الدخول هذه غير مُفعّلة في Firebase Console';
+      case 'requires-recent-login':
+        return 'أعد تسجيل الدخول ثم حاول مجدداً';
       default:
         return e.message ?? 'خطأ غير معروف (${e.code})';
     }
   }
 
-  /// تسجيل حالة عدم التوفر (للتشخيص)
   static void logStatus() {
     if (kDebugMode) {
       debugPrint('[AuthService] cloud available: $isCloudAvailable');

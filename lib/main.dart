@@ -17,6 +17,8 @@ import 'data/app_database.dart';
 import 'providers/erp_provider.dart';
 import 'providers/session_provider.dart';
 import 'services/auth_service.dart';
+import 'services/control_service.dart';
+import 'services/device_service.dart';
 import 'services/firebase_config.dart';
 import 'services/local_notifications.dart';
 import 'services/push_notifications.dart';
@@ -31,14 +33,18 @@ Future<void> main() async {
   // 1) التخزين المحلي
   await AppDatabase.init();
   await UserService.initBoxes();
+  await ControlService.initBoxes();
 
   // 2) Firebase (اختياري — يتخطى بهدوء إن لم تُرفع الإعدادات)
   await _initFirebase();
 
-  // 3) الإشعارات المحلية
+  // 3) تسجيل الجهاز (تتبّع التنزيلات)
+  await DeviceService.init();
+
+  // 4) الإشعارات المحلية
   await LocalNotifications.init();
 
-  // 4) الإشعارات السحابية (FCM)
+  // 5) الإشعارات السحابية (FCM)
   await PushNotifications.init();
 
   runApp(

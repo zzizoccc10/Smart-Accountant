@@ -195,6 +195,9 @@ class AppUser {
   final String id; // uid من Firebase Auth أو UUID محلي
   String name;
   String email;
+  String username; // اسم المستخدم (للدخول من داخل المنشأة)
+  String passwordHash; // تجزئة كلمة المرور (SHA-256 + salt)
+  String passwordSalt; // الملح
   String phone;
   UserRole role;
   Set<String> permissions; // صلاحيات مخصّصة (تتجاوز الدور إن وُجدت)
@@ -203,6 +206,8 @@ class AppUser {
   String? branchId; // الفرع المرتبط (اختياري)
   String? photoUrl;
   String? fcmToken; // رمز الإشعارات السحابية
+  String companyId; // المنشأة التابع لها المستخدم
+  String createdBy; // معرّف من أنشأ هذا المستخدم (المالك الرئيسي)
   String createdAt;
   String updatedAt;
   bool synced; // هل تمّت مزامنته مع السحابة
@@ -210,7 +215,10 @@ class AppUser {
   AppUser({
     required this.id,
     required this.name,
-    required this.email,
+    this.email = '',
+    this.username = '',
+    this.passwordHash = '',
+    this.passwordSalt = '',
     this.phone = '',
     this.role = UserRole.viewer,
     Set<String>? permissions,
@@ -219,12 +227,18 @@ class AppUser {
     this.branchId,
     this.photoUrl,
     this.fcmToken,
+    this.companyId = '',
+    this.createdBy = '',
     String? createdAt,
     String? updatedAt,
     this.synced = false,
   })  : permissions = permissions ?? {},
         createdAt = createdAt ?? DateTime.now().toIso8601String(),
         updatedAt = updatedAt ?? DateTime.now().toIso8601String();
+
+  /// هل لهذا المستخدم بيانات دخول محلية (اسم مستخدم + كلمة مرور)؟
+  bool get hasCredentials =>
+      username.isNotEmpty && passwordHash.isNotEmpty && passwordSalt.isNotEmpty;
 
   /// الصلاحيات الفعّالة (المخصّصة أو الافتراضية حسب الدور)
   Set<String> get effectivePermissions =>
@@ -250,6 +264,9 @@ class AppUser {
         'id': id,
         'name': name,
         'email': email,
+        'username': username,
+        'passwordHash': passwordHash,
+        'passwordSalt': passwordSalt,
         'phone': phone,
         'role': role.name,
         'permissions': permissions.toList(),
@@ -258,6 +275,8 @@ class AppUser {
         'branchId': branchId,
         'photoUrl': photoUrl,
         'fcmToken': fcmToken,
+        'companyId': companyId,
+        'createdBy': createdBy,
         'createdAt': createdAt,
         'updatedAt': updatedAt,
         'synced': synced,
@@ -267,6 +286,9 @@ class AppUser {
         id: m['id'] as String,
         name: m['name'] as String? ?? '',
         email: m['email'] as String? ?? '',
+        username: m['username'] as String? ?? '',
+        passwordHash: m['passwordHash'] as String? ?? '',
+        passwordSalt: m['passwordSalt'] as String? ?? '',
         phone: m['phone'] as String? ?? '',
         role: UserRoleX.fromKey(m['role'] as String?),
         permissions: ((m['permissions'] as List?) ?? const [])
@@ -277,6 +299,8 @@ class AppUser {
         branchId: m['branchId'] as String?,
         photoUrl: m['photoUrl'] as String?,
         fcmToken: m['fcmToken'] as String?,
+        companyId: m['companyId'] as String? ?? '',
+        createdBy: m['createdBy'] as String? ?? '',
         createdAt: m['createdAt'] as String?,
         updatedAt: m['updatedAt'] as String?,
         synced: m['synced'] as bool? ?? false,
@@ -285,6 +309,9 @@ class AppUser {
   AppUser copyWith({
     String? name,
     String? email,
+    String? username,
+    String? passwordHash,
+    String? passwordSalt,
     String? phone,
     UserRole? role,
     Set<String>? permissions,
@@ -293,12 +320,17 @@ class AppUser {
     String? branchId,
     String? photoUrl,
     String? fcmToken,
+    String? companyId,
+    String? createdBy,
     bool? synced,
   }) =>
       AppUser(
         id: id,
         name: name ?? this.name,
         email: email ?? this.email,
+        username: username ?? this.username,
+        passwordHash: passwordHash ?? this.passwordHash,
+        passwordSalt: passwordSalt ?? this.passwordSalt,
         phone: phone ?? this.phone,
         role: role ?? this.role,
         permissions: permissions ?? this.permissions,
@@ -307,6 +339,8 @@ class AppUser {
         branchId: branchId ?? this.branchId,
         photoUrl: photoUrl ?? this.photoUrl,
         fcmToken: fcmToken ?? this.fcmToken,
+        companyId: companyId ?? this.companyId,
+        createdBy: createdBy ?? this.createdBy,
         createdAt: createdAt,
         updatedAt: DateTime.now().toIso8601String(),
         synced: synced ?? this.synced,

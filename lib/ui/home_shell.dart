@@ -5,7 +5,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/erp_provider.dart';
+import '../providers/session_provider.dart';
+import '../models/user_models.dart';
+import '../services/user_service.dart';
 import '../theme/app_theme.dart';
+import 'auth/login_screen.dart';
 import 'dashboard_screen.dart';
 import 'sales/sales_home.dart';
 import 'sales/orders_list_screen.dart';
@@ -17,6 +21,8 @@ import 'assets/assets_home.dart';
 import 'alerts_screen.dart';
 import 'settings/notifications_screen.dart';
 import 'settings_screen.dart';
+import 'system_owner/system_owner_dashboard.dart';
+import 'users/sub_users_screen.dart';
 
 class HomeShell extends StatefulWidget {
   const HomeShell({super.key});
@@ -263,6 +269,9 @@ class _HomeShellState extends State<HomeShell> {
 
   Widget _buildDrawer(BuildContext context) {
     final prov = context.read<ERPProvider>();
+    final session = context.watch<SessionProvider>();
+    final user = session.currentUser;
+    final company = session.activeCompany;
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
@@ -279,17 +288,56 @@ class _HomeShellState extends State<HomeShell> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                const Icon(
-                  Icons.account_balance_wallet_rounded,
-                  size: 44,
-                  color: Colors.white,
+                Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 22,
+                      backgroundColor: Colors.white.withValues(alpha: 0.2),
+                      child: Text(
+                        user?.initials ?? '؟',
+                        style: const TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            user?.name ?? 'زائر',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            user != null
+                                ? '${user.role.labelAr}${company != null ? ' • ${company.companyName}' : ''}'
+                                : 'المحاسب السهل — ERP',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.85),
+                              fontSize: 11,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 8),
                 Text(
                   prov.companyName,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 18,
+                    fontSize: 15,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -297,12 +345,30 @@ class _HomeShellState extends State<HomeShell> {
                   'المحاسب السهل — ERP',
                   style: TextStyle(
                     color: Colors.white.withValues(alpha: 0.85),
-                    fontSize: 12,
+                    fontSize: 11,
                   ),
                 ),
               ],
             ),
           ),
+          // لوحة تحكم مالك النظام (تظهر فقط في وضع مالك النظام)
+          if (session.isSystemOwner) ...[
+            ListTile(
+              leading: const Icon(Icons.admin_panel_settings,
+                  color: AppColors.purple),
+              title: const Text('لوحة تحكم مالك النظام'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const SystemOwnerDashboard(),
+                  ),
+                );
+              },
+            ),
+            const Divider(),
+          ],
           _tile(context, Icons.dashboard_rounded, 'الرئيسية', 0),
           _tile(context, Icons.point_of_sale_rounded, 'البيع والشراء', 1),
           ListTile(
@@ -313,8 +379,7 @@ class _HomeShellState extends State<HomeShell> {
               Navigator.pop(context);
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                    builder: (_) => const OrdersListScreen()),
+                MaterialPageRoute(builder: (_) => const OrdersListScreen()),
               );
             },
           ),
@@ -322,6 +387,26 @@ class _HomeShellState extends State<HomeShell> {
           _tile(context, Icons.account_balance_rounded, 'الحسابات', 3),
           _tile(context, Icons.bar_chart_rounded, 'التقارير', 4),
           const Divider(),
+          // مستخدمو المنشأة (للمالك/المدير فقط)
+          if (user != null &&
+              (user.isOwner ||
+                  user.can(Perm.usersManage) ||
+                  user.can(Perm.usersView)))
+            ListTile(
+              leading: const Icon(Icons.people_alt, color: AppColors.primary),
+              title: const Text('مستخدمو المنشأة'),
+              subtitle: Text(
+                '${(UserService.ofCompany(session.currentCompanyId)).length} مستخدم',
+                style: const TextStyle(fontSize: 11),
+              ),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const SubUsersScreen()),
+                );
+              },
+            ),
           ListTile(
             leading: const Icon(Icons.groups, color: AppColors.teal),
             title: const Text('الموارد البشرية'),
@@ -355,6 +440,38 @@ class _HomeShellState extends State<HomeShell> {
               );
             },
           ),
+          const Divider(),
+          ListTile(
+            leading: const Icon(Icons.logout, color: AppColors.danger),
+            title: const Text('تسجيل الخروج'),
+            onTap: () async {
+              final ok = await showDialog<bool>(
+                context: context,
+                builder: (dlgCtx) => AlertDialog(
+                  title: const Text('تسجيل الخروج'),
+                  content: const Text('هل تريد تسجيل الخروج والعودة لشاشة الدخول؟'),
+                  actions: [
+                    TextButton(
+                        onPressed: () => Navigator.pop(dlgCtx, false),
+                        child: const Text('إلغاء')),
+                    ElevatedButton(
+                        onPressed: () => Navigator.pop(dlgCtx, true),
+                        child: const Text('خروج')),
+                  ],
+                ),
+              );
+              if (ok == true && context.mounted) {
+                await context.read<SessionProvider>().signOut();
+                if (!context.mounted) return;
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                      builder: (_) => const LoginScreen()),
+                  (route) => false,
+                );
+              }
+            },
+          ),
+          const SizedBox(height: 8),
         ],
       ),
     );

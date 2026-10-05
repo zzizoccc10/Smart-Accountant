@@ -11,6 +11,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import '../data/app_database.dart';
 import '../models/user_models.dart';
 import 'firebase_config.dart';
+import 'security_service.dart';
 
 class UserService {
   static const boxUsers = 'users';
@@ -61,10 +62,95 @@ class UserService {
 
   static AppUser? byEmail(String email) {
     final e = email.trim().toLowerCase();
+    if (e.isEmpty) return null;
     for (final u in all()) {
       if (u.email.toLowerCase() == e) return u;
     }
     return null;
+  }
+
+  /// البحث باسم المستخدم (للدخول من داخل المنشأة)
+  static AppUser? byUsername(String username) {
+    final key = username.trim().toLowerCase();
+    if (key.isEmpty) return null;
+    for (final u in all()) {
+      if (u.username.toLowerCase() == key) return u;
+    }
+    return null;
+  }
+
+  /// البحث ببريد أو اسم مستخدم (موحّد لشاشة الدخول)
+  static AppUser? byLogin(String login) {
+    return byEmail(login) ?? byUsername(login);
+  }
+
+  /// التحقق من بيانات دخول مستخدم (اسم مستخدم/بريد + كلمة مرور)
+  static AppUser? verifyCredentials(String login, String password) {
+    final u = byLogin(login);
+    if (u == null) return null;
+    if (!u.hasCredentials) return null;
+    if (!SecurityService.verify(password, u.passwordHash, u.passwordSalt)) {
+      return null;
+    }
+    return u;
+  }
+
+  /// إنشاء مستخدم ببيانات دخول (اسم مستخدم + كلمة مرور) من داخل الحساب الرئيسي
+  static Future<AppUser> createWithCredentials({
+    required String name,
+    required String username,
+    required String password,
+    String email = '',
+    String phone = '',
+    required UserRole role,
+    Set<String>? permissions,
+    bool useRoleDefaults = true,
+    String? branchId,
+    String companyId = '',
+    String createdBy = '',
+  }) async {
+    final cred = SecurityService.createPassword(password);
+    final u = AppUser(
+      id: newId(),
+      name: name.trim(),
+      username: username.trim(),
+      passwordHash: cred.hash,
+      passwordSalt: cred.salt,
+      email: email.trim(),
+      phone: phone.trim(),
+      role: role,
+      permissions: permissions ?? {},
+      useRoleDefaults: useRoleDefaults,
+      branchId: branchId,
+      companyId: companyId,
+      createdBy: createdBy,
+    );
+    return create(u);
+  }
+
+  /// تغيير كلمة مرور مستخدم
+  static Future<void> setPassword(String userId, String newPassword) async {
+    final u = byId(userId);
+    if (u == null) return;
+    final cred = SecurityService.createPassword(newPassword);
+    await update(u.copyWith(
+      passwordHash: cred.hash,
+      passwordSalt: cred.salt,
+    ));
+  }
+
+  /// عدد مستخدمي منشأة معيّنة
+  static int countOfCompany(String companyId) {
+    if (companyId.isEmpty) return all().length;
+    return all().where((u) => u.companyId == companyId).length;
+  }
+
+  /// مستخدمو منشأة معيّنة
+  static List<AppUser> ofCompany(String companyId, {String? excludeId}) {
+    return all()
+        .where((u) =>
+            u.companyId == companyId && (excludeId == null || u.id != excludeId))
+        .toList();
   }
 
   /// هل يوجد أي مستخدم مُعرَّف؟ (لتحديد إن كنا بحاجة لإنشاء المالك الأول)
