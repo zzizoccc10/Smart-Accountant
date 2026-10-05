@@ -1466,8 +1466,9 @@ class ERPProvider extends ChangeNotifier {
         referenceId: it.id,
       );
       await AppDatabase.saveNotification(n);
-      if (push)
+      if (push) {
         await LocalNotifications.lowStock(it.name, qty, it.reorderLevel);
+      }
       created++;
     }
 

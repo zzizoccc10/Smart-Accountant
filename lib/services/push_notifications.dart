@@ -74,8 +74,9 @@ class PushNotifications {
 
       // إشعار في المقدمة
       FirebaseMessaging.onMessage.listen((msg) {
-        if (kDebugMode)
+        if (kDebugMode) {
           debugPrint('[FCM] foreground: ${msg.notification?.title}');
+        }
         onForegroundMessage?.call(msg);
       });
 
