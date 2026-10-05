@@ -51,6 +51,9 @@ class OperationService {
         details: details,
       );
       await _box.put(op.id, op.toMap());
+      _cache = null; // إبطال الذاكرة المؤقتة للعدّادات
+      _byCompany = null;
+      _byUser = null;
       // تقليم السجل المحلي عند تجاوز الحد
       if (_box.length > _maxLocal) {
         final list = all();
@@ -87,13 +90,50 @@ class OperationService {
   static List<OperationLog> ofUser(String userId) =>
       all().where((o) => o.userId == userId).toList();
 
+  // ---------------------------- عدّادات سريعة (ذاكرة مؤقتة) ----------------------------
+  // تجنّباً لمسح السجل كاملاً في كل استدعاء (قد تكون هناك آلاف العمليات).
+  static List<OperationLog>? _cache;
+  static int _cacheLen = -1;
+  static Map<String, int>? _byCompany;
+  static Map<String, int>? _byUser;
+
+  static List<OperationLog> _cachedAll() {
+    if (_cache != null && _cacheLen == _box.length) return _cache!;
+    final fresh = all();
+    _cache = fresh;
+    _cacheLen = _box.length;
+    _byCompany = null;
+    _byUser = null;
+    return fresh;
+  }
+
+  static Map<String, int> _companyIndex() {
+    if (_byCompany != null) return _byCompany!;
+    final m = <String, int>{};
+    for (final o in _cachedAll()) {
+      if (o.companyId.isEmpty) continue;
+      m[o.companyId] = (m[o.companyId] ?? 0) + 1;
+    }
+    return _byCompany = m;
+  }
+
+  static Map<String, int> _userIndex() {
+    if (_byUser != null) return _byUser!;
+    final m = <String, int>{};
+    for (final o in _cachedAll()) {
+      if (o.userId.isEmpty) continue;
+      m[o.userId] = (m[o.userId] ?? 0) + 1;
+    }
+    return _byUser = m;
+  }
+
   /// عدد عمليات منشأة
   static int countOfCompany(String companyId) =>
-      companyId.isEmpty ? 0 : ofCompany(companyId).length;
+      companyId.isEmpty ? 0 : (_companyIndex()[companyId] ?? 0);
 
   /// عدد عمليات مستخدم
   static int countOfUser(String userId) =>
-      userId.isEmpty ? 0 : ofUser(userId).length;
+      userId.isEmpty ? 0 : (_userIndex()[userId] ?? 0);
 
   /// عدد عمليات منشأة خلال فترة (عدد الأيام للخلف)
   static int countOfCompanySince(String companyId, int days) {
@@ -110,7 +150,12 @@ class OperationService {
     return all().where((o) => o.createdAt.startsWith(today)).length;
   }
 
-  static Future<void> clearAll() => _box.clear();
+  static Future<void> clearAll() async {
+    _cache = null;
+    _byCompany = null;
+    _byUser = null;
+    await _box.clear();
+  }
 
   // ---------------------------- السحابة ----------------------------
   static Future<void> _pushToCloud(OperationLog op) async {

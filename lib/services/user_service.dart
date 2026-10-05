@@ -11,6 +11,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import '../data/app_database.dart';
 import '../models/user_models.dart';
 import 'firebase_config.dart';
+import 'operation_service.dart';
 import 'security_service.dart';
 
 class UserService {
@@ -248,6 +249,16 @@ class UserService {
       details: details,
     );
     await _activity.put(act.id, act.toMap());
+    // سجّل العملية أيضاً في لوحة تحكم مالك النظام (عدّادات المنشآت/المستخدمين)
+    try {
+      await OperationService.log(
+        action: action,
+        companyId: AppDatabase.getSetting('companyId', ''),
+        userId: userId,
+        userName: userName,
+        details: details,
+      );
+    } catch (_) {}
   }
 
   static List<UserActivity> recentActivity({int limit = 100}) {
